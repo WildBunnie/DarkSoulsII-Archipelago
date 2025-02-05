@@ -36,7 +36,7 @@ typedef char(__thiscall* itemGive_t)(UINT_PTR thisPtr, ItemStruct* itemsList, IN
 typedef void(__cdecl* createPopupStructure_t)(UINT_PTR displayStruct, ItemStruct* items, INT amountOfItems, INT displayMode);
 
 // this function displays the item popup
-typedef void(__thiscall* showItemPopup_t)(UINT_PTR thisPtr, UINT_PTR idk);
+typedef void(__thiscall* showItemPopup_t)(UINT_PTR thisPtr, UINT_PTR displayStruct);
 
 // used to check when player clicks the create new game button
 typedef void(__thiscall* selectMenuOption_t)(UINT_PTR thisPtr);
