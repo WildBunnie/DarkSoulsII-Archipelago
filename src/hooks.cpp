@@ -1,6 +1,6 @@
-#include <windows.h>
 #include <minhook.h>
 #include <iostream>
+
 #include "hooks.h"
 
 bool showItem;

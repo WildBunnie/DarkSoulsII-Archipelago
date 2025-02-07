@@ -1,5 +1,11 @@
 {
   "dependencies": [
-    "minhook"
+    "asio",
+    "minhook",
+    "nlohmann-json",
+    "spdlog",
+    "valijson",
+    "websocketpp",
+    "zlib"
   ]
 }

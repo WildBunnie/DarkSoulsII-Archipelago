@@ -1,16 +1,24 @@
-#include <windows.h>
+#pragma comment(lib, "Crypt32.lib")
+
 #include <stdio.h>
 #include <iostream>
+
+#include "Core.h"
 #include "hooks.h"
+
+ClientCore* CCore;
 
 DWORD WINAPI Init(LPVOID lpParam) {
     AllocConsole();
     freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+    freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
 
     HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
     DWORD baseAddress = (DWORD)hModule;
 
     initHooks();
+
+    CCore->Start();
 
     int prevHp, curHp = -1;
     while (true) {

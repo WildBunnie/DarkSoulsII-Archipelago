@@ -3,6 +3,8 @@
 
 #include <windows.h>
 #include <vector>
+#include <WinSock2.h>
+#include <winsock.h>
 
 bool initHooks();
 DWORD GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DWORD> offsets);
