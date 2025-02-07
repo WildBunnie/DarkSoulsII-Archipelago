@@ -6,6 +6,7 @@
 bool showItem = true;
 DWORD baseAddress;
 
+getaddrinfo_t originalGetaddrinfo = nullptr;
 checkLocation_t originalCheckLocation = nullptr;
 itemGive_t originalItemGive = nullptr;
 createPopupStructure_t originalCreatePopupStructure = nullptr;
@@ -91,14 +92,13 @@ void overwriteItemLots() {
 
 // ============================= HOOKS =============================
 
-int __stdcall detourConnect(SOCKET, const sockaddr*, int namelen)
-{
-    return SOCKET_ERROR;
-}
+INT __stdcall detourGetaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHints, PADDRINFOA* ppResult) {
 
-int __stdcall detourWSAGetLastError()
-{
-    return WSAENETDOWN;
+    if (address && strcmp(address, "frpg2-steam-ope.fromsoftware.jp") == 0) {
+        return EAI_FAIL;
+    }
+
+    return originalGetaddrinfo(address, port, pHints, ppResult);
 }
 
 void __fastcall detourCheckLocation(UINT_PTR thisPtr, void* Unknown, UINT_PTR idk) {
@@ -166,8 +166,7 @@ bool initHooks() {
 
     MH_Initialize();
 
-    MH_CreateHookApi(L"ws2_32", "connect", &detourConnect, NULL);
-    MH_CreateHookApi(L"ws2_32", "WSAGetLastError", &detourWSAGetLastError, NULL);
+    MH_CreateHookApi(L"ws2_32", "getaddrinfo", &detourGetaddrinfo, (LPVOID*)&originalGetaddrinfo);
 
     MH_CreateHook((LPVOID)(baseAddress + 0x257060), &detourCheckLocation, (LPVOID*)&originalCheckLocation);
     MH_CreateHook((LPVOID)(baseAddress + 0x22AD20), &detourItemGive, (LPVOID*)&originalItemGive);

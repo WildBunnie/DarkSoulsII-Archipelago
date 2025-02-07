@@ -5,6 +5,7 @@
 #include <vector>
 #include <WinSock2.h>
 #include <winsock.h>
+#include <Ws2tcpip.h>
 
 bool initHooks();
 DWORD GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DWORD> offsets);
@@ -24,9 +25,9 @@ struct ItemStruct {
     Item items[8];
 };
 
-// hooking this functions to always start the game offline
-typedef int(__stdcall* connect_t)(SOCKET, const sockaddr*, int namelen);
-typedef int(__stdcall* WSAGetLastError_t)();
+// hooking this function to always start the game offline
+// by blocking the game's dns lookup
+typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const ADDRINFOA* pHints, PADDRINFOA* ppResult);
 
 // fuction is called when an itemlot is picked up
 typedef void(__thiscall* checkLocation_t)(UINT_PTR thisPtr, UINT_PTR idk);
