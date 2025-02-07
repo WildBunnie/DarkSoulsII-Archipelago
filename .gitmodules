@@ -1,12 +1,12 @@
-[submodule "subprojects/apclientpp"]
-	path = subprojects/apclientpp
-	url = git@github.com:black-sliver/apclientpp.git
-[submodule "subprojects/wswrap"]
-	path = subprojects/wswrap
+[submodule "client/subprojects/apclientpp"]
+	path = client/subprojects/apclientpp
+	url = https://github.com/black-sliver/apclientpp.git
+[submodule "client/subprojects/wswrap"]
+	path = client/subprojects/wswrap
 	url = https://github.com/black-sliver/wswrap.git
-[submodule "subprojects/zlib"]
-	path = subprojects/zlib
-	url = git@github.com:madler/zlib.git
-[submodule "subprojects/openssl"]
-	path = subprojects/openssl
-	url = git@github.com:openssl/openssl.git
+[submodule "client/subprojects/zlib"]
+	path = client/subprojects/zlib
+	url = https://github.com/madler/zlib.git
+[submodule "client/subprojects/openssl"]
+	path = client/subprojects/openssl
+	url = https://github.com/openssl/openssl.git
