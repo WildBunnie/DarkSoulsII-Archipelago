@@ -3,7 +3,7 @@
 
 #include "hooks.h"
 
-bool showItem;
+bool showItem = true;
 DWORD baseAddress;
 
 checkLocation_t originalCheckLocation = nullptr;
@@ -53,7 +53,7 @@ void giveItems(std::vector<int> ids) {
     VirtualFree((LPVOID)displayStruct, 0, MEM_RELEASE);
 }
 
-void overrideItemLots() {
+void overwriteItemLots() {
 
     DWORD itemLotsAddress = GetPointerAddress(baseAddress, 0x1150414, { 0x60, 0x30, 0x94, 0x2C });
     DWORD firstLotAddress = itemLotsAddress + 0x20;
@@ -66,7 +66,15 @@ void overrideItemLots() {
 
         ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pointer), &curItemLotId, sizeof(int), NULL);
         ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pointer + 4), &curOffset, sizeof(int), NULL);
-        for (int i = 0; i < 8; i++) {
+
+        // skip if it's a bird trade
+        // TODO: maybe make bird trades a location
+        if (curItemLotId >= 50000000 && curItemLotId <= 50000303) {
+            pointer += 12;
+            continue;
+        }
+
+        for (int i = 0; i < 10; i++) {
             ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(itemLotsAddress + curOffset + i * 4), &curItemId, sizeof(int), NULL);
             if (curItemId == 0 || curItemId == 10) {
                 continue;
@@ -135,7 +143,7 @@ void __fastcall detourSelectMenuOption(UINT_PTR thisPtr, void* Unknown) {
 
     if (menuOptionId == 1) {
         std::cout << "created a new game" << std::endl;
-        overrideItemLots();
+        overwriteItemLots();
     }
 }
 
@@ -146,7 +154,7 @@ void __fastcall detourSelectSaveSlot(UINT_PTR thisPtr, void* Unknown) {
 
     std::cout << "loaded save " << slotId << std::endl;
 
-    overrideItemLots();
+    overwriteItemLots();
 
     originalSelectSaveSlot(thisPtr);
 }
