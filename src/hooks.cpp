@@ -101,11 +101,15 @@ INT __stdcall detourGetaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHin
     return originalGetaddrinfo(address, port, pHints, ppResult);
 }
 
+int locationAmount = 0;
 void __fastcall detourCheckLocation(UINT_PTR thisPtr, void* Unknown, UINT_PTR idk) {
     int itemLotId = 0;
     ReadProcessMemory(GetCurrentProcess(), (LPCVOID)(thisPtr + 8), &itemLotId, sizeof(itemLotId), 0);
 
-    std::cout << "just checked item location: " << itemLotId << std::endl;
+    for (int i = 0; i < locationAmount; i++) {
+        std::cout << "just checked item location: " << itemLotId + i << std::endl;
+    }
+    locationAmount = 0;
 
     return originalCheckLocation(thisPtr, idk);
 }
@@ -119,8 +123,12 @@ char __fastcall detourItemGive(UINT_PTR thisPtr, void* Unknown, ItemStruct* item
         // we don't give the player the item
         if (item->itemId == 60375000) {
             showItem = false;
-            return 1;
+            locationAmount++;
         }
+    }
+
+    if (!showItem) {
+        return 1;
     }
 
     return originalItemGive(thisPtr, itemsList, amountToGive, param_3);
