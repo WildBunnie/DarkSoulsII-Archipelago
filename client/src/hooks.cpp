@@ -7,7 +7,7 @@ bool showItem = true;
 DWORD baseAddress;
 
 getaddrinfo_t originalGetaddrinfo = nullptr;
-checkLocation_t originalCheckLocation = nullptr;
+pickupItemLot_t originalPickupItemLot = nullptr;
 itemGive_t originalItemGive = nullptr;
 createPopupStructure_t originalCreatePopupStructure = nullptr;
 showItemPopup_t originalShowItemPopup = nullptr;
@@ -67,6 +67,18 @@ void overwriteItemLots() {
 
         ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pointer), &curItemLotId, sizeof(int), NULL);
         ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pointer + 4), &curOffset, sizeof(int), NULL);
+        
+        // id of the last itemLot from ItemLotParam2_Other
+        if (curItemLotId == 99996008) {
+            break;
+        }
+
+        // for now only override for items that are pickups
+        // TODO: make events, boss rewards, ... into locations
+        if (curItemLotId < 10025010 || curItemLotId > 50376770) {
+            pointer += 12;
+            continue;
+        }
 
         // skip if it's a bird trade
         // TODO: maybe make bird trades a location
@@ -83,10 +95,6 @@ void overwriteItemLots() {
             WriteProcessMemory(GetCurrentProcess(), (LPVOID*)(itemLotsAddress + curOffset + i * 4), &itemToReplaceId, sizeof(int), NULL);
         }
         pointer += 12;
-
-        if (curItemLotId == 99996008) {
-            break;
-        }
     }
 }
 
@@ -102,16 +110,16 @@ INT __stdcall detourGetaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHin
 }
 
 int locationAmount = 0;
-void __fastcall detourCheckLocation(UINT_PTR thisPtr, void* Unknown, UINT_PTR idk) {
+void __fastcall detourPickupItemLot(UINT_PTR thisPtr, void* Unknown, UINT_PTR idk) {
     int itemLotId = 0;
     ReadProcessMemory(GetCurrentProcess(), (LPCVOID)(thisPtr + 8), &itemLotId, sizeof(itemLotId), 0);
 
     for (int i = 0; i < locationAmount; i++) {
-        std::cout << "just checked item location: " << itemLotId + i << std::endl;
+        std::cout << "just picked up itemlot with id: " << itemLotId + i << std::endl;
     }
     locationAmount = 0;
 
-    return originalCheckLocation(thisPtr, idk);
+    return originalPickupItemLot(thisPtr, idk);
 }
 
 char __fastcall detourItemGive(UINT_PTR thisPtr, void* Unknown, ItemStruct* itemsList, INT amountToGive, INT param_3) {
@@ -176,7 +184,7 @@ bool initHooks() {
 
     MH_CreateHookApi(L"ws2_32", "getaddrinfo", &detourGetaddrinfo, (LPVOID*)&originalGetaddrinfo);
 
-    MH_CreateHook((LPVOID)(baseAddress + 0x257060), &detourCheckLocation, (LPVOID*)&originalCheckLocation);
+    MH_CreateHook((LPVOID)(baseAddress + 0x257060), &detourPickupItemLot, (LPVOID*)&originalPickupItemLot);
     MH_CreateHook((LPVOID)(baseAddress + 0x22AD20), &detourItemGive, (LPVOID*)&originalItemGive);
     originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + 0x11F430);
     MH_CreateHook((LPVOID)(baseAddress + 0x4FA9B0), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);

@@ -30,7 +30,7 @@ struct ItemStruct {
 typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const ADDRINFOA* pHints, PADDRINFOA* ppResult);
 
 // fuction is called when an itemlot is picked up
-typedef void(__thiscall* checkLocation_t)(UINT_PTR thisPtr, UINT_PTR idk);
+typedef void(__thiscall* pickupItemLot_t)(UINT_PTR thisPtr, UINT_PTR idk);
 
 // this function adds the item to the players inventory
 typedef char(__thiscall* itemGive_t)(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3);
