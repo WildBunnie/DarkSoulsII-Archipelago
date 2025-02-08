@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include <vector>
+#include <list>
 #include <WinSock2.h>
 #include <winsock.h>
 #include <Ws2tcpip.h>
@@ -10,7 +11,10 @@
 bool initHooks();
 DWORD GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DWORD> offsets);
 void giveItems(std::vector<int> ids);
-void overrideItemLots();
+void overwriteItemLots();
+
+std::list<int64_t> getLocations();
+void clearLocations(std::list<int64_t> locationsToRemove);
 
 struct Item {
     int idk;

@@ -2,6 +2,7 @@
 
 #include "ArchipelagoInterface.h"
 #include "apuuid.hpp"
+#include "hooks.h"
 
 #ifdef __EMSCRIPTEN__
 #define DATAPACKAGE_CACHE "/settings/datapackage.json"
@@ -22,7 +23,7 @@ BOOL CArchipelago::Initialise(std::string URI) {
 		ap->reset();
 	}
 
-	ap = new APClient(uuid, "Dark Souls III", URI);
+	ap = new APClient(uuid, "Dark Souls II", URI);
 
 	ap_sync_queued = false;
 	ap->set_socket_connected_handler([]() {
@@ -47,12 +48,12 @@ BOOL CArchipelago::Initialise(std::string URI) {
 
 	ap->set_room_info_handler([]() {
 		std::list<std::string> tags;
-		ap->ConnectSlot("SomeoneRandom", "", 5, tags, { 0, 4, 9});
+		ap->ConnectSlot("bunnie", "", 3, tags, { 0, 4, 9});
 		//if (GameHook->dIsDeathLink) { tags.push_back("DeathLink"); }
 		//ap->ConnectSlot(Core->pSlotName, Core->pPassword, 5, tags, { 0,4,2 });
 		});
 
-	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& items) {
+	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& receivedItems) {
 
 		if (!ap->is_data_package_valid()) {
 			// NOTE: this should not happen since we ask for data package before connecting
@@ -60,6 +61,14 @@ BOOL CArchipelago::Initialise(std::string URI) {
 			ap_sync_queued = true;
 			return;
 		}
+
+		std::vector<int> items;
+		for (auto const& i : receivedItems) {
+			items.push_back(i.item);
+		}
+
+		giveItems(items);
+
 		});
 
 	//TODO :   * you can still use `set_data_package` or `set_data_package_from_file` during migration to make use of the old cache
@@ -93,6 +102,11 @@ BOOLEAN CArchipelago::isConnected() {
 
 VOID CArchipelago::update() {
 	if (ap) ap->poll();
+
+	std::list<int64_t> locations = getLocations();
+	if (locations.size() > 0 && ap->LocationChecks(locations)) {
+		clearLocations(locations);
+	};
 }
 
 VOID CArchipelago::gameFinished() {

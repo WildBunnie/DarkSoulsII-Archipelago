@@ -98,6 +98,16 @@ void overwriteItemLots() {
     }
 }
 
+std::list<int64_t> locations;
+std::list<int64_t> getLocations() {
+    return locations;
+};
+void clearLocations(std::list<int64_t> locationsToRemove) {
+    for (auto const& i : locationsToRemove) {
+        locations.remove(i);
+    }
+};
+
 // ============================= HOOKS =============================
 
 INT __stdcall detourGetaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHints, PADDRINFOA* ppResult) {
@@ -115,7 +125,9 @@ void __fastcall detourPickupItemLot(UINT_PTR thisPtr, void* Unknown, UINT_PTR id
     ReadProcessMemory(GetCurrentProcess(), (LPCVOID)(thisPtr + 8), &itemLotId, sizeof(itemLotId), 0);
 
     for (int i = 0; i < locationAmount; i++) {
-        std::cout << "just picked up itemlot with id: " << itemLotId + i << std::endl;
+        std::cout << "just picked up itemlot with id: " << itemLotId << std::endl;
+        locations.push_back(itemLotId);
+        itemLotId++;
     }
     locationAmount = 0;
 

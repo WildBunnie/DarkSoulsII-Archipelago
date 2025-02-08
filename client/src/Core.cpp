@@ -13,10 +13,7 @@ VOID ClientCore::Start()
 
     while (true) {
         acplg->update();
-        Sleep(2000);
-        if (acplg->isConnected()) {
-            std::cout << "connected";
-        }
+        Sleep(1000/60);
     }
 }
 
