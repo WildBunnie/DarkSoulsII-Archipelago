@@ -2,7 +2,7 @@ import re
 items = {}
 descriptions = {}
 
-with open("sotfs/ItemParam.csv") as itemsFile:
+with open("vanilla/ItemParam.csv") as itemsFile:
     next(itemsFile) # skip csv header
     for line in itemsFile:
         data = line.split(",")
@@ -29,10 +29,10 @@ with open("meta.csv") as itemsFile:
 
 regions = {}
 
-with open("sotfs/ItemLotParam2_Other.csv") as itemLotFile:
+with open("vanilla/ItemLotParam2_Other.csv") as itemLotFile:
     next(itemLotFile) # skip csv header
 
-    checkedLocations = {}
+    checkedLocations = []
     for line in itemLotFile:
         data = line.split(",")
         itemLotId = int(data[0])
@@ -57,13 +57,12 @@ with open("sotfs/ItemLotParam2_Other.csv") as itemLotFile:
     
         if regionName not in regions:
             regions[regionName] = []
-            checkedLocations[regionName] = []
 
-        if description not in checkedLocations[regionName]:
-            checkedLocations[regionName].append(description)
+        if description not in checkedLocations:
+            checkedLocations.append(description)
         else:
-            amount = checkedLocations[regionName].count(description)
-            checkedLocations[regionName].append(description)
+            amount = checkedLocations.count(description)
+            checkedLocations.append(description)
             description = description + f" ({amount+1})"
 
         multipleItems = False
