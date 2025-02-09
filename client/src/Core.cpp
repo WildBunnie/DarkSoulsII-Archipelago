@@ -48,7 +48,7 @@ VOID ClientCore::InputCommand()
                     password = param.substr(passwordIndex + 9);
                 }
                 //Core->pPassword = password;
-                if (!acplg->Initialise(address)) {
+                if (!acplg->Initialise(address, slotName)) {
                     std::cout << "failed to connect to Archipelago\n";
                 }
             }

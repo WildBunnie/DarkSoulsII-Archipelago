@@ -15,7 +15,7 @@
 bool ap_sync_queued = false;
 APClient* ap;
 
-BOOL CArchipelago::Initialise(std::string URI) {
+BOOL CArchipelago::Initialise(std::string URI, std::string slotName) {
 	spdlog::info("ClientArchipelago::Intialise");
 
 	std::string uuid = ap_get_uuid(UUID_FILE);
@@ -46,9 +46,9 @@ BOOL CArchipelago::Initialise(std::string URI) {
 		}
 		});
 
-	ap->set_room_info_handler([]() {
+	ap->set_room_info_handler([slotName]() {
 		std::list<std::string> tags;
-		ap->ConnectSlot("bunnie", "", 3, tags, { 0, 4, 9});
+		ap->ConnectSlot(slotName, "", 3, tags, { 0, 4, 9});
 		//if (GameHook->dIsDeathLink) { tags.push_back("DeathLink"); }
 		//ap->ConnectSlot(Core->pSlotName, Core->pPassword, 5, tags, { 0,4,2 });
 		});
