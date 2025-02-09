@@ -104,7 +104,7 @@ VOID CArchipelago::update() {
 	if (ap) ap->poll();
 
 	std::list<int64_t> locations = getLocations();
-	if (locations.size() > 0 && ap->LocationChecks(locations)) {
+	if (isConnected() && locations.size() > 0 && ap->LocationChecks(locations)) {
 		clearLocations(locations);
 	};
 }
