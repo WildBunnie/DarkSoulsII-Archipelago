@@ -13,6 +13,8 @@ public:
     std::string pSlotName;
     std::string pPassword;
     std::string pSeed;
+    std::vector<int> itemsToGive;
+
 
     static const int RUN_SLEEP = 2000;
 };

@@ -23,10 +23,28 @@ VOID ClientCore::Start()
     
     while (true) {
         acplg->update();
-        Sleep(RUN_SLEEP/60);
-        if (isPlayerDead()) {
+        
+        if (isPlayerInGame() && isPlayerDead()) {
             acplg->sendDeathLink();
         }
+
+        if (Core->itemsToGive.size() > 0 && isPlayerInGame()) {
+            size_t totalItems = Core->itemsToGive.size();
+            size_t batchSize = 8;
+            for (int i = 0; i < totalItems; i += batchSize) {
+                std::vector<int> batch(Core->itemsToGive.begin() + i,
+                                       Core->itemsToGive.begin() + std::min(i + batchSize, totalItems));
+
+                giveItems(batch);
+
+                Core->itemsToGive.erase(Core->itemsToGive.begin() + i,
+                                        Core->itemsToGive.begin() + std::min(i + batchSize, totalItems));
+
+                totalItems = Core->itemsToGive.size();
+            }
+        }
+
+        Sleep(1000/60); // run the loop 60 times per second
     }
 }
 

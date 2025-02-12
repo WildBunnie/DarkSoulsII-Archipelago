@@ -29,30 +29,30 @@ BOOL CArchipelago::Initialise(std::string URI) {
 
 	ap_sync_queued = false;
 	ap->set_socket_connected_handler([]() {
-		});
+	});
 
 	ap->set_socket_disconnected_handler([]() {
-		});
+	});
 
 	ap->set_slot_connected_handler([](const json& data) {
 		spdlog::info("Slot connected successfully, reading slot data ... ");
-		});
+	});
 
 	ap->set_slot_disconnected_handler([]() {
 		spdlog::info("Slot disconnected");
-		});
+	});
 
 	ap->set_slot_refused_handler([](const std::list<std::string>& errors) {
 		for (const auto& error : errors) {
 			spdlog::warn("Connection refused: {}", error);
 		}
-		});
+	});
 
 	ap->set_room_info_handler([]() {
 		std::list<std::string> tags;
 		tags.push_back("DeathLink");
 		ap->ConnectSlot(Core->pSlotName, Core->pPassword, 3, tags, APClientVersion);
-		});
+	});
 
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& receivedItems) {
 
@@ -63,30 +63,27 @@ BOOL CArchipelago::Initialise(std::string URI) {
 			return;
 		}
 
-		std::vector<int> items;
 		for (auto const& i : receivedItems) {
-			items.push_back(i.item);
+			Core->itemsToGive.push_back(i.item);
 		}
 
-		giveItems(items);
-
-		});
+	});
 
 	//TODO :   * you can still use `set_data_package` or `set_data_package_from_file` during migration to make use of the old cache
 
 	ap->set_print_handler([](const std::string& msg) {
 		spdlog::info(msg);
-		});
+	});
 
 	ap->set_print_json_handler([](const std::list<APClient::TextNode>& msg) {
 		auto message = ap->render_json(msg, APClient::RenderFormat::TEXT);
 		spdlog::info(message);
-		});
+	});
 
 	ap->set_bounced_handler([](const json& cmd) {
 		killPlayer();
 		spdlog::debug("Bad deathlink packet!");
-		});
+	});
 	return true;
 }
 

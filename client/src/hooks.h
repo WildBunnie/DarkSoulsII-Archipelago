@@ -13,6 +13,10 @@ DWORD GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DWORD> of
 void giveItems(std::vector<int> ids);
 void overwriteItemLots();
 
+bool isPlayerDead();
+void killPlayer();
+bool isPlayerInGame();
+
 std::list<int64_t> getLocations();
 void clearLocations(std::list<int64_t> locationsToRemove);
 
@@ -50,9 +54,5 @@ typedef void(__thiscall* selectMenuOption_t)(UINT_PTR thisPtr);
 
 // used to check when a player clicks to enter an existing save
 typedef void(__thiscall* selectSaveSlot_t)(UINT_PTR thisPtr);
-
-bool isPlayerDead();
-
-void killPlayer();
 
 #endif

@@ -42,9 +42,6 @@ DWORD WINAPI Init(LPVOID lpParam) {
     freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
     freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
 
-    HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
-    DWORD baseAddress = (DWORD)hModule;
-
     initHooks();
 
     Core->Start();

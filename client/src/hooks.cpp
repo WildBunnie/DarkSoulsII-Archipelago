@@ -31,6 +31,10 @@ DWORD GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DWORD> of
 // TODO: receive the other item information like amount, upgrades and infusions
 void giveItems(std::vector<int> ids) {
 
+    if (ids.size() > 8) {
+        return;
+    }
+
     ItemStruct itemStruct;
 
     for (size_t i = 0; i < ids.size() && i < 8; ++i) {
@@ -211,7 +215,7 @@ bool initHooks() {
 int prevHp, curHp = -1;
 bool isPlayerDead() {
     prevHp = curHp;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x34, 0x08, 0xFC }), &curHp, sizeof(int), NULL);
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x74, 0xFC }), &curHp, sizeof(int), NULL);
     if (prevHp != 0 && curHp == 0) {
         return true;
     }
@@ -220,5 +224,14 @@ bool isPlayerDead() {
 
 void killPlayer() {
     int zeroHp = 0;
-    WriteProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x34, 0x08, 0xFC }), &zeroHp, sizeof(int), NULL);
+    WriteProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x74, 0xFC }), &zeroHp, sizeof(int), NULL);
+}
+
+bool isPlayerInGame() {
+    DWORD value;
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x74 }), &value, sizeof(DWORD), NULL);
+    if (value != 0) {
+        return true;
+    }
+    return false;
 }
