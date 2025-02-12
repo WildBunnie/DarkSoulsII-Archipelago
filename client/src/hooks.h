@@ -51,4 +51,8 @@ typedef void(__thiscall* selectMenuOption_t)(UINT_PTR thisPtr);
 // used to check when a player clicks to enter an existing save
 typedef void(__thiscall* selectSaveSlot_t)(UINT_PTR thisPtr);
 
+bool isPlayerDead();
+
+void killPlayer();
+
 #endif

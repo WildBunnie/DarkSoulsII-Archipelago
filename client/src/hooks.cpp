@@ -207,3 +207,18 @@ bool initHooks() {
 
     return true;
 }
+
+int prevHp, curHp = -1;
+bool isPlayerDead() {
+    prevHp = curHp;
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x34, 0x08, 0xFC }), &curHp, sizeof(int), NULL);
+    if (prevHp != 0 && curHp == 0) {
+        return true;
+    }
+    return false;
+}
+
+void killPlayer() {
+    int zeroHp = 0;
+    WriteProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x34, 0x08, 0xFC }), &zeroHp, sizeof(int), NULL);
+}

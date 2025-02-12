@@ -1,19 +1,32 @@
 #include "Core.h"
+#include "hooks.h"
 
 CArchipelago* acplg;
+ClientCore* Core;
+
+
+ClientCore::ClientCore() {
+    Core = this;
+}
 
 VOID ClientCore::Start()
 {
+    Core = new ClientCore();
+
     std::cout << "Archipelago client\n"
         "Type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]' to connect to the room\n"
         "Type '/help' for more information\n"
         "-----------------------------------------------------\n";
 
-    CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)InputCommand, NULL, NULL, NULL);
+    CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)Core->InputCommand, NULL, NULL, NULL);
 
+    
     while (true) {
         acplg->update();
-        Sleep(1000/60);
+        Sleep(RUN_SLEEP/60);
+        if (isPlayerDead()) {
+            acplg->sendDeathLink();
+        }
     }
 }
 
@@ -42,13 +55,15 @@ VOID ClientCore::InputCommand()
                 std::string slotName = param.substr(spaceIndex + 1, passwordIndex - spaceIndex - 2);
                 std::string password = "";
                 std::cout << address << " - " << slotName << "\n";
-                //Core->pSlotName = slotName;
+                std::cout << Core->pSlotName;
+                Core->pSlotName = slotName;
+                std::cout << Core->pSlotName;
                 if (passwordIndex != std::string::npos)
                 {
                     password = param.substr(passwordIndex + 9);
                 }
-                //Core->pPassword = password;
-                if (!acplg->Initialise(address, slotName)) {
+                Core->pPassword = password;
+                if (!acplg->Initialise(address)) {
                     std::cout << "failed to connect to Archipelago\n";
                 }
             }

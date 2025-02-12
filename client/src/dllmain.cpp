@@ -6,34 +6,9 @@
 #include "Core.h"
 #include "hooks.h"
 
-ClientCore* CCore;
+extern ClientCore* Core;
 
-DWORD WINAPI Init(LPVOID lpParam) {
-    AllocConsole();
-    freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
-    freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
-
-    HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
-    DWORD baseAddress = (DWORD)hModule;
-
-    initHooks();
-
-    CCore->Start();
-
-    int prevHp, curHp = -1;
-    while (true) {
-
-        // check if player died
-        prevHp = curHp;
-        ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x34, 0x08, 0xFC }), &curHp, sizeof(int), NULL);
-        if (prevHp != 0 && curHp == 0) {
-            std::cout << "you died" << std::endl;
-        }
-    }
-
-    return 0;
-}
-
+DWORD WINAPI Init(LPVOID lpParam);
 void LoadOriginalDll();
 HINSTANCE mHinstDLL = 0;
 UINT_PTR mProcs[6] = { 0 };
@@ -60,6 +35,21 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
     }
 
     return TRUE;
+}
+
+DWORD WINAPI Init(LPVOID lpParam) {
+    AllocConsole();
+    freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+    freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
+
+    HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
+    DWORD baseAddress = (DWORD)hModule;
+
+    initHooks();
+
+    Core->Start();
+
+    return 0;
 }
 
 // route our emulated functions

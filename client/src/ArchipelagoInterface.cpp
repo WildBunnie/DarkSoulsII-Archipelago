@@ -14,8 +14,10 @@
 
 bool ap_sync_queued = false;
 APClient* ap;
+APClient::Version APClientVersion = { 0, 4, 9 };
+extern ClientCore* Core;
 
-BOOL CArchipelago::Initialise(std::string URI, std::string slotName) {
+BOOL CArchipelago::Initialise(std::string URI) {
 	spdlog::info("ClientArchipelago::Intialise");
 
 	std::string uuid = ap_get_uuid(UUID_FILE);
@@ -46,11 +48,10 @@ BOOL CArchipelago::Initialise(std::string URI, std::string slotName) {
 		}
 		});
 
-	ap->set_room_info_handler([slotName]() {
+	ap->set_room_info_handler([]() {
 		std::list<std::string> tags;
-		ap->ConnectSlot(slotName, "", 3, tags, { 0, 4, 9});
-		//if (GameHook->dIsDeathLink) { tags.push_back("DeathLink"); }
-		//ap->ConnectSlot(Core->pSlotName, Core->pPassword, 5, tags, { 0,4,2 });
+		tags.push_back("DeathLink");
+		ap->ConnectSlot(Core->pSlotName, Core->pPassword, 3, tags, APClientVersion);
 		});
 
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& receivedItems) {
@@ -83,6 +84,7 @@ BOOL CArchipelago::Initialise(std::string URI, std::string slotName) {
 		});
 
 	ap->set_bounced_handler([](const json& cmd) {
+		killPlayer();
 		spdlog::debug("Bad deathlink packet!");
 		});
 	return true;
@@ -111,4 +113,17 @@ VOID CArchipelago::update() {
 
 VOID CArchipelago::gameFinished() {
 	if (ap) ap->StatusUpdate(APClient::ClientStatus::GOAL);
+}
+
+VOID CArchipelago::sendDeathLink() {
+	if (!isConnected()) return;
+
+	spdlog::info("Sending deathlink");
+
+	json data{
+		{"time", ap->get_server_time()},
+		{"cause", "Dark Souls II."},
+		{"source", ap->get_slot()},
+	};
+	ap->Bounce(data, {}, {}, { "DeathLink" });
 }
