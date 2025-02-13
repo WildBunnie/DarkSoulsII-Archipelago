@@ -1,10 +1,47 @@
-#include <minhook.h>
-#include <iostream>
-
 #include "hooks.h"
+#include "Offsets.h"
+#include <spdlog/spdlog.h>
+
+extern Hooks* GameHooks;
+
+// ============================= Utils =============================
 
 bool showItem = true;
-DWORD baseAddress;
+
+struct Item {
+    int idk;
+    int itemId;
+    int durability;
+    short amount;
+    char upgrade;
+    char infusion;
+};
+
+struct ItemStruct {
+    Item items[8];
+};
+
+// hooking this function to always start the game offline
+// by blocking the game's dns lookup
+typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const ADDRINFOA* pHints, PADDRINFOA* ppResult);
+
+// fuction is called when an itemlot is picked up
+typedef void(__thiscall* pickupItemLot_t)(UINT_PTR thisPtr, UINT_PTR idk);
+
+// this function adds the item to the players inventory
+typedef char(__thiscall* itemGive_t)(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3);
+
+// this function creates the structure that is passed to the function that displays the item popup
+typedef void(__cdecl* createPopupStructure_t)(UINT_PTR displayStruct, ItemStruct* items, INT amountOfItems, INT displayMode);
+
+// this function displays the item popup
+typedef void(__thiscall* showItemPopup_t)(UINT_PTR thisPtr, UINT_PTR displayStruct);
+
+// used to check when player clicks the create new game button
+typedef void(__thiscall* selectMenuOption_t)(UINT_PTR thisPtr);
+
+// used to check when a player clicks to enter an existing save
+typedef void(__thiscall* selectSaveSlot_t)(UINT_PTR thisPtr);
 
 getaddrinfo_t originalGetaddrinfo = nullptr;
 pickupItemLot_t originalPickupItemLot = nullptr;
@@ -14,9 +51,9 @@ showItemPopup_t originalShowItemPopup = nullptr;
 selectMenuOption_t originalSelectMenuOption = nullptr;
 selectSaveSlot_t originalSelectSaveSlot = nullptr;
 
-// ============================= Utils =============================
+DWORD baseAddress;
 
-DWORD GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DWORD> offsets)
+DWORD Hooks::GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DWORD> offsets)
 {
     DWORD offset_null = NULL;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(gameBaseAddr + address), &offset_null, sizeof(offset_null), 0);
@@ -29,7 +66,7 @@ DWORD GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DWORD> of
 }
 
 // TODO: receive the other item information like amount, upgrades and infusions
-void giveItems(std::vector<int> ids) {
+void Hooks::giveItems(std::vector<int> ids) {
 
     if (ids.size() > 8) {
         return;
@@ -58,7 +95,7 @@ void giveItems(std::vector<int> ids) {
     VirtualFree((LPVOID)displayStruct, 0, MEM_RELEASE);
 }
 
-void overwriteItemLots() {
+void Hooks::overwriteItemLots() {
 
     DWORD itemLotsAddress = GetPointerAddress(baseAddress, 0x1150414, { 0x60, 0x30, 0x94, 0x2C });
     DWORD firstLotAddress = itemLotsAddress + 0x20;
@@ -103,14 +140,16 @@ void overwriteItemLots() {
 }
 
 std::list<int64_t> locations;
-std::list<int64_t> getLocations() {
+std::list<int64_t> Hooks::getLocations()
+{
     return locations;
-};
-void clearLocations(std::list<int64_t> locationsToRemove) {
+}
+
+void Hooks::clearLocations(std::list<int64_t> locationsToRemove) {
     for (auto const& i : locationsToRemove) {
         locations.remove(i);
     }
-};
+}
 
 // ============================= HOOKS =============================
 
@@ -129,7 +168,7 @@ void __fastcall detourPickupItemLot(UINT_PTR thisPtr, void* Unknown, UINT_PTR id
     ReadProcessMemory(GetCurrentProcess(), (LPCVOID)(thisPtr + 8), &itemLotId, sizeof(itemLotId), 0);
 
     for (int i = 0; i < locationAmount; i++) {
-        std::cout << "just picked up itemlot with id: " << itemLotId << std::endl;
+        spdlog::debug("just picked up itemlot with id: ", itemLotId);
         locations.push_back(itemLotId);
         itemLotId++;
     }
@@ -143,8 +182,7 @@ char __fastcall detourItemGive(UINT_PTR thisPtr, void* Unknown, ItemStruct* item
     for (int i = 0; i < 8; ++i) {
         Item* item = &itemsList->items[i];
 
-        // if item was picked up from a location
-        // we don't give the player the item
+        // if item was picked up from a location we don't give the player the item
         if (item->itemId == 60375000) {
             showItem = false;
             locationAmount++;
@@ -174,24 +212,23 @@ void __fastcall detourSelectMenuOption(UINT_PTR thisPtr, void* Unknown) {
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(thisPtr + 0xA4), &menuOptionId, sizeof(menuOptionId), NULL);
 
     if (menuOptionId == 1) {
-        std::cout << "created a new game" << std::endl;
-        overwriteItemLots();
+        spdlog::debug("created a new game");
+        GameHooks->overwriteItemLots();
     }
 }
 
 void __fastcall detourSelectSaveSlot(UINT_PTR thisPtr, void* Unknown) {
-
     int slotId;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(thisPtr + 0x74), &slotId, sizeof(slotId), NULL);
 
-    std::cout << "loaded save " << slotId << std::endl;
+    spdlog::debug("loaded save: ", slotId);
 
-    overwriteItemLots();
+    GameHooks->overwriteItemLots();
 
     originalSelectSaveSlot(thisPtr);
 }
 
-bool initHooks() {
+bool Hooks::initHooks() {
 
     HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
     baseAddress = (DWORD)hModule;
@@ -200,12 +237,12 @@ bool initHooks() {
 
     MH_CreateHookApi(L"ws2_32", "getaddrinfo", &detourGetaddrinfo, (LPVOID*)&originalGetaddrinfo);
 
-    MH_CreateHook((LPVOID)(baseAddress + 0x257060), &detourPickupItemLot, (LPVOID*)&originalPickupItemLot);
-    MH_CreateHook((LPVOID)(baseAddress + 0x22AD20), &detourItemGive, (LPVOID*)&originalItemGive);
-    originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + 0x11F430);
-    MH_CreateHook((LPVOID)(baseAddress + 0x4FA9B0), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
-    MH_CreateHook((LPVOID)(baseAddress + 0x18C160), &detourSelectMenuOption, (LPVOID*)&originalSelectMenuOption);
-    MH_CreateHook((LPVOID)(baseAddress + 0x189450), &detourSelectSaveSlot, (LPVOID*)&originalSelectSaveSlot);
+    MH_CreateHook((LPVOID)(baseAddress + APickupItemLot), &detourPickupItemLot, (LPVOID*)&originalPickupItemLot);
+    MH_CreateHook((LPVOID)(baseAddress + AItemGive), &detourItemGive, (LPVOID*)&originalItemGive);
+    originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + APopUpStruct);
+    MH_CreateHook((LPVOID)(baseAddress + AShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
+    MH_CreateHook((LPVOID)(baseAddress + ASelectMenuOption), &detourSelectMenuOption, (LPVOID*)&originalSelectMenuOption);
+    MH_CreateHook((LPVOID)(baseAddress + ASelectSaveSlot), &detourSelectSaveSlot, (LPVOID*)&originalSelectSaveSlot);
 
     MH_EnableHook(MH_ALL_HOOKS);
 
@@ -213,7 +250,7 @@ bool initHooks() {
 }
 
 int prevHp, curHp = -1;
-bool isPlayerDead() {
+bool Hooks::isPlayerDead() {
     prevHp = curHp;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x74, 0xFC }), &curHp, sizeof(int), NULL);
     if (prevHp != 0 && curHp == 0) {
@@ -222,12 +259,12 @@ bool isPlayerDead() {
     return false;
 }
 
-void killPlayer() {
+void Hooks::killPlayer() {
     int zeroHp = 0;
     WriteProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x74, 0xFC }), &zeroHp, sizeof(int), NULL);
 }
 
-bool isPlayerInGame() {
+bool Hooks::isPlayerInGame() {
     DWORD value;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x74 }), &value, sizeof(DWORD), NULL);
     if (value != 0) {

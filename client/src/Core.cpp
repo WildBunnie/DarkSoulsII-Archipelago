@@ -1,22 +1,24 @@
 #include "Core.h"
 #include "hooks.h"
+#include <spdlog/spdlog.h>
 
 CArchipelago* acplg;
 ClientCore* Core;
-
+Hooks* GameHooks;
 
 ClientCore::ClientCore() {
     Core = this;
+    GameHooks = new Hooks();
 }
 
 VOID ClientCore::Start()
 {
     Core = new ClientCore();
 
-    std::cout << "Archipelago client\n"
+    spdlog::info("Archipelago client\n"
         "Type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]' to connect to the room\n"
         "Type '/help' for more information\n"
-        "-----------------------------------------------------\n";
+        "-----------------------------------------------------\n");
 
     CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)Core->InputCommand, NULL, NULL, NULL);
 
@@ -24,18 +26,18 @@ VOID ClientCore::Start()
     while (true) {
         acplg->update();
         
-        if (isPlayerInGame() && isPlayerDead()) {
+        if (GameHooks->isPlayerInGame() && GameHooks->isPlayerDead()) {
             acplg->sendDeathLink();
         }
 
-        if (Core->itemsToGive.size() > 0 && isPlayerInGame()) {
+        if (Core->itemsToGive.size() > 0 && GameHooks->isPlayerInGame()) {
             size_t totalItems = Core->itemsToGive.size();
             size_t batchSize = 8;
             for (int i = 0; i < totalItems; i += batchSize) {
                 std::vector<int> batch(Core->itemsToGive.begin() + i,
                                        Core->itemsToGive.begin() + std::min(i + batchSize, totalItems));
 
-                giveItems(batch);
+                GameHooks->giveItems(batch);
 
                 Core->itemsToGive.erase(Core->itemsToGive.begin() + i,
                                         Core->itemsToGive.begin() + std::min(i + batchSize, totalItems));
@@ -55,34 +57,32 @@ VOID ClientCore::InputCommand()
         std::getline(std::cin, line);
 
         if (line == "/help") {
-            printf("List of available commands : \n");
-            printf("/help : Prints this help message.\n");
-            printf("!help : Prints the help message related to Archipelago.\n");
-            printf("/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}] : Connect to the specified server.\n");
-            printf("/debug on|off : Prints additional debug info \n");
+            spdlog::info("List of available commands : \n"
+                "/help : Prints this help message.\n"
+                "!help : Prints the help message related to Archipelago.\n"
+                "/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}] : Connect to the specified server.\n"
+                "/debug on|off : Prints additional debug info \n");
         }
         else if (line.find("/connect ") == 0) {
             std::string param = line.substr(9);
             int spaceIndex = param.find(" ");
             if (spaceIndex == std::string::npos) {
-                std::cout << "Missing parameter : Make sure to type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]\n'";
+                spdlog::info("Missing parameter : Make sure to type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]\n");
             }
             else {
                 int passwordIndex = param.find("password:");
                 std::string address = param.substr(0, spaceIndex);
                 std::string slotName = param.substr(spaceIndex + 1, passwordIndex - spaceIndex - 2);
                 std::string password = "";
-                std::cout << address << " - " << slotName << "\n";
-                std::cout << Core->pSlotName;
+                spdlog::info("{} - {}", address, slotName, "\n");
                 Core->pSlotName = slotName;
-                std::cout << Core->pSlotName;
                 if (passwordIndex != std::string::npos)
                 {
                     password = param.substr(passwordIndex + 9);
                 }
                 Core->pPassword = password;
                 if (!acplg->Initialise(address)) {
-                    std::cout << "failed to connect to Archipelago\n";
+                    spdlog::info("failed to connect to Archipelago\n");
                 }
             }
         }
@@ -90,7 +90,7 @@ VOID ClientCore::InputCommand()
             acplg->say(line);
         }
         else {
-            std::cout << "Sorry did not understand that.";
+            spdlog::info("Sorry did not understand that.\n");
         }
     }
 }
