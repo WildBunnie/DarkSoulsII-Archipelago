@@ -47,8 +47,45 @@ class DS2World(World):
             self.multiworld.regions.append(region)
         
         regions["Menu"].connect(regions["Things Betwixt"])
+
         regions["Things Betwixt"].connect(regions["Majula"])
+
         regions["Majula"].connect(regions["Forest of Fallen Giants"])
+        regions["Majula"].connect(regions["Path to Shaded Woods"])
+        regions["Majula"].connect(regions["Heide's Tower of Flame"])
+        regions["Majula"].connect(regions["Huntman's Copse"])
+        regions["Majula"].connect(regions["Grave of Saints"])
+
+        regions["Grave of Saints"].connect(regions["The Gutter"])
+        regions["The Gutter"].connect(regions["Chasm of the Abyss"])
+        regions["The Gutter"].connect(regions["Shulva"])
+
+        regions["Forest of Fallen Giants"].connect(regions["Giant's Memory"])
+        regions["Forest of Fallen Giants"].connect(regions["Lost Bastille"])
+
+        regions["Heide's Tower of Flame"].connect(regions["Unseen Path to Heide"])
+        regions["Unseen Path to Heide"].connect(regions["No-man's Wharf"])
+        regions["No-man's Wharf"].connect(regions["Lost Bastille"])
+
+        regions["Huntman's Copse"].connect(regions["Earthen Peak"])
+        regions["Earthen Peak"].connect(regions["Iron Keep"])
+        regions["Iron Keep"].connect(regions["Brume Tower"])
+
+        regions["Path to Shaded Woods"].connect(regions["Shaded Woods"])
+        regions["Shaded Woods"].connect(regions["Drangleic Castle"])
+        regions["Shaded Woods"].connect(regions["Doors of Pharros"])
+        regions["Shaded Woods"].connect(regions["Aldia's Keep"])
+        regions["Shaded Woods"].connect(regions["Chasm of the Abyss"])
+        regions["Shaded Woods"].connect(regions["Eleum Loyce"])
+
+        regions["Doors of Pharros"].connect(regions["Brightstone Cove"])
+        regions["Brightstone Cove"].connect(regions["Dragon Memories"])
+
+        regions["Drangleic Castle"].connect(regions["Shrine of Amana"])
+        regions["Drangleic Castle"].connect(regions["Chasm of the Abyss"])
+        regions["Shrine of Aman"].connect(regions["Undead Crypt"])
+        
+        regions["Aldia's Keep"].connect(regions["Dragon Aerie"])
 
     def create_region(self, name):
         return Region(name, self.player, self.multiworld)
