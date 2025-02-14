@@ -28,8 +28,11 @@ typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const
 // fuction is called when an itemlot is picked up
 typedef void(__thiscall* pickupItemLot_t)(UINT_PTR thisPtr, UINT_PTR idk);
 
+// fuction is called when player receives a reward (boss, covenant, npc or event)
+typedef void(__thiscall* giveReward_t)(UINT_PTR thisPtr, UINT_PTR* pItemLot, INT idk1, INT idk2, INT idk3);
+
 // this function adds the item to the players inventory
-typedef char(__thiscall* itemGive_t)(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3);
+typedef char(__thiscall* addToInventory_t)(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3);
 
 // this function creates the structure that is passed to the function that displays the item popup
 typedef void(__cdecl* createPopupStructure_t)(UINT_PTR displayStruct, ItemStruct* items, INT amountOfItems, INT displayMode);
@@ -45,7 +48,8 @@ typedef void(__thiscall* selectSaveSlot_t)(UINT_PTR thisPtr);
 
 getaddrinfo_t originalGetaddrinfo = nullptr;
 pickupItemLot_t originalPickupItemLot = nullptr;
-itemGive_t originalItemGive = nullptr;
+giveReward_t originalGiveReward = nullptr;
+addToInventory_t originalAddToInventory = nullptr;
 createPopupStructure_t originalCreatePopupStructure = nullptr;
 showItemPopup_t originalShowItemPopup = nullptr;
 selectMenuOption_t originalSelectMenuOption = nullptr;
@@ -58,7 +62,7 @@ DWORD Hooks::GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DW
     DWORD offset_null = NULL;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(gameBaseAddr + address), &offset_null, sizeof(offset_null), 0);
     DWORD pointeraddress = offset_null; // the address we need
-    for (int i = 0; i < offsets.size() - 1; i++) // we dont want to change the last offset value so we do -1
+    for (size_t i = 0; i < offsets.size() - 1; i++) // we dont want to change the last offset value so we do -1
     {
         ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pointeraddress + offsets.at(i)), &pointeraddress, sizeof(pointeraddress), 0);
     }
@@ -88,7 +92,7 @@ void Hooks::giveItems(std::vector<int> ids) {
 
     UINT_PTR displayStruct = (UINT_PTR)VirtualAlloc(nullptr, 0x110, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-    originalItemGive(GetPointerAddress(baseAddress, 0x1150414, { 0x60, 0x8, 0x8, 0x0 }), &itemStruct, ids.size(), 0);
+    originalAddToInventory(GetPointerAddress(baseAddress, 0x1150414, { 0x60, 0x8, 0x8, 0x0 }), &itemStruct, ids.size(), 0);
     originalCreatePopupStructure(displayStruct, &itemStruct, ids.size(), 1);
     originalShowItemPopup(GetPointerAddress(baseAddress, 0x1150414, { 0xCC4, 0x0 }), displayStruct);
 
@@ -112,13 +116,6 @@ void Hooks::overwriteItemLots() {
         // id of the last itemLot from ItemLotParam2_Other
         if (curItemLotId == 99996008) {
             break;
-        }
-
-        // for now only override for items that are pickups
-        // TODO: make events, boss rewards, ... into locations
-        if (curItemLotId < 10025010 || curItemLotId > 50376770) {
-            pointer += 12;
-            continue;
         }
 
         // skip if it's a bird trade
@@ -163,6 +160,7 @@ INT __stdcall detourGetaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHin
 }
 
 int locationAmount = 0;
+// this runs after AddToInventory
 void __fastcall detourPickupItemLot(UINT_PTR thisPtr, void* Unknown, UINT_PTR idk) {
     int itemLotId = 0;
     ReadProcessMemory(GetCurrentProcess(), (LPCVOID)(thisPtr + 8), &itemLotId, sizeof(itemLotId), 0);
@@ -177,23 +175,41 @@ void __fastcall detourPickupItemLot(UINT_PTR thisPtr, void* Unknown, UINT_PTR id
     return originalPickupItemLot(thisPtr, idk);
 }
 
-char __fastcall detourItemGive(UINT_PTR thisPtr, void* Unknown, ItemStruct* itemsList, INT amountToGive, INT param_3) {
+int locationId = -1;
+// this runs before AddToInventory
+void __fastcall detourGiveReward(UINT_PTR thisPtr, void* Unknown, UINT_PTR* pItemLot, INT idk1, INT idk2, INT idk3) {
+
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pItemLot), &locationId, sizeof(locationId), NULL);
+    spdlog::debug("was rewarded: ", locationId);
+    return originalGiveReward(thisPtr, pItemLot, idk1, idk2, idk3);
+}
+
+char __fastcall detourAddToInventory(UINT_PTR thisPtr, void* Unknown, ItemStruct* itemsList, INT amountToGive, INT param_3) {
 
     for (int i = 0; i < 8; ++i) {
         Item* item = &itemsList->items[i];
 
         // if item was picked up from a location we don't give the player the item
-        if (item->itemId == 60375000) {
-            showItem = false;
+        if (item->itemId != 60375000) break;
+           
+        showItem = false;
+        
+        // we are getting a reward
+        if (locationId != -1) {
+            locations.push_back(locationId+i);
+        }
+        // we picked up an item
+        else {
             locationAmount++;
         }
     }
 
     if (!showItem) {
+        locationId = -1;
         return 1;
     }
 
-    return originalItemGive(thisPtr, itemsList, amountToGive, param_3);
+    return originalAddToInventory(thisPtr, itemsList, amountToGive, param_3);
 }
 
 void __fastcall detourShowItemPopup(UINT_PTR thisPtr, void* Unknown, UINT_PTR displayStruct) {
@@ -238,7 +254,8 @@ bool Hooks::initHooks() {
     MH_CreateHookApi(L"ws2_32", "getaddrinfo", &detourGetaddrinfo, (LPVOID*)&originalGetaddrinfo);
 
     MH_CreateHook((LPVOID)(baseAddress + PickupItemLotFunction), &detourPickupItemLot, (LPVOID*)&originalPickupItemLot);
-    MH_CreateHook((LPVOID)(baseAddress + ItemGiveFunction), &detourItemGive, (LPVOID*)&originalItemGive);
+    MH_CreateHook((LPVOID)(baseAddress + GiveItemRewardsFunction), &detourGiveReward, (LPVOID*)&originalGiveReward);
+    MH_CreateHook((LPVOID)(baseAddress + AddItemToInventoryFunction), &detourAddToInventory, (LPVOID*)&originalAddToInventory);
     originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + PopUpStructFunction);
     MH_CreateHook((LPVOID)(baseAddress + ShowItemPopupFunction), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
     MH_CreateHook((LPVOID)(baseAddress + SelectMenuOptionFunction), &detourSelectMenuOption, (LPVOID*)&originalSelectMenuOption);
