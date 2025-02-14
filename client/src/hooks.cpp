@@ -190,7 +190,7 @@ char __fastcall detourAddToInventory(UINT_PTR thisPtr, void* Unknown, ItemStruct
         Item* item = &itemsList->items[i];
 
         // if item was picked up from a location we don't give the player the item
-        if (item->itemId != 60375000) break;
+        if (item->itemId != 60375000) continue;
            
         showItem = false;
         
