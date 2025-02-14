@@ -1,8 +1,7 @@
-#include <spdlog/spdlog.h>
-
 #include "ArchipelagoInterface.h"
 #include "apuuid.hpp"
 #include "hooks.h"
+#include <spdlog/spdlog.h>
 
 #ifdef __EMSCRIPTEN__
 #define DATAPACKAGE_CACHE "/settings/datapackage.json"
@@ -16,6 +15,7 @@ bool ap_sync_queued = false;
 APClient* ap;
 APClient::Version APClientVersion = { 0, 4, 9 };
 extern ClientCore* Core;
+extern Hooks* GameHooks;
 
 BOOL CArchipelago::Initialise(std::string URI) {
 	spdlog::info("ClientArchipelago::Intialise");
@@ -36,6 +36,12 @@ BOOL CArchipelago::Initialise(std::string URI) {
 
 	ap->set_slot_connected_handler([](const json& data) {
 		spdlog::info("Slot connected successfully, reading slot data ... ");
+
+		data.at("slot").get_to(Core->pSlotName);
+
+		if (data.contains("options")) {
+			
+		}
 	});
 
 	ap->set_slot_disconnected_handler([]() {
@@ -50,7 +56,7 @@ BOOL CArchipelago::Initialise(std::string URI) {
 
 	ap->set_room_info_handler([]() {
 		std::list<std::string> tags;
-		tags.push_back("DeathLink");
+		tags.push_back("DeathLink"); // TODO: change this to be based on options
 		ap->ConnectSlot(Core->pSlotName, Core->pPassword, 3, tags, APClientVersion);
 	});
 
@@ -81,7 +87,7 @@ BOOL CArchipelago::Initialise(std::string URI) {
 	});
 
 	ap->set_bounced_handler([](const json& cmd) {
-		killPlayer();
+		GameHooks->killPlayer();
 		spdlog::debug("Bad deathlink packet!");
 	});
 	return true;
@@ -102,9 +108,9 @@ BOOLEAN CArchipelago::isConnected() {
 VOID CArchipelago::update() {
 	if (ap) ap->poll();
 
-	std::list<int64_t> locations = getLocations();
+	std::list<int64_t> locations = GameHooks->getLocations();
 	if (isConnected() && locations.size() > 0 && ap->LocationChecks(locations)) {
-		clearLocations(locations);
+		GameHooks->clearLocations(locations);
 	};
 }
 

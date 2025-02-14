@@ -7,6 +7,7 @@
 #include "hooks.h"
 
 extern ClientCore* Core;
+extern Hooks* GameHooks;
 
 DWORD WINAPI Init(LPVOID lpParam);
 void LoadOriginalDll();
@@ -42,7 +43,7 @@ DWORD WINAPI Init(LPVOID lpParam) {
     freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
     freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
 
-    initHooks();
+    GameHooks->initHooks();
 
     Core->Start();
 
