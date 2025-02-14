@@ -1,5 +1,5 @@
 #include "hooks.h"
-#include "Offsets.h"
+#include "FunctionOffsets.h"
 #include <spdlog/spdlog.h>
 
 extern Hooks* GameHooks;
@@ -237,12 +237,12 @@ bool Hooks::initHooks() {
 
     MH_CreateHookApi(L"ws2_32", "getaddrinfo", &detourGetaddrinfo, (LPVOID*)&originalGetaddrinfo);
 
-    MH_CreateHook((LPVOID)(baseAddress + APickupItemLot), &detourPickupItemLot, (LPVOID*)&originalPickupItemLot);
-    MH_CreateHook((LPVOID)(baseAddress + AItemGive), &detourItemGive, (LPVOID*)&originalItemGive);
-    originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + APopUpStruct);
-    MH_CreateHook((LPVOID)(baseAddress + AShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
-    MH_CreateHook((LPVOID)(baseAddress + ASelectMenuOption), &detourSelectMenuOption, (LPVOID*)&originalSelectMenuOption);
-    MH_CreateHook((LPVOID)(baseAddress + ASelectSaveSlot), &detourSelectSaveSlot, (LPVOID*)&originalSelectSaveSlot);
+    MH_CreateHook((LPVOID)(baseAddress + PickupItemLotFunction), &detourPickupItemLot, (LPVOID*)&originalPickupItemLot);
+    MH_CreateHook((LPVOID)(baseAddress + ItemGiveFunction), &detourItemGive, (LPVOID*)&originalItemGive);
+    originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + PopUpStructFunction);
+    MH_CreateHook((LPVOID)(baseAddress + ShowItemPopupFunction), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
+    MH_CreateHook((LPVOID)(baseAddress + SelectMenuOptionFunction), &detourSelectMenuOption, (LPVOID*)&originalSelectMenuOption);
+    MH_CreateHook((LPVOID)(baseAddress + SelectSaveSlotFunction), &detourSelectSaveSlot, (LPVOID*)&originalSelectSaveSlot);
 
     MH_EnableHook(MH_ALL_HOOKS);
 
