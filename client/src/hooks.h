@@ -23,4 +23,6 @@ public:
     void clearLocations(std::list<int64_t> locationsToRemove);
 
     std::list<int64_t> getLocations();
+
+    bool isDeathLink;
 };

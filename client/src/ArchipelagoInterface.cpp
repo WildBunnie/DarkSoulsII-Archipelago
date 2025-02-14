@@ -36,12 +36,18 @@ BOOL CArchipelago::Initialise(std::string URI) {
 
 	ap->set_slot_connected_handler([](const json& data) {
 		spdlog::info("Slot connected successfully, reading slot data ... ");
+		spdlog::debug(data.dump());
 
-		data.at("slot").get_to(Core->pSlotName);
-
-		if (data.contains("options")) {
-			
+		if (data.contains("death_link")) {
+			GameHooks->isDeathLink = (data.at("death_link") != 0);
 		}
+
+		std::list<std::string> tags;
+		if (GameHooks->isDeathLink) {
+			tags.push_back("DeathLink");
+			ap->ConnectUpdate(false, 1, true, tags);
+		}
+
 	});
 
 	ap->set_slot_disconnected_handler([]() {
@@ -55,9 +61,7 @@ BOOL CArchipelago::Initialise(std::string URI) {
 	});
 
 	ap->set_room_info_handler([]() {
-		std::list<std::string> tags;
-		tags.push_back("DeathLink"); // TODO: change this to be based on options
-		ap->ConnectSlot(Core->pSlotName, Core->pPassword, 3, tags, APClientVersion);
+		ap->ConnectSlot(Core->pSlotName, Core->pPassword, 3, {}, APClientVersion);
 	});
 
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& receivedItems) {
@@ -87,8 +91,7 @@ BOOL CArchipelago::Initialise(std::string URI) {
 	});
 
 	ap->set_bounced_handler([](const json& cmd) {
-		GameHooks->killPlayer();
-		spdlog::debug("Bad deathlink packet!");
+		if(GameHooks->isDeathLink) GameHooks->killPlayer();
 	});
 	return true;
 }
@@ -119,7 +122,7 @@ VOID CArchipelago::gameFinished() {
 }
 
 VOID CArchipelago::sendDeathLink() {
-	if (!isConnected()) return;
+	if (!isConnected() || !GameHooks->isDeathLink) return;
 
 	spdlog::info("Sending deathlink");
 
