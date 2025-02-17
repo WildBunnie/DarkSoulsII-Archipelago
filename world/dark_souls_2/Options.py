@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from Options import PerGameCommonOptions
+from Options import PerGameCommonOptions, DeathLink
     
 @dataclass
 class DS2Options(PerGameCommonOptions):
-    pass
+    death_link: DeathLink

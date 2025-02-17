@@ -106,3 +106,6 @@ class DS2World(World):
         code = self.item_name_to_id[name]
         classification = ItemClassification.progression if name in progression_items else ItemClassification.filler
         return DS2Item(name, classification, code, self.player)
+    
+    def fill_slot_data(self) -> dict:
+        return self.options.as_dict("death_link")

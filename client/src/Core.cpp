@@ -18,7 +18,7 @@ VOID ClientCore::Start()
     spdlog::info("Archipelago client\n"
         "Type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]' to connect to the room\n"
         "Type '/help' for more information\n"
-        "-----------------------------------------------------\n");
+        "-----------------------------------------------------");
 
     CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)Core->InputCommand, NULL, NULL, NULL);
 
@@ -26,7 +26,7 @@ VOID ClientCore::Start()
     while (true) {
         acplg->update();
         
-        if (GameHooks->isPlayerInGame() && GameHooks->isPlayerDead()) {
+        if (GameHooks->isDeathLink && GameHooks->isPlayerInGame() && GameHooks->isPlayerDead()) {
             acplg->sendDeathLink();
         }
 
