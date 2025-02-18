@@ -3,7 +3,8 @@ progression_items: list[str] = [
     "King's Ring",
     "Soldier Key",
     "Silvercat Ring",
-    "Ashen Mist Heart"
+    "Ashen Mist Heart",
+    "Giant's Kinship"
 ]
 
 item_list: list[tuple[int, str]] = [
