@@ -180,6 +180,8 @@
     <ClCompile Include="src\ArchipelagoInterface.cpp" />
     <ClCompile Include="src\Core.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\GameData.cpp" />
+    <ClCompile Include="src\GameData.h" />
     <ClCompile Include="src\hooks.cpp" />
   </ItemGroup>
   <ItemGroup>

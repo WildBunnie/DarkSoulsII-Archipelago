@@ -1,6 +1,7 @@
 #include "ArchipelagoInterface.h"
 #include "apuuid.hpp"
 #include "hooks.h"
+#include "GameData.h"
 #include <spdlog/spdlog.h>
 
 #ifdef __EMSCRIPTEN__
@@ -47,6 +48,8 @@ BOOL CArchipelago::Initialise(std::string URI) {
 			tags.push_back("DeathLink");
 			ap->ConnectUpdate(false, 1, true, tags);
 		}
+
+		GameHooks->locationsToCheck = ap->get_missing_locations();
 
 	});
 
@@ -111,9 +114,32 @@ BOOLEAN CArchipelago::isConnected() {
 VOID CArchipelago::update() {
 	if (ap) ap->poll();
 
-	std::list<int64_t> locations = GameHooks->getLocations();
+	if (isConnected()) {
+		handleLocationChecks();
+	}
+}
+
+VOID CArchipelago::handleLocationChecks() {
+	std::list<int64_t> locations = GameHooks->checkedLocations;
+	if (locations.size() == 0) return;
+
+
+	// if an itemlot has multiple item rewards
+	// count it has being multiple locations
+	for (auto const& location : locations) {
+		if (GameData::itemLotRewardAmount.contains(location)) {
+			int rewardAmount = GameData::itemLotRewardAmount[location];
+
+			if (rewardAmount > 1) {
+				for (int i = 1; i < rewardAmount; ++i) {
+					locations.push_back(location + i);
+				}
+			}
+		}
+	}
+
 	if (isConnected() && locations.size() > 0 && ap->LocationChecks(locations)) {
-		GameHooks->clearLocations(locations);
+		GameHooks->checkedLocations.clear();
 	};
 }
 

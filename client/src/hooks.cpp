@@ -21,6 +21,7 @@ struct ItemStruct {
     Item items[8];
 };
 
+// function that allows us to get the itemLotId on giveItemsOnPickup
 extern "C" int __cdecl getItemLotId(DWORD thisPtr, DWORD arg1, DWORD arg2, DWORD baseAddress);
 
 // hooking this function to always start the game offline
@@ -93,18 +94,6 @@ void Hooks::giveItems(std::vector<int> ids) {
     VirtualFree((LPVOID)displayStruct, 0, MEM_RELEASE);
 }
 
-std::list<int64_t> locations;
-std::list<int64_t> Hooks::getLocations()
-{
-    return locations;
-}
-
-void Hooks::clearLocations(std::list<int64_t> locationsToRemove) {
-    for (auto const& i : locationsToRemove) {
-        locations.remove(i);
-    }
-}
-
 // ============================= HOOKS =============================
 
 INT __stdcall detourGetaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHints, PADDRINFOA* ppResult) {
@@ -118,13 +107,17 @@ INT __stdcall detourGetaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHin
 
 void __fastcall detourGiveItemsOnReward(UINT_PTR thisPtr, void* Unknown, UINT_PTR* pItemLot, INT idk1, INT idk2, INT idk3) {
 
-    int itemLotId;
+    int64_t itemLotId;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pItemLot), &itemLotId, sizeof(itemLotId), NULL);
     spdlog::debug("was rewarded: {}", itemLotId);
 
-    locations.push_back(itemLotId);
+    if (GameHooks->locationsToCheck.contains(itemLotId)) {
+        GameHooks->checkedLocations.push_back(itemLotId);
+        GameHooks->locationsToCheck.erase(itemLotId);
+        return;
+    }
 
-    return;
+    return originalGiveItemsOnReward(thisPtr, pItemLot, idk1, idk2, idk3);
 }
 
 // this strategy with the booleans is not the best
@@ -133,12 +126,13 @@ bool giveNextItem = true;
 bool showNextItem = true;
 void __fastcall detourGiveItemsOnPickup(UINT_PTR thisPtr, void* Unknown, INT idk1, INT idk2) {
 
-    int itemLotId = getItemLotId(thisPtr, idk1, idk2, baseAddress);
+    int64_t itemLotId = getItemLotId(thisPtr, idk1, idk2, baseAddress);
     spdlog::debug("picked up: {}", itemLotId);
 
     // 0 means its an item we dropped
-    if (itemLotId != 0) {
-        locations.push_back(itemLotId);
+    if (itemLotId != 0 && GameHooks->locationsToCheck.contains(itemLotId)) {
+        GameHooks->checkedLocations.push_back(itemLotId);
+        GameHooks->locationsToCheck.erase(itemLotId);
         giveNextItem = false;
         showNextItem = false;
     }
