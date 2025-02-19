@@ -21,30 +21,12 @@ VOID ClientCore::Start()
         "-----------------------------------------------------");
 
     CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)Core->InputCommand, NULL, NULL, NULL);
-
     
     while (true) {
         acplg->update();
         
-        if (GameHooks->isDeathLink && GameHooks->isPlayerInGame() && GameHooks->isPlayerDead()) {
-            acplg->sendDeathLink();
-        }
-
-        if (Core->itemsToGive.size() > 0 && GameHooks->isPlayerInGame()) {
-            size_t totalItems = Core->itemsToGive.size();
-            size_t batchSize = 8;
-            for (int i = 0; i < totalItems; i += batchSize) {
-                std::vector<int> batch(Core->itemsToGive.begin() + i,
-                                       Core->itemsToGive.begin() + std::min(i + batchSize, totalItems));
-
-                GameHooks->giveItems(batch);
-
-                Core->itemsToGive.erase(Core->itemsToGive.begin() + i,
-                                        Core->itemsToGive.begin() + std::min(i + batchSize, totalItems));
-
-                totalItems = Core->itemsToGive.size();
-            }
-        }
+        Core->HandleDeathLink();
+        Core->HandleGiveItems();
 
         Sleep(1000/60); // run the loop 60 times per second
     }
@@ -95,7 +77,79 @@ VOID ClientCore::InputCommand()
     }
 }
 
-VOID ClientCore::Run()
+VOID ClientCore::HandleDeathLink()
 {
-	return VOID();
+    if (GameHooks->isDeathLink && GameHooks->isPlayerInGame() && GameHooks->isPlayerDead()) {
+        acplg->sendDeathLink();
+    }
+}
+
+VOID ClientCore::HandleGiveItems()
+{
+    if (Core->itemsToGive.size() > 0 && GameHooks->isPlayerInGame() && Core->saveLoaded) {
+
+        std::vector<int> items;
+
+        for (const auto& networkItem : Core->itemsToGive) {
+            if (networkItem.index < Core->lastReceivedIndex) {
+                continue;
+            }
+
+            items.push_back(networkItem.item);
+
+            if (items.size() == 8) {
+                GameHooks->giveItems(items);
+                Core->lastReceivedIndex += items.size();
+                items.clear();
+            }
+        }
+        if (!items.empty()) {
+            GameHooks->giveItems(items);
+            Core->lastReceivedIndex += items.size();
+        }
+
+        Core->itemsToGive.clear();
+        Core->WriteSaveFile(); // this is probably not a good idea
+    }
+}
+
+VOID ClientCore::WriteSaveFile() {
+    try {
+        std::filesystem::create_directory("archipelago");
+
+        json j = {
+            {"lastReceivedIndex", Core->lastReceivedIndex}
+        };
+
+        std::ofstream file("archipelago/" + std::string(Core->pSaveId) + "_" + std::string(Core->pSlotName) + ".json");
+
+        file << j.dump(4);
+
+        file.close();
+
+        spdlog::debug("Successfully wrote save file");
+    }
+    catch (const std::exception& e) {
+        spdlog::debug("Error writing save file");
+    }
+}
+
+VOID ClientCore::ReadSaveFile() {
+    try {
+        std::ifstream file("archipelago/" + std::string(Core->pSaveId) + "_" + std::string(Core->pSlotName) + ".json");
+
+        json j;
+        file >> j;
+
+        if (j.contains("lastReceivedIndex")) {
+            Core->lastReceivedIndex = j["lastReceivedIndex"];
+            spdlog::debug("Successfully read lastReceivedIndex: {}", Core->lastReceivedIndex);
+            Core->saveLoaded = true;
+        }
+
+        file.close();
+    }
+    catch (const std::exception& e) {
+        spdlog::debug("Error reading save file");
+    }
 }

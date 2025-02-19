@@ -1,11 +1,12 @@
 {
-  "dependencies": [
-    "asio",
-    "minhook",
-    "nlohmann-json",
-    "spdlog",
-    "valijson",
-    "websocketpp",
-    "zlib"
-  ]
+    "dependencies": [
+        "asio",
+        "minhook",
+        "nlohmann-json",
+        "spdlog",
+        "valijson",
+        "websocketpp",
+        "zlib",
+        "boost-uuid"
+    ]
 }
