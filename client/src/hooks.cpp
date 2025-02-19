@@ -129,6 +129,8 @@ void __fastcall detourGiveItemsOnPickup(UINT_PTR thisPtr, void* Unknown, INT idk
     int64_t itemLotId = getItemLotId(thisPtr, idk1, idk2, baseAddress);
     spdlog::debug("picked up: {}", itemLotId);
 
+    if (itemLotId == -1) spdlog::warn("error finding out what itemLot was picked up");
+
     // 0 means its an item we dropped
     if (itemLotId != 0 && GameHooks->locationsToCheck.contains(itemLotId)) {
         GameHooks->checkedLocations.push_back(itemLotId);
