@@ -4,7 +4,7 @@ import random
 from worlds.AutoWorld import World
 from BaseClasses import Item, ItemClassification, Location, Region
 from .Items import item_list, progression_items
-from .Locations import location_table
+from .Locations import location_table, dlc_regions
 from .Options import DS2Options
 
 class DS2Location(Location):
@@ -28,7 +28,7 @@ class DS2World(World):
     options: DS2Options
 
     item_name_to_id = {name: code for (code, name) in item_list}
-    location_name_to_id = {name: code for region in location_table.keys() for code, name, _ in location_table[region]}
+    location_name_to_id = {location_data.name: location_data.code for region in location_table.keys() for location_data in location_table[region]}
 
     def create_regions(self):
 
@@ -39,9 +39,10 @@ class DS2World(World):
         regions["Menu"] = menu_region
     
         for region_name in location_table:
+            if region_name in dlc_regions and not self.options.enable_dlcs: continue
             region = self.create_region(region_name)
-            for _, location_name, default_item in location_table[region_name]:
-                location = self.create_location(location_name, region, default_item)
+            for location_data in location_table[region_name]:
+                location = self.create_location(location_data.name, region, location_data.default_item)
                 region.locations.append(location)
             regions[region_name] = region
             self.multiworld.regions.append(region)
@@ -58,7 +59,6 @@ class DS2World(World):
 
         regions["Grave of Saints"].connect(regions["The Gutter"])
         regions["The Gutter"].connect(regions["Chasm of the Abyss"])
-        regions["The Gutter"].connect(regions["Shulva"])
 
         regions["Forest of Fallen Giants"].connect(regions["Giant's Memory"])
         regions["Forest of Fallen Giants"].connect(regions["Lost Bastille"])
@@ -69,14 +69,12 @@ class DS2World(World):
 
         regions["Huntman's Copse"].connect(regions["Earthen Peak"])
         regions["Earthen Peak"].connect(regions["Iron Keep"])
-        regions["Iron Keep"].connect(regions["Brume Tower"])
 
         regions["Path to Shaded Woods"].connect(regions["Shaded Woods"])
         regions["Shaded Woods"].connect(regions["Drangleic Castle"])
         regions["Shaded Woods"].connect(regions["Doors of Pharros"])
         regions["Shaded Woods"].connect(regions["Aldia's Keep"])
         regions["Shaded Woods"].connect(regions["Chasm of the Abyss"])
-        regions["Shaded Woods"].connect(regions["Eleum Loyce"])
 
         regions["Doors of Pharros"].connect(regions["Brightstone Cove"])
         regions["Brightstone Cove"].connect(regions["Dragon Memories"])
@@ -86,6 +84,11 @@ class DS2World(World):
         regions["Shrine of Amana"].connect(regions["Undead Crypt"])
         
         regions["Aldia's Keep"].connect(regions["Dragon Aerie"])
+
+        if self.options.enable_dlcs:
+            regions["Shaded Woods"].connect(regions["Eleum Loyce"])
+            regions["Iron Keep"].connect(regions["Brume Tower"])
+            regions["The Gutter"].connect(regions["Shulva"])
 
     def create_region(self, name):
         return Region(name, self.player, self.multiworld)
