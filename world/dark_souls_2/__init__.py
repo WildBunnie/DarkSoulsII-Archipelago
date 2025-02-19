@@ -2,6 +2,7 @@ import string
 import random
 
 from worlds.AutoWorld import World
+from worlds.generic.Rules import set_rule
 from BaseClasses import Item, ItemClassification, Location, Region
 from .Items import item_list, progression_items
 from .Locations import location_table, dlc_regions
@@ -28,7 +29,7 @@ class DS2World(World):
     options: DS2Options
 
     item_name_to_id = {name: code for (code, name) in item_list}
-    location_name_to_id = {location_data.name: location_data.code for region in location_table.keys() for location_data in location_table[region]}
+    location_name_to_id = {name: code for region in location_table.keys() for code, name, _ in location_table[region]}
 
     def create_regions(self):
 
@@ -41,8 +42,8 @@ class DS2World(World):
         for region_name in location_table:
             if region_name in dlc_regions and not self.options.enable_dlcs: continue
             region = self.create_region(region_name)
-            for location_data in location_table[region_name]:
-                location = self.create_location(location_data.name, region, location_data.default_item)
+            for _, location_name, default_item in location_table[region_name]:
+                location = self.create_location(location_name, region, default_item)
                 region.locations.append(location)
             regions[region_name] = region
             self.multiworld.regions.append(region)
@@ -79,8 +80,9 @@ class DS2World(World):
         regions["Doors of Pharros"].connect(regions["Brightstone Cove"])
         regions["Brightstone Cove"].connect(regions["Dragon Memories"])
 
-        regions["Drangleic Castle"].connect(regions["Shrine of Amana"])
+        regions["Drangleic Castle"].connect(regions["Throne of Want"])
         regions["Drangleic Castle"].connect(regions["Chasm of the Abyss"])
+        regions["Drangleic Castle"].connect(regions["Shrine of Amana"])
         regions["Shrine of Amana"].connect(regions["Undead Crypt"])
         
         regions["Aldia's Keep"].connect(regions["Dragon Aerie"])
@@ -99,7 +101,11 @@ class DS2World(World):
     def create_items(self):
         pool = []
         
-        for location in self.multiworld.get_locations(self.player):
+        final_item = self.create_item("Soul of Nashandra")
+        self.multiworld.get_location("[Drangleic] Nashandra drop", self.player).place_locked_item(final_item)
+
+        for location in self.multiworld.get_unfilled_locations(self.player):
+            if not location.default_item: continue
             item = self.create_item(location.default_item)
             pool.append(item)
 
@@ -109,6 +115,23 @@ class DS2World(World):
         code = self.item_name_to_id[name]
         classification = ItemClassification.progression if name in progression_items else ItemClassification.filler
         return DS2Item(name, classification, code, self.player)
-    
+
+    def set_rules(self):
+        self.set_connection_rule("Path to Shaded Woods", "Shaded Woods", lambda state: state.has("Fragrant Branch of Yore", self.player))
+        self.set_connection_rule("Forest of Fallen Giants", "Lost Bastille", lambda state: state.has("Soldier Key", self.player))
+        self.set_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("King's Ring", self.player))
+        self.set_connection_rule("Forest of Fallen Giants", "Giant's Memory", lambda state: state.has("King's Ring", self.player) and state.has("Ashen Mist Heart", self.player))
+        self.set_connection_rule("Drangleic Castle", "Throne of Want", lambda state: state.has("King's Ring", self.player))
+        
+        set_rule(self.multiworld.get_location("[Drangleic] Nashandra drop", self.player), lambda state: state.has("Giant's Kinship", self.player))
+
+        self.multiworld.completion_condition[self.player] = lambda state: state.has("Soul of Nashandra", self.player)
+
+        # from Utils import visualize_regions
+        # visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
+
+    def set_connection_rule(self, fromRegion, toRegion, state):
+        set_rule(self.multiworld.get_entrance(f"{fromRegion} -> {toRegion}", self.player), state)
+
     def fill_slot_data(self) -> dict:
         return self.options.as_dict("death_link")

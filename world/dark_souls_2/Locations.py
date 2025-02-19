@@ -585,6 +585,7 @@ location_table = {
         # (600000, "[DragonShrine] Ancient dragon drop (item 1)", "Ashen Mist Heart"),
         # (600001, "[DragonShrine] Ancient dragon drop (item 2)", "Soul of a Giant"),
         # (600008, "[DragonShrine] Ancient dragon drop (item 9)", "Petrified Dragon Bone"),
+        (1787000, "[DragonShrine] Gift from ancient dragon when speaking to him", "Ashen Mist Heart"),
         (10275000, "[DragonShrine] Metal chest in a side room right after the bonfire", "Bonfire Ascetic"),
         (10275010, "[DragonShrine] Wooden chest on right side of the stairs", "Titanite Slab"),
         (10275020, "[DragonShrine] Wooden chest on roof on the path to the left of the second Drakekeeper", "Twinkling Titanite"),
@@ -838,13 +839,15 @@ location_table = {
         (20116200, "[Amana] In a cave behind roots with a hippo (item 1)", "Singer's Dress"),
         (20116201, "[Amana] In a cave behind roots with a hippo (item 2)", "Life Ring+2"),
     ],
-    "Drangleic Castle": [
-        (309610, "[Drangleic] Twin Dragonriders drop", "Dragonrider Soul"),
+    "Throne of Want": [
         (332000, "[Drangleic] Throne Watcher and Defender drop (item 1)", "Throne Defender Soul"),
         (332001, "[Drangleic] Throne Watcher and Defender drop (item 2)", "Throne Watcher Soul"),
+        (627000, "[Drangleic] Nashandra drop", "Soul of Nashandra"),
+    ],
+    "Drangleic Castle": [
+        (309610, "[Drangleic] Twin Dragonriders drop", "Dragonrider Soul"),
         (504000, "[Drangleic] Looking Glass Knight drop", "Looking Glass Knight Soul"),
         # (506100, "[Drangleic] Darklurker drop", "Darklurker Soul"),
-        (627000, "[Drangleic] Nashandra drop", "Soul of Nashandra"),
         (20215000, "[Drangleic] Metal chest one level down from the Forgotten Chamber bonfire (item 1)", "Hunter's Blackbow"),
         (20215001, "[Drangleic] Metal chest one level down from the Forgotten Chamber bonfire (item 2)", "Iron Arrow"),
         (20215010, "[Drangleic] Wooden chest in acid pool", "Corrosive Urn"),
