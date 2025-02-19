@@ -163,8 +163,6 @@ bool Hooks::initHooks() {
     HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
     baseAddress = (DWORD)hModule;
 
-    spdlog::set_level(spdlog::level::level_enum::debug);
-
     MH_Initialize();
 
     MH_CreateHookApi(L"ws2_32", "getaddrinfo", &detourGetaddrinfo, (LPVOID*)&originalGetaddrinfo);
