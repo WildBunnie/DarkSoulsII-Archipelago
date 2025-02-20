@@ -36,6 +36,7 @@ class DS2World(World):
             if region_name in dlc_regions and not self.options.enable_dlcs: continue
             region = self.create_region(region_name)
             for location_data in location_table[region_name]:
+                if location_data.ngp and not self.options.enable_ngp: continue
                 location = self.create_location(location_data.name, region)
                 region.locations.append(location)
             regions[region_name] = region
