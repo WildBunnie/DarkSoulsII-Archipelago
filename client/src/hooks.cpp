@@ -30,7 +30,7 @@ typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const
 
 // fuction is called when player receives a reward (boss, covenant, npc or event)
 typedef void(__thiscall* giveItemsOnReward_t)(UINT_PTR thisPtr, UINT_PTR* pItemLot, INT idk1, INT idk2, INT idk3);
-// fuction is called when player receives a reward (boss, covenant, npc or event)
+// fuction is called when player picks up an item
 typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, INT idk1, INT idk2);
 
 // this function adds the item to the players inventory
