@@ -1,7 +1,6 @@
 #include "ArchipelagoInterface.h"
 #include "apuuid.hpp"
 #include "hooks.h"
-#include "GameData.h"
 #include <spdlog/spdlog.h>
 
 #include <boost/uuid/uuid.hpp>
@@ -149,24 +148,9 @@ VOID CArchipelago::update() {
 
 VOID CArchipelago::handleLocationChecks() {
 	std::list<int64_t> locations = GameHooks->checkedLocations;
-	if (locations.size() == 0) return;
-
-
-	// if an itemlot has multiple item rewards
-	// count it has being multiple locations
-	for (auto const& location : locations) {
-		if (GameData::itemLotRewardAmount.contains(location)) {
-			int rewardAmount = GameData::itemLotRewardAmount[location];
-
-			if (rewardAmount > 1) {
-				for (int i = 1; i < rewardAmount; ++i) {
-					locations.push_back(location + i);
-				}
-			}
-		}
-	}
-
-	if (isConnected() && locations.size() > 0 && ap->LocationChecks(locations)) {
+	if (!isConnected() || locations.size() == 0) return;
+	
+	if (ap->LocationChecks(locations)) {
 		GameHooks->checkedLocations.clear();
 	};
 }
