@@ -54,6 +54,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -179,6 +180,8 @@
     <ClCompile Include="src\ArchipelagoInterface.cpp" />
     <ClCompile Include="src\Core.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\GameData.cpp" />
+    <ClCompile Include="src\GameData.h" />
     <ClCompile Include="src\hooks.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -190,7 +193,11 @@
     <ClInclude Include="src\FunctionOffsets.h" />
     <ClInclude Include="src\hooks.h" />
   </ItemGroup>
+  <ItemGroup>
+    <MASM Include="src\functions.asm" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>

@@ -13,4 +13,7 @@ public:
 	VOID update();
 	VOID gameFinished();
 	VOID sendDeathLink();
+
+private:
+	VOID handleLocationChecks();
 };

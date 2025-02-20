@@ -83,7 +83,7 @@ class DS2World(World):
 
         regions["Drangleic Castle"].connect(regions["Shrine of Amana"])
         regions["Drangleic Castle"].connect(regions["Chasm of the Abyss"])
-        regions["Shrine of Aman"].connect(regions["Undead Crypt"])
+        regions["Shrine of Amana"].connect(regions["Undead Crypt"])
         
         regions["Aldia's Keep"].connect(regions["Dragon Aerie"])
 

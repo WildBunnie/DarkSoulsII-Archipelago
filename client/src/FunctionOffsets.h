@@ -1,10 +1,9 @@
 #pragma once
 
 enum FunctionOffsets {
-    PickupItemLotFunction = 0x257060,
-    ItemGiveFunction = 0x22AD20,
-    ShowItemPopupFunction = 0x4FA9B0,
-    PopUpStructFunction = 0x11F430,
-    SelectMenuOptionFunction = 0x18C160,
-    SelectSaveSlotFunction = 0x189450
+    GiveItemsOnReward = 0x21D3C0,
+    GiveItemsOnPickup = 0x25bff0,
+    AddItemsToInventory= 0x22AD20,
+    ShowItemPopup = 0x4FA9B0,
+    CreatePopUpStruct = 0x11F430,
 };

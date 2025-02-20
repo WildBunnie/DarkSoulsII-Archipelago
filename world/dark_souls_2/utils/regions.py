@@ -6,7 +6,8 @@ with open("vanilla/ItemParam.csv") as itemsFile:
     next(itemsFile) # skip csv header
     for line in itemsFile:
         data = line.split(",")
-        items[int(data[0])] = data[1]
+        name = re.sub(r'(?<!\s)- ', ', ', data[1])
+        items[int(data[0])] = name
 
 with open("meta.csv") as itemsFile:
     for line in itemsFile:
@@ -39,9 +40,11 @@ with open("vanilla/ItemLotParam2_Other.csv") as itemLotFile:
         locationName = data[1]
         description = descriptions[itemLotId]
 
-        if itemLotId < 10025010 or itemLotId > 50376770: continue # only item pickups
+        if itemLotId < 106000 or itemLotId > 60046001: continue
+        if itemLotId >= 3001000 and itemLotId <= 3021000: continue # skip gestures
         if itemLotId >= 50000000 and itemLotId <= 50000303: continue # skip birds
         if locationName.startswith("[Unknown]"): continue
+        if locationName.startswith("UNKNOWN"): continue
     
         # # since its a csv all the ',' have been replaced with '-'
         # # we want them back but we need to make sure there is something before the '-'
