@@ -68,10 +68,17 @@ is_enemy_drop:
     push esi
     lea eax, [edi + 25D170h]
     call eax
-    add esp, 4
+    test eax, eax
+    jz error
 
     mov eax, [eax+44h]
     mov eax, [eax+80h]
+
+    jmp done
+
+error:
+    mov eax, -1
+    ret
 
 done:
     ret

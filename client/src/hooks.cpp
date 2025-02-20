@@ -30,7 +30,7 @@ typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const
 
 // fuction is called when player receives a reward (boss, covenant, npc or event)
 typedef void(__thiscall* giveItemsOnReward_t)(UINT_PTR thisPtr, UINT_PTR* pItemLot, INT idk1, INT idk2, INT idk3);
-// fuction is called when player receives a reward (boss, covenant, npc or event)
+// fuction is called when player picks up an item
 typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, INT idk1, INT idk2);
 
 // this function adds the item to the players inventory
@@ -129,6 +129,8 @@ void __fastcall detourGiveItemsOnPickup(UINT_PTR thisPtr, void* Unknown, INT idk
     int64_t itemLotId = getItemLotId(thisPtr, idk1, idk2, baseAddress);
     spdlog::debug("picked up: {}", itemLotId);
 
+    if (itemLotId == -1) spdlog::warn("error finding out what itemLot was picked up");
+
     // 0 means its an item we dropped
     if (itemLotId != 0 && GameHooks->locationsToCheck.contains(itemLotId)) {
         GameHooks->checkedLocations.push_back(itemLotId);
@@ -162,8 +164,6 @@ bool Hooks::initHooks() {
 
     HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
     baseAddress = (DWORD)hModule;
-
-    spdlog::set_level(spdlog::level::level_enum::debug);
 
     MH_Initialize();
 
