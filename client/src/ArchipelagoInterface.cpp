@@ -150,6 +150,14 @@ VOID CArchipelago::handleLocationChecks() {
 	std::list<int64_t> locations = GameHooks->checkedLocations;
 	if (!isConnected() || locations.size() == 0) return;
 	
+	// if we are awarded the sould of nashandra then send game completion
+	auto it = std::find(locations.begin(), locations.end(), 627000);
+	if (it != locations.end()) {
+		gameFinished();
+		GameHooks->checkedLocations.clear();
+		return;
+	}
+
 	if (ap->LocationChecks(locations)) {
 		GameHooks->checkedLocations.clear();
 	};
