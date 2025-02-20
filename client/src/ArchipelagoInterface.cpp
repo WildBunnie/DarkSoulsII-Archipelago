@@ -3,6 +3,10 @@
 #include "hooks.h"
 #include <spdlog/spdlog.h>
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 #ifdef __EMSCRIPTEN__
 #define DATAPACKAGE_CACHE "/settings/datapackage.json"
 #define UUID_FILE "/settings/uuid"
@@ -48,10 +52,34 @@ BOOL CArchipelago::Initialise(std::string URI) {
 			ap->ConnectUpdate(false, 1, true, tags);
 		}
 
+		Core->pSeed = ap->get_seed();
+		Core->pTeamNumber = ap->get_team_number();
+
 		GameHooks->locationsToCheck = ap->get_missing_locations();
 
+		ap->Get({ Core->getSaveIdKey() });
 	});
 
+	ap->set_retrieved_handler([](const std::map<std::string, json>& keys) {
+		if (keys.contains(Core->getSaveIdKey()) && !keys.at(Core->getSaveIdKey()).is_null()) {
+			Core->pSaveId = keys.at(Core->getSaveIdKey());
+			spdlog::debug("retrieved save id {}", Core->pSaveId);
+			Core->ReadSaveFile();
+		}
+		else {
+			boost::uuids::uuid uuid = boost::uuids::random_generator()();
+			Core->pSaveId = boost::uuids::to_string(uuid);
+			if (ap->Set(Core->getSaveIdKey(), Core->pSaveId, false, {})) {
+				spdlog::debug("new save id has been set {}", Core->pSaveId);
+				Core->WriteSaveFile();
+				Core->saveLoaded = true;
+			}
+			else {
+				spdlog::error("error setting save id");
+			}
+		}
+	});
+	
 	ap->set_slot_disconnected_handler([]() {
 		spdlog::info("Slot disconnected");
 	});
@@ -76,7 +104,7 @@ BOOL CArchipelago::Initialise(std::string URI) {
 		}
 
 		for (auto const& i : receivedItems) {
-			Core->itemsToGive.push_back(i.item);
+			Core->itemsToGive.push_back(i);
 		}
 
 	});

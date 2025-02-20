@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;DS2ARCHIPELAGO_EXPORTS;_WINDOWS;_USRDLL;ASIO_STANDALONE;APCLIENT_DEBUG;_WIN32_WINNT=0x0600;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;DS2ARCHIPELAGO_EXPORTS;_WINDOWS;_USRDLL;ASIO_STANDALONE;APCLIENT_DEBUG;_WIN32_WINNT=0x0600;WIN32_LEAN_AND_MEAN;BOOST_UUID_FORCE_AUTO_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
