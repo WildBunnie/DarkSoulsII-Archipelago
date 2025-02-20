@@ -41,15 +41,10 @@ with open("vanilla/ItemLotParam2_Other.csv") as itemLotFile:
         description = descriptions[itemLotId]
 
         if itemLotId < 106000 or itemLotId > 60046001: continue
-        if itemLotId >= 3001000 and itemLotId <= 3021000: continue # skip gestures
-        if itemLotId >= 50000000 and itemLotId <= 50000303: continue # skip birds
+        # if itemLotId >= 3001000 and itemLotId <= 3021000: continue # skip gestures
+        # if itemLotId >= 50000000 and itemLotId <= 50000303: continue # skip birds
         if locationName.startswith("[Unknown]"): continue
         if locationName.startswith("UNKNOWN"): continue
-    
-        # # since its a csv all the ',' have been replaced with '-'
-        # # we want them back but we need to make sure there is something before the '-'
-        # # so that we dont pickup things in the prefix
-        # locationName = re.sub(r'(?<!\s)- ', ', ', locationName)
 
         prefix = locationName.split("] ")[0] + "]"
         if " - " in prefix:
@@ -67,28 +62,14 @@ with open("vanilla/ItemLotParam2_Other.csv") as itemLotFile:
             amount = checkedLocations.count(description)
             checkedLocations.append(description)
             description = description + f" ({amount+1})"
-
-        multipleItems = False
-        if int(data[47]) != 10: multipleItems = True
-
-        for i in range(46, 56):
-            itemId = int(data[i])
-            if itemId in [0, 10]: continue # ignore empty
-            itemName = items[itemId]
-
-            finalItemLotId = itemLotId + i-46
-
-            if multipleItems:
-                count = i-45
-                regions[regionName].append(f'({finalItemLotId}, "{description} (item {count})", "{itemName}")')
-            else:
-                regions[regionName].append(f'({finalItemLotId}, "{description}", "{itemName}")')
+    
+        regions[regionName].append(f'LocationData({itemLotId}, "{description}")')
 
 
 def writeToFile(file, text):
     file.write(f"{text}\n")
 
-with open("regions.txt","w") as regionsFile:
+with open("locations.txt","w") as regionsFile:
     writeToFile(regionsFile, "location_table = {")
     for region in regions:
         writeToFile(regionsFile, f'    "{region}": [')
