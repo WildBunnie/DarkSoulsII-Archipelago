@@ -12,7 +12,13 @@ extern Hooks* GameHooks;
 DWORD WINAPI Init(LPVOID lpParam);
 void LoadOriginalDll();
 HINSTANCE mHinstDLL = 0;
+
+#ifdef _M_IX86
 UINT_PTR mProcs[6] = { 0 };
+#elif defined(_M_X64)
+extern "C" UINT_PTR mProcs[6] = { 0 };
+#endif
+
 LPCSTR mImportNames[] = { "DirectInput8Create", "DllCanUnloadNow", "DllGetClassObject", "DllRegisterServer", "DllUnregisterServer", "GetdfDIJoystick" };
 
 BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
@@ -52,12 +58,22 @@ DWORD WINAPI Init(LPVOID lpParam) {
 
 // route our emulated functions
 // to the original dll functions
+#ifdef _M_IX86
 extern "C" __declspec(naked) void __stdcall DirectInput8Create_wrapper() { __asm {jmp mProcs[0 * 4]} }
 extern "C" __declspec(naked) void __stdcall DllCanUnloadNow_wrapper() { __asm {jmp mProcs[1 * 4]} }
 extern "C" __declspec(naked) void __stdcall DllGetClassObject_wrapper() { __asm {jmp mProcs[2 * 4]} }
 extern "C" __declspec(naked) void __stdcall DllRegisterServer_wrapper() { __asm {jmp mProcs[3 * 4]} }
 extern "C" __declspec(naked) void __stdcall DllUnregisterServer_wrapper() { __asm {jmp mProcs[4 * 4]} }
 extern "C" __declspec(naked) void __stdcall GetdfDIJoystick_wrapper() { __asm {jmp mProcs[5 * 4]} }
+#elif defined(_M_X64)
+extern "C" void DirectInput8Create_wrapper();
+extern "C" void DllCanUnloadNow_wrapper();
+extern "C" void DllGetClassObject_wrapper();
+extern "C" void DllRegisterServer_wrapper();
+extern "C" void DllUnregisterServer_wrapper();
+extern "C" void GetdfDIJoystick_wrapper();
+#endif
+
 
 // Loads the original DLL from the default system directory
 // Function originally written by Michael Koch

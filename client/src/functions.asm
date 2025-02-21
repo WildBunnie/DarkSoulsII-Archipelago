@@ -1,3 +1,12 @@
+; Check if compiling for x86 architecture
+IFDEF RAX
+    END_IF_NOT_X86 equ end
+ELSE
+    END_IF_NOT_X86 equ <>
+ENDIF
+
+END_IF_NOT_X86
+
 .386
 .model flat, c
 .code
