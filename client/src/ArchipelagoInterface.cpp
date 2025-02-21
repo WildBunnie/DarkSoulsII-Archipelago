@@ -17,13 +17,11 @@
 
 bool ap_sync_queued = false;
 APClient* ap;
-APClient::Version APClientVersion = { 0, 4, 9 };
+APClient::Version APClientVersion = { 0, 5, 1 };
 extern ClientCore* Core;
 extern Hooks* GameHooks;
 
 BOOL CArchipelago::Initialise(std::string URI) {
-	spdlog::info("ClientArchipelago::Intialise");
-
 	std::string uuid = ap_get_uuid(UUID_FILE);
 	if (ap != nullptr) {
 		ap->reset();

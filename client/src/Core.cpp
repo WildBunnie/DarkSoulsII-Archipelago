@@ -15,6 +15,12 @@ VOID ClientCore::Start()
 {
     Core = new ClientCore();
 
+#ifdef NDEBUG
+    spdlog::set_level(spdlog::level::info);
+#else
+    spdlog::set_level(spdlog::level::debug);
+#endif
+
     spdlog::info("Archipelago client\n"
         "Type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]' to connect to the room\n"
         "Type '/help' for more information\n"
@@ -42,14 +48,13 @@ VOID ClientCore::InputCommand()
             spdlog::info("List of available commands : \n"
                 "/help : Prints this help message.\n"
                 "!help : Prints the help message related to Archipelago.\n"
-                "/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}] : Connect to the specified server.\n"
-                "/debug on|off : Prints additional debug info \n");
+                "/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}] : Connect to the specified server.");
         }
         else if (line.find("/connect ") == 0) {
             std::string param = line.substr(9);
             int spaceIndex = param.find(" ");
             if (spaceIndex == std::string::npos) {
-                spdlog::info("Missing parameter : Make sure to type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]\n");
+                spdlog::info("Missing parameter : Make sure to type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]");
             }
             else {
                 int passwordIndex = param.find("password:");
@@ -64,7 +69,7 @@ VOID ClientCore::InputCommand()
                 }
                 Core->pPassword = password;
                 if (!acplg->Initialise(address)) {
-                    spdlog::info("failed to connect to Archipelago\n");
+                    spdlog::info("failed to connect to Archipelago");
                 }
             }
         }
@@ -72,7 +77,7 @@ VOID ClientCore::InputCommand()
             acplg->say(line);
         }
         else {
-            spdlog::info("Sorry did not understand that.\n");
+            spdlog::info("Sorry did not understand that.");
         }
     }
 }
