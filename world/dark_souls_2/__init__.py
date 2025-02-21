@@ -37,6 +37,7 @@ class DS2World(World):
             region = self.create_region(region_name)
             for location_data in location_table[region_name]:
                 if location_data.ngp and not self.options.enable_ngp: continue
+                if location_data.sotfs and not self.options.game_version == "sotfs": continue
                 location = self.create_location(location_data.name, region)
                 region.locations.append(location)
             regions[region_name] = region
