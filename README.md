@@ -14,17 +14,17 @@ The mod works with a single `dinput8.dll` file.
 ### Generating the world
 
 - Download the lastest version of the archipelago client available [here](https://github.com/ArchipelagoMW/Archipelago/releases/latest).
-- Inside the archipelago client, press the `Install APWorld` and select the download apworld.
-- Press the `Generate Template Options` and grab the `Dark Souls II.yaml`.
+- Inside the archipelago client, press `Install APWorld` and select the apworld you downloaded.
+- Press `Generate Template Options` and grab the `Dark Souls II.yaml`.
 - Edit the settings on the yaml file to your liking, especially changing your name.
-- Press the `Browse Files` option in the client and place your yaml file and any others from people you might be playing with inside the `Players` folder.
+- Press `Browse Files` in the client and place your yaml file and any others from people you might be playing with inside the `Players` folder.
 - Press `generate` in the client to generate the world.
 - Now either choose `host` to host the game locally or upload the file in the `output` folder to [archipelago's website](https://archipelago.gg/uploads).
 
 ### Joining a game
 
 - Simply launch the game and a console will launch together with it.
-- In that console type `/connect server_address:port slot_name password`, replacing the correct values with the password being optional and the slot name being the name you placed in the yaml file.
+- In that console type `/connect server_address:port slot_name password`, replacing the correct values. The password is optional and the slot name is the name you placed in the yaml file.
 - For example, if you host in archipelago's website it would look something like `/connect archipelago.gg:123456 JohnSouls`.
 
 ## Building Locally
@@ -33,3 +33,7 @@ The mod works with a single `dinput8.dll` file.
 - run `git submodule update --init --recursive` to download the submodules
 - make sure you have vcpkg, it should be installed together with visual studio, and then run `vcpkg integrate install`
 - set the platform to x86 and build
+
+## Special Thank you
+
+[pseudostripy](https://github.com/pseudostripy) (developer of [META](https://github.com/pseudostripy/DS2S-META)) for answering all my questions and helping out when i was lost
