@@ -120,10 +120,28 @@ BOOL CArchipelago::Initialise(std::string URI) {
 
 	ap->set_bounced_handler([](const json& cmd) {
 		if (GameHooks->isDeathLink) {
-			Core->diedByDeathLink = true;
-			GameHooks->killPlayer();
+			spdlog::debug("Received DeathLink");
+
+			auto tagsIt = cmd.find("tags");
+			auto dataIt = cmd.find("data");
+
+			if (tagsIt != cmd.end() && tagsIt->is_array() && std::find(tagsIt->begin(), tagsIt->end(), "DeathLink") != tagsIt->end()) {
+				if (dataIt != cmd.end() && dataIt->is_object()) {
+					json data = *dataIt;
+
+					std::string source = data["source"].is_string() ? data["source"].get<std::string>() : "";
+					std::string cause = data["cause"].is_string() ? data["cause"].get<std::string>() : "";
+
+					if (!source.empty() && source != Core->pSlotName) {
+						spdlog::info("DeathLink source: {} caused by: {}", source, cause);
+						Core->diedByDeathLink = true;
+						GameHooks->killPlayer();
+					}
+				}
+			}
 		}
 	});
+
 	return true;
 }
 

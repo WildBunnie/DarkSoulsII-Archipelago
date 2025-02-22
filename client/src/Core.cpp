@@ -85,12 +85,11 @@ VOID ClientCore::InputCommand()
 VOID ClientCore::HandleDeathLink()
 {
     if (GameHooks->isDeathLink && GameHooks->isPlayerInGame() && GameHooks->playerJustDied()) {
+        spdlog::debug("player just died")
         if (!Core->diedByDeathLink) {
             acplg->sendDeathLink();
         }
-        else {
-            Core->diedByDeathLink = false;
-        }
+        Core->diedByDeathLink = false;
     }
 }
 
