@@ -182,7 +182,7 @@ bool Hooks::initHooks() {
 }
 
 int prevHp, curHp = -1;
-bool Hooks::isPlayerDead() {
+bool Hooks::playerJustDied() {
     prevHp = curHp;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x74, 0xFC }), &curHp, sizeof(int), NULL);
     if (prevHp != 0 && curHp == 0) {

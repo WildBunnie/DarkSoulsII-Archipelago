@@ -16,7 +16,7 @@ public:
     DWORD GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DWORD> offsets);
     void giveItems(std::vector<int> ids);
 
-    bool isPlayerDead();
+    bool playerJustDied();
     bool isPlayerInGame();
     void killPlayer();
 
