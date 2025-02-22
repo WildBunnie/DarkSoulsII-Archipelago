@@ -119,7 +119,10 @@ BOOL CArchipelago::Initialise(std::string URI) {
 	});
 
 	ap->set_bounced_handler([](const json& cmd) {
-		if(GameHooks->isDeathLink) GameHooks->killPlayer();
+		if (GameHooks->isDeathLink) {
+			Core->diedByDeathLink = true;
+			GameHooks->killPlayer();
+		}
 	});
 	return true;
 }

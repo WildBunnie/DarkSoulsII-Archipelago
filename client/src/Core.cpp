@@ -84,8 +84,13 @@ VOID ClientCore::InputCommand()
 
 VOID ClientCore::HandleDeathLink()
 {
-    if (GameHooks->isDeathLink && GameHooks->isPlayerInGame() && GameHooks->isPlayerDead()) {
-        acplg->sendDeathLink();
+    if (GameHooks->isDeathLink && GameHooks->isPlayerInGame() && GameHooks->playerJustDied()) {
+        if (!Core->diedByDeathLink) {
+            acplg->sendDeathLink();
+        }
+        else {
+            Core->diedByDeathLink = false;
+        }
     }
 }
 
