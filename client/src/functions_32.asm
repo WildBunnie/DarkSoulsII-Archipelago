@@ -16,7 +16,7 @@ END_IF_NOT_X86
 
 ; this function allows us to get the itemLotId of an item that is being picked up
 ; since the itemGive function only receives the contents of the itemLot
-getItemLotId proc thisPtr:ptr, arg1:dword, arg2:dword, baseAddress:ptr
+getItemLotId proc thisPtr:ptr, arg1:ptr, arg2:ptr, baseAddress:ptr
 
     ; Load arguments into registers
     mov esi, thisPtr     ; thisPtr

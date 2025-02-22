@@ -220,11 +220,11 @@
   <ItemGroup>
     <ClInclude Include="src\ArchipelagoInterface.h" />
     <ClInclude Include="src\Core.h" />
-    <ClInclude Include="src\FunctionOffsets.h" />
+    <ClInclude Include="src\offsets.h" />
     <ClInclude Include="src\hooks.h" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\functions.asm" />
+    <MASM Include="src\functions_32.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
