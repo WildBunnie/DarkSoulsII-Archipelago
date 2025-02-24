@@ -4,7 +4,7 @@ import random
 from worlds.AutoWorld import World
 from worlds.generic.Rules import set_rule
 from BaseClasses import Item, ItemClassification, Location, Region
-from .Items import item_list, progression_items
+from .Items import item_list, progression_items, repetable_categories
 from .Locations import location_table, dlc_regions
 from .Options import DS2Options
 
@@ -93,24 +93,44 @@ class DS2World(World):
         return DS2Location(self.player, name, self.location_name_to_id[name], region)
 
     def create_items(self):
-        pool = []
+        pool : list[DS2Item] = []
 
+        # set the soul of nashandra at the original location
+        # to use it for the game completion logic
         final_item = self.create_item("Soul of Nashandra")
         self.multiworld.get_location("[Drangleic] Nashandra drop", self.player).place_locked_item(final_item)
 
         max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
 
+        # make sure all the progression items are in the pool
         for progression_item in progression_items:
             item = self.create_item(progression_item)
             pool.append(item)
 
-        if len(pool) > max_pool_size:
-            print("ERROR: Pool cannot fit all the progression items")
-            return
+        assert len(pool) <= max_pool_size , "item pool cannot fit all the progression items" 
+        
+        # initial attempt at filling the item pool
+        items_in_pool = [item.name for item in pool]
+        for _ in range(max_pool_size - len(pool)):
+            
+            item_data = random.choice(item_list)
+            
+            # skip unwanted items
+            if item_data.skip: continue
+            # dont allow duplicates
+            if item_data.category not in repetable_categories and item_data.name in items_in_pool: continue
 
-        for i in range(max_pool_size - len(pool)):
-            item = self.create_item(random.choice(item_list).name)
+            item = self.create_item(item_data.name)
+            items_in_pool.append(item_data.name)
             pool.append(item)
+
+        # fill the rest of the pool with filler items
+        filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip]
+        for _ in range(max_pool_size - len(pool)):
+            item = self.create_item(random.choice(filler_items).name)
+            pool.append(item)
+
+        assert len(pool) == max_pool_size , "item pool is under-filled or over-filled"
 
         self.multiworld.itempool += pool
 
