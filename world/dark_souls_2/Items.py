@@ -1124,7 +1124,7 @@ item_list: list[ItemData] = [
     ItemData(60406000, "Dragon Torso Stone", ItemCategory.USABLE_ITEM),
     ItemData(60406010, "Dragon Torso Stone", ItemCategory.USABLE_ITEM),
     ItemData(60410000, "Repair Powder", ItemCategory.CONSUMABLE),
-    ItemData(60420000, "Torch", ItemCategory.CONSUMABLE), # changed to consumable so it can be repeated
+    ItemData(60420000, "Torch", ItemCategory.USABLE_ITEM),
     ItemData(60430000, "Flame Butterfly", ItemCategory.CONSUMABLE),
     ItemData(60450000, "Prism Stone", ItemCategory.CONSUMABLE),
     ItemData(60470000, "Hello Carving", ItemCategory.USABLE_ITEM, skip=True),
