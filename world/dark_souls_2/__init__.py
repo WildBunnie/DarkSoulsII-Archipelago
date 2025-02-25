@@ -117,6 +117,7 @@ class DS2World(World):
         assert len(pool) <= max_pool_size, "item pool cannot fit all the progression items" 
         
         # initial attempt at filling the item pool with the default items
+        items_in_pool = [item.name for item in pool]
         for location in self.multiworld.get_unfilled_locations(self.player):
             
             item_name = random.choice(location.default_items)
@@ -125,8 +126,11 @@ class DS2World(World):
 
             # skip unwanted items
             if item_data.skip: continue
+            # dont allow duplicates
+            if item_data.category not in repetable_categories and item_data.name in items_in_pool: continue
 
             item = self.create_item(item_data.name)
+            items_in_pool.append(item_data.name)
             pool.append(item)
 
         # fill the rest of the pool with filler items
