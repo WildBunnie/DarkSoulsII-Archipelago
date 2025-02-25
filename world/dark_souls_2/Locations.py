@@ -27,7 +27,7 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(10026070, "[Betwixt] On path after the backstab tutorial", ["Dagger"]),
         LocationData(10026080, "[Betwixt] Next to fog gate and archer", ["Lifegem"]),
         LocationData(10026090, "[Betwixt] Other side of the jumpable gap", ["Amber Herb"]),
-        LocationData(10027000, "Bone of Order", ["Bone of Order"]),
+        # LocationData(10027000, "Bone of Order", ["Bone of Order"]),
     ],
     "Majula": [
         LocationData(10045000, "[Majula] Wooden chest on the attic of Maughlin the Armorer", ["Titanite Shard"]),
@@ -40,7 +40,7 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(10045050, "[Pit] Second metal chest behind the forgotten door", ["Witchtree Branch", "Witchtree Bellvine"]),
         LocationData(10045060, "[Majula] Metal chest on the way towards forest", ["Rusted Coin"]),
         LocationData(10045070, "[Majula] Metal chest in staircase towards Heide's Tower of Flame", ["Crimson Parma"]),
-        LocationData(10045500, "Rubbish", ["Rubbish"]),
+        # LocationData(10045500, "Rubbish", ["Rubbish"]),
         LocationData(10045600, "[Majula] Metal chest in Cale's house basement", ["Soul Vessel"]),
         LocationData(10046000, "[Majula] Majula well", ["Estus Flask Shard"]),
         LocationData(10046010, "[Majula] Under the tree on the way from Things Betwixt", ["Divine Blessing"]),
