@@ -102,20 +102,21 @@ class DS2World(World):
     def create_items(self):
         pool : list[DS2Item] = []
 
-        # set the soul of nashandra at the original location
-        # to use it for the game completion logic
-        final_item = self.create_item("Soul of Nashandra")
-        self.multiworld.get_location("[Drangleic] Nashandra drop", self.player).place_locked_item(final_item)
-
-        max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
-
         # make sure all the progression items are in the pool
         for progression_item in progression_items:
             item = self.create_item(progression_item)
+
+            # set the soul of nashandra at the original location
+            # to use it for the game completion logic
+            if progression_item == "Soul of Nashandra":
+                self.multiworld.get_location("[Drangleic] Nashandra drop", self.player).place_locked_item(item)
+                continue
+            
             pool.append(item)
 
+        max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
         assert len(pool) <= max_pool_size, "item pool cannot fit all the progression items" 
-        
+
         # initial attempt at filling the item pool with the default items
         items_in_pool = [item.name for item in pool]
         for location in self.multiworld.get_unfilled_locations(self.player):
