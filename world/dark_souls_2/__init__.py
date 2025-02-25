@@ -102,6 +102,8 @@ class DS2World(World):
     def create_items(self):
         pool : list[DS2Item] = []
 
+        num_locations = len(self.multiworld.get_locations(self.player))
+
         # make sure all the progression items are in the pool
         for progression_item in progression_items:
             item = self.create_item(progression_item)
@@ -114,8 +116,7 @@ class DS2World(World):
             
             pool.append(item)
 
-        max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
-        assert len(pool) <= max_pool_size, "item pool cannot fit all the progression items" 
+        assert len(pool) <= num_locations, "item pool cannot fit all the progression items" 
 
         # initial attempt at filling the item pool with the default items
         items_in_pool = [item.name for item in pool]
@@ -136,11 +137,11 @@ class DS2World(World):
 
         # fill the rest of the pool with filler items
         filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip]
-        for _ in range(max_pool_size - len(pool)):
+        for _ in range(num_locations - len(pool)):
             item = self.create_item(random.choice(filler_items).name)
             pool.append(item)
 
-        assert len(pool) == max_pool_size, "item pool is under-filled or over-filled"
+        assert len(pool) == num_locations, "item pool is under-filled or over-filled"
 
         self.multiworld.itempool += pool
 
