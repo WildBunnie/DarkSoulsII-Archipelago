@@ -104,16 +104,29 @@ class DS2World(World):
 
         num_locations = len(self.multiworld.get_locations(self.player))
 
+        placed_items = []
+        # set the soul of nashandra at the original location
+        # to use it for the game completion logic
+        item = self.create_item("Soul of Nashandra")
+        self.multiworld.get_location("[Drangleic] Nashandra drop", self.player).place_locked_item(item)
+        placed_items.append("Soul of Nashandra")
+        # set the four old souls at the original location
+        # to use it for the shrine of winter logic
+        # having a check for lighting the primal bonfires would probably be better
+        self.multiworld.get_location("[Gulch] The Rotten drop", self.player).place_locked_item(self.create_item("Soul of the Rotten"))
+        self.multiworld.get_location("[SinnersRise] Lost Sinner drop", self.player).place_locked_item(self.create_item("Soul of the Lost Sinner"))
+        self.multiworld.get_location("[IronKeep] Old Iron King drop", self.player).place_locked_item(self.create_item("Old Iron King Soul"))
+        self.multiworld.get_location("[Tseldora] Duke's Dear Freja drop", self.player).place_locked_item(self.create_item("Soul of the Duke's Dear Freja"))
+        placed_items.extend(["Soul of the Rotten","Soul of the Lost Sinner","Old Iron King Soul","Soul of the Duke's Dear Freja"])
+        # set the giant's kinship at the original location
+        # because killing the giant lord is necessary to kill nashandra
+        self.multiworld.get_location("[MemoryJeigh] Giant Lord drop", self.player).place_locked_item(self.create_item("Giant's Kinship"))
+        placed_items.append("Giant's Kinship")
+
         # make sure all the progression items are in the pool
         for progression_item in progression_items:
+            if progression_item in placed_items: continue
             item = self.create_item(progression_item)
-
-            # set the soul of nashandra at the original location
-            # to use it for the game completion logic
-            if progression_item == "Soul of Nashandra":
-                self.multiworld.get_location("[Drangleic] Nashandra drop", self.player).place_locked_item(item)
-                continue
-            
             pool.append(item)
 
         assert len(pool) <= num_locations, "item pool cannot fit all the progression items" 
@@ -154,6 +167,11 @@ class DS2World(World):
         self.set_connection_rule("Path to Shaded Woods", "Shaded Woods", lambda state: state.has("Fragrant Branch of Yore", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "Lost Bastille", lambda state: state.has("Soldier Key", self.player))
         self.set_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("King's Ring", self.player))
+        self.set_connection_rule("Shaded Woods", "Drangleic Castle", lambda state: 
+                                 state.has("Soul of the Rotten", self.player) and
+                                 state.has("Soul of the Lost Sinner", self.player) and
+                                 state.has("Old Iron King Soul", self.player) and
+                                 state.has("Soul of the Duke's Dear Freja", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "Giant's Memory", lambda state: state.has("King's Ring", self.player) and state.has("Ashen Mist Heart", self.player))
         self.set_connection_rule("Drangleic Castle", "Throne of Want", lambda state: state.has("King's Ring", self.player))
         

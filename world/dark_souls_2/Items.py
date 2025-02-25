@@ -42,7 +42,11 @@ progression_items: list[str] = [
     "Silvercat Ring",
     "Ashen Mist Heart",
     "Giant's Kinship",
-    "Soul of Nashandra"
+    "Soul of the Rotten",
+    "Soul of the Lost Sinner",
+    "Old Iron King Soul",
+    "Soul of the Duke's Dear Freja",
+    "Soul of Nashandra",
 ]
 
 item_list: list[ItemData] = [
@@ -1240,18 +1244,18 @@ item_list: list[ItemData] = [
     ItemData(64030000, "Old Dragonslayer Soul", ItemCategory.CONSUMABLE),
     ItemData(64040000, "Flexile Sentry Soul", ItemCategory.CONSUMABLE),
     ItemData(64050000, "Ruin Sentinel Soul", ItemCategory.CONSUMABLE),
-    ItemData(64060000, "Soul of the Lost Sinner", ItemCategory.CONSUMABLE),
+    ItemData(64060000, "Soul of the Lost Sinner", ItemCategory.KEY_ITEM), # changed to key item to not mess with logic
     ItemData(64070000, "Executioner's Chariot Soul", ItemCategory.CONSUMABLE),
     ItemData(64080000, "Skeleton Lord's Soul", ItemCategory.CONSUMABLE),
     ItemData(64090000, "Covetous Demon Soul", ItemCategory.CONSUMABLE),
     ItemData(64100000, "Mytha, the Baneful Queen Soul", ItemCategory.CONSUMABLE),
     ItemData(64110000, "Smelter Demon Soul", ItemCategory.CONSUMABLE),
-    ItemData(64120000, "Old Iron King Soul", ItemCategory.CONSUMABLE),
+    ItemData(64120000, "Old Iron King Soul", ItemCategory.KEY_ITEM), # changed to key item to not mess with logic
     ItemData(64130000, "Royal Rat Vanguard Soul", ItemCategory.CONSUMABLE),
-    ItemData(64140000, "Soul of the Rotten", ItemCategory.CONSUMABLE),
+    ItemData(64140000, "Soul of the Rotten", ItemCategory.KEY_ITEM), # changed to key item to not mess with logic
     ItemData(64150000, "Scorpioness Najka Soul", ItemCategory.CONSUMABLE),
     ItemData(64160000, "Royal Rat Authority Soul", ItemCategory.CONSUMABLE),
-    ItemData(64170000, "Soul of the Duke's Dear Freja", ItemCategory.CONSUMABLE),
+    ItemData(64170000, "Soul of the Duke's Dear Freja", ItemCategory.KEY_ITEM), # changed to key item to not mess with logic
     ItemData(64180000, "Looking Glass Knight Soul", ItemCategory.CONSUMABLE),
     ItemData(64190000, "Demon of Song Soul", ItemCategory.CONSUMABLE),
     ItemData(64200000, "Soul of Velstadt", ItemCategory.CONSUMABLE),
