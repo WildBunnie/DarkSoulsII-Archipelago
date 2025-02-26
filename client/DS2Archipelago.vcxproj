@@ -215,6 +215,7 @@
     <MASM Include="src\dinput8.asm">
       <FileType>Document</FileType>
     </MASM>
+    <MASM Include="src\functions_64.asm" />
     <None Include="src\dllmain.def" />
   </ItemGroup>
   <ItemGroup>

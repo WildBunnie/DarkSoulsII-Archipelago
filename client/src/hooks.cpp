@@ -159,8 +159,6 @@ void __fastcall detourGiveItemsOnPickup(UINT_PTR thisPtr, void* Unknown, UINT_PT
 }
 #elif defined(_M_X64)
 void __cdecl detourGiveItemsOnPickup(UINT_PTR thisPtr, UINT_PTR idk1) {
-    spdlog::debug("picked up: {}", thisPtr);
-    spdlog::debug("picked up: {}", idk1);
     int32_t itemLotId = getItemLotId(thisPtr, idk1, baseAddress);
     detourGiveItemsOnPickupLogic(itemLotId);
     return originalGiveItemsOnPickup(thisPtr, idk1);
@@ -170,7 +168,7 @@ void __cdecl detourGiveItemsOnPickup(UINT_PTR thisPtr, UINT_PTR idk1) {
 #ifdef _M_IX86
 char __fastcall detourAddItemsToInventory(UINT_PTR thisPtr, void* Unknown, ItemStruct* itemsList, INT amountToGive, INT param_3) {
 #elif defined(_M_X64)
-char __cdecl detourAddItemsToInventory(UINT_PTR thisPtr, ItemStruct * itemsList, INT amountToGive, INT param_3) {
+char __cdecl detourAddItemsToInventory(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3) {
 #endif
     if (!giveNextItem) {
         giveNextItem = true;
