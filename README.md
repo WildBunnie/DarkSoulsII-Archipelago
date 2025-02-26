@@ -24,9 +24,11 @@ The mod works with a single `dinput8.dll` file.
 
 ### Joining a game
 
+- (Optional) Backup your save just to make sure the mod doesn't mess with it.
 - Simply launch the game and a console will launch together with it.
 - In that console type `/connect server_address:port slot_name password`, replacing the correct values. The password is optional and the slot name is the name you placed in the yaml file.
 - For example, if you host in archipelago's website it would look something like `/connect archipelago.gg:123456 JohnSouls`.
+- Start a new game and enjoy.
 
 ## Building Locally
 
