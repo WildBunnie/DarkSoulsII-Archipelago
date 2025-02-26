@@ -10,7 +10,7 @@ The mod works with a single `dinput8.dll` file.
 
 - Download the dll and apworld files from the [latest release](https://github.com/WildBunnie/DarkSoulsII-Archipelago/releases) for your game version.
 - Rename the dll file to `dinput8.dll`.
-- Place the `dinput8.dll` file in your game folder, next to the executable.
+- Place the `dinput8.dll` file inside the `Game` folder in the game folder, next to the executable.
 
 ### Generating the world
 
