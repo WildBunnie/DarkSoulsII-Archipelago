@@ -33,7 +33,7 @@ The mod works with a single `dinput8.dll` file.
 - clone the repository
 - run `git submodule update --init --recursive` to download the submodules
 - make sure you have vcpkg, it should be installed together with visual studio, and then run `vcpkg integrate install`
-- set the platform to x86 and build
+- set the correct platform (x86 for vanilla, x64 for scholar) and build
 
 ## Special Thank you
 
