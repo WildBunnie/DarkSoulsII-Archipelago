@@ -21,7 +21,7 @@ class GameVersion(Choice):
 
 @dataclass
 class DS2Options(PerGameCommonOptions):
-    death_link: DeathLink
     game_version: GameVersion
+    death_link: DeathLink
     enable_dlcs: EnableDLCsOption
     enable_ngp: EnableNGPOption
