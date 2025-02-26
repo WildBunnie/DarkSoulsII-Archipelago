@@ -1,6 +1,6 @@
-# DarkSoulsII Archipelago Client and World
+# Dark Souls II Archipelago
 
-Dark Souls II client and world made for Archipelago multiworld randomizer. See [archipelago.gg](https://archipelago.gg/). This is currently only available for **VANILLA DARK SOULS II**, not the scholar of the first sin version.
+Dark Souls II client and world implementations for the [Archipelago multiworld randomizer](https://archipelago.gg/). Currently supports both the vanilla and scholar of the first sin version of the game.
 
 ## How to Use
 
@@ -8,7 +8,8 @@ Dark Souls II client and world made for Archipelago multiworld randomizer. See [
 
 The mod works with a single `dinput8.dll` file.
 
-- Download the dll and apworld files from the [latest release](https://github.com/WildBunnie/DarkSoulsII-Archipelago/releases).
+- Download the dll and apworld files from the [latest release](https://github.com/WildBunnie/DarkSoulsII-Archipelago/releases) for your game version.
+- Rename the dll file to `dinput8.dll`.
 - Place the `dinput8.dll` file in your game folder, next to the executable.
 
 ### Generating the world
@@ -16,7 +17,7 @@ The mod works with a single `dinput8.dll` file.
 - Download the lastest version of the archipelago client available [here](https://github.com/ArchipelagoMW/Archipelago/releases/latest).
 - Inside the archipelago client, press `Install APWorld` and select the apworld you downloaded.
 - Press `Generate Template Options` and grab the `Dark Souls II.yaml`.
-- Edit the settings on the yaml file to your liking, especially changing your name.
+- Edit the settings on the yaml file to your liking, especially changing your name and selecting the version of the game you will be playing.
 - Press `Browse Files` in the client and place your yaml file and any others from people you might be playing with inside the `Players` folder.
 - Press `generate` in the client to generate the world.
 - Now either choose `host` to host the game locally or upload the file in the `output` folder to [archipelago's website](https://archipelago.gg/uploads).
