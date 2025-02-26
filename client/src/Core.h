@@ -26,6 +26,7 @@ public:
     std::list<APClient::NetworkItem> itemsToGive;
     int lastReceivedIndex = 0;
     bool saveLoaded;
+    bool diedByDeathLink = false;
 
     static const int RUN_SLEEP = 2000;
 };

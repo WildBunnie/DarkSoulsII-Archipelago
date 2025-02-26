@@ -16,7 +16,7 @@ public:
     uintptr_t GetPointerAddress(uintptr_t gameBaseAddr, uintptr_t address, std::vector<uintptr_t> offsets);
     void giveItems(std::vector<int> ids);
 
-    bool isPlayerDead();
+    bool playerJustDied();
     bool isPlayerInGame();
     void killPlayer();
 
