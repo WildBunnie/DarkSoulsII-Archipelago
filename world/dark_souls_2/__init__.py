@@ -104,8 +104,6 @@ class DS2World(World):
     def create_items(self):
         pool : list[DS2Item] = []
 
-        num_locations = len(self.multiworld.get_locations(self.player))
-
         placed_items = []
         # set the soul of nashandra at the original location
         # to use it for the game completion logic
@@ -125,13 +123,15 @@ class DS2World(World):
         self.multiworld.get_location("[MemoryJeigh] Giant Lord drop", self.player).place_locked_item(self.create_item("Giant's Kinship"))
         placed_items.append("Giant's Kinship")
 
+        max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
+
         # make sure all the progression items are in the pool
         for progression_item in progression_items:
             if progression_item in placed_items: continue
             item = self.create_item(progression_item)
             pool.append(item)
 
-        assert len(pool) <= num_locations, "item pool cannot fit all the progression items" 
+        assert len(pool) <= max_pool_size, "item pool cannot fit all the progression items" 
 
         # initial attempt at filling the item pool with the default items
         items_in_pool = [item.name for item in pool]
@@ -152,11 +152,11 @@ class DS2World(World):
 
         # fill the rest of the pool with filler items
         filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip]
-        for _ in range(num_locations - len(pool)):
+        for _ in range(max_pool_size - len(pool)):
             item = self.create_item(random.choice(filler_items).name)
             pool.append(item)
 
-        assert len(pool) == num_locations, "item pool is under-filled or over-filled"
+        assert len(pool) == max_pool_size, "item pool is under-filled or over-filled"
 
         self.multiworld.itempool += pool
 
