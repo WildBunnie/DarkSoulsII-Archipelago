@@ -38,8 +38,9 @@ The mod works with a single `dinput8.dll` file.
 - set the correct platform (x86 for vanilla, x64 for scholar) and build
 
 ## Credits
-https://github.com/SeanPesce/DLL_Wrapper_Generator
-https://github.com/black-sliver/apclientpp
+
+https://github.com/SeanPesce/DLL_Wrapper_Generator \
+https://github.com/black-sliver/apclientpp \
 https://github.com/pseudostripy/DS2S-META
 
 ## Special Thank you
