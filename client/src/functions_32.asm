@@ -1,3 +1,12 @@
+; Check if compiling for x86 architecture
+IFDEF RAX
+    END_IF_NOT_X86 equ end
+ELSE
+    END_IF_NOT_X86 equ <>
+ENDIF
+
+END_IF_NOT_X86
+
 .386
 .model flat, c
 .code
@@ -7,7 +16,7 @@
 
 ; this function allows us to get the itemLotId of an item that is being picked up
 ; since the itemGive function only receives the contents of the itemLot
-getItemLotId proc thisPtr:ptr, arg1:dword, arg2:dword, baseAddress:ptr
+getItemLotId proc thisPtr:ptr, arg1:ptr, arg2:ptr, baseAddress:ptr
 
     ; Load arguments into registers
     mov esi, thisPtr     ; thisPtr

@@ -51,5 +51,8 @@
     <MASM Include="src\functions.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="src\dllmain.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

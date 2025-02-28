@@ -1,5 +1,5 @@
 #include "hooks.h"
-#include "FunctionOffsets.h"
+#include "offsets.h"
 #include <spdlog/spdlog.h>
 
 extern Hooks* GameHooks;
@@ -22,16 +22,25 @@ struct ItemStruct {
 };
 
 // function that allows us to get the itemLotId on giveItemsOnPickup
-extern "C" int __cdecl getItemLotId(DWORD thisPtr, DWORD arg1, DWORD arg2, DWORD baseAddress);
+#ifdef _M_IX86
+extern "C" int __cdecl getItemLotId(UINT_PTR thisPtr, UINT_PTR arg1, UINT_PTR arg2, UINT_PTR baseAddress);
+#elif defined(_M_X64)
+extern "C" int getItemLotId(UINT_PTR thisPtr, UINT_PTR arg1, UINT_PTR baseAddress);
+#endif
 
 // hooking this function to always start the game offline
 // by blocking the game's dns lookup
 typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const ADDRINFOA* pHints, PADDRINFOA* ppResult);
 
 // fuction is called when player receives a reward (boss, covenant, npc or event)
-typedef void(__thiscall* giveItemsOnReward_t)(UINT_PTR thisPtr, UINT_PTR* pItemLot, INT idk1, INT idk2, INT idk3);
+typedef void(__thiscall* giveItemsOnReward_t)(UINT_PTR thisPtr, UINT_PTR pItemLot, INT idk1, INT idk2, INT idk3);
 // fuction is called when player picks up an item
-typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, INT idk1, INT idk2);
+#ifdef _M_IX86
+typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, UINT_PTR idk1, UINT_PTR idk2);
+#elif defined(_M_X64)
+typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, UINT_PTR idk1);
+#endif
+
 
 // this function adds the item to the players inventory
 typedef char(__thiscall* addItemsToInventory_t)(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3);
@@ -50,13 +59,13 @@ addItemsToInventory_t originalAddItemsToInventory = nullptr;
 createPopupStructure_t originalCreatePopupStructure = nullptr;
 showItemPopup_t originalShowItemPopup = nullptr;
 
-DWORD baseAddress;
+uintptr_t baseAddress;
 
-DWORD Hooks::GetPointerAddress(DWORD gameBaseAddr, DWORD address, std::vector<DWORD> offsets)
+uintptr_t Hooks::GetPointerAddress(uintptr_t gameBaseAddr, uintptr_t address, std::vector<uintptr_t> offsets)
 {
-    DWORD offset_null = NULL;
+    uintptr_t offset_null = NULL;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(gameBaseAddr + address), &offset_null, sizeof(offset_null), 0);
-    DWORD pointeraddress = offset_null; // the address we need
+    uintptr_t pointeraddress = offset_null; // the address we need
     for (size_t i = 0; i < offsets.size() - 1; i++) // we dont want to change the last offset value so we do -1
     {
         ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pointeraddress + offsets.at(i)), &pointeraddress, sizeof(pointeraddress), 0);
@@ -87,9 +96,9 @@ void Hooks::giveItems(std::vector<int> ids) {
 
     UINT_PTR displayStruct = (UINT_PTR)VirtualAlloc(nullptr, 0x110, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-    originalAddItemsToInventory(GetPointerAddress(baseAddress, 0x1150414, { 0x60, 0x8, 0x8, 0x0 }), &itemStruct, ids.size(), 0);
+    originalAddItemsToInventory(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::AvailableItemBag), &itemStruct, ids.size(), 0);
     originalCreatePopupStructure(displayStruct, &itemStruct, ids.size(), 1);
-    originalShowItemPopup(GetPointerAddress(baseAddress, 0x1150414, { 0xCC4, 0x0 }), displayStruct);
+    originalShowItemPopup(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::ItemGiveWindow), displayStruct);
 
     VirtualFree((LPVOID)displayStruct, 0, MEM_RELEASE);
 }
@@ -98,16 +107,20 @@ void Hooks::giveItems(std::vector<int> ids) {
 
 INT __stdcall detourGetaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHints, PADDRINFOA* ppResult) {
 
-    if (address && strcmp(address, "frpg2-steam-ope.fromsoftware.jp") == 0) {
+    if (address && strcmp(address, GameHooks->addressToBlock) == 0) {
         return EAI_FAIL;
     }
 
     return originalGetaddrinfo(address, port, pHints, ppResult);
 }
 
-void __fastcall detourGiveItemsOnReward(UINT_PTR thisPtr, void* Unknown, UINT_PTR* pItemLot, INT idk1, INT idk2, INT idk3) {
+#ifdef _M_IX86
+void __fastcall detourGiveItemsOnReward(UINT_PTR thisPtr, void* Unknown, UINT_PTR pItemLot, INT idk1, INT idk2, INT idk3) {
+#elif defined(_M_X64)
+void __cdecl detourGiveItemsOnReward(UINT_PTR thisPtr, UINT_PTR pItemLot, INT idk1, INT idk2, INT idk3) {
+#endif
 
-    int64_t itemLotId;
+    int32_t itemLotId;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pItemLot), &itemLotId, sizeof(itemLotId), NULL);
     spdlog::debug("was rewarded: {}", itemLotId);
 
@@ -124,9 +137,7 @@ void __fastcall detourGiveItemsOnReward(UINT_PTR thisPtr, void* Unknown, UINT_PT
 // but if we dont call the original the item wont be removed from the map
 bool giveNextItem = true;
 bool showNextItem = true;
-void __fastcall detourGiveItemsOnPickup(UINT_PTR thisPtr, void* Unknown, INT idk1, INT idk2) {
-
-    int64_t itemLotId = getItemLotId(thisPtr, idk1, idk2, baseAddress);
+void detourGiveItemsOnPickupLogic(int32_t itemLotId){
     spdlog::debug("picked up: {}", itemLotId);
 
     if (itemLotId == -1) spdlog::warn("error finding out what itemLot was picked up");
@@ -138,11 +149,27 @@ void __fastcall detourGiveItemsOnPickup(UINT_PTR thisPtr, void* Unknown, INT idk
         giveNextItem = false;
         showNextItem = false;
     }
-
-    return originalGiveItemsOnPickup(thisPtr, idk1, idk2);
 }
 
+#ifdef _M_IX86
+void __fastcall detourGiveItemsOnPickup(UINT_PTR thisPtr, void* Unknown, UINT_PTR idk1, UINT_PTR idk2) {
+    int32_t itemLotId = getItemLotId(thisPtr, idk1, idk2, baseAddress);
+    detourGiveItemsOnPickupLogic(itemLotId);
+    return originalGiveItemsOnPickup(thisPtr, idk1, idk2);
+}
+#elif defined(_M_X64)
+void __cdecl detourGiveItemsOnPickup(UINT_PTR thisPtr, UINT_PTR idk1) {
+    int32_t itemLotId = getItemLotId(thisPtr, idk1, baseAddress);
+    detourGiveItemsOnPickupLogic(itemLotId);
+    return originalGiveItemsOnPickup(thisPtr, idk1);
+}
+#endif
+
+#ifdef _M_IX86
 char __fastcall detourAddItemsToInventory(UINT_PTR thisPtr, void* Unknown, ItemStruct* itemsList, INT amountToGive, INT param_3) {
+#elif defined(_M_X64)
+char __cdecl detourAddItemsToInventory(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3) {
+#endif
     if (!giveNextItem) {
         giveNextItem = true;
         return 1;
@@ -151,7 +178,11 @@ char __fastcall detourAddItemsToInventory(UINT_PTR thisPtr, void* Unknown, ItemS
     return originalAddItemsToInventory(thisPtr, itemsList, amountToGive, param_3);
 }
 
+#ifdef _M_IX86
 void __fastcall detourShowItemPopup(UINT_PTR thisPtr, void* Unknown, UINT_PTR displayStruct) {
+#elif defined(_M_X64)
+void __cdecl detourShowItemPopup(UINT_PTR thisPtr, UINT_PTR displayStruct) {
+#endif
     if (!showNextItem) {
         showNextItem = true;
         return;
@@ -163,18 +194,18 @@ void __fastcall detourShowItemPopup(UINT_PTR thisPtr, void* Unknown, UINT_PTR di
 bool Hooks::initHooks() {
 
     HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
-    baseAddress = (DWORD)hModule;
+    baseAddress = (uintptr_t)hModule;
 
     MH_Initialize();
 
     MH_CreateHookApi(L"ws2_32", "getaddrinfo", &detourGetaddrinfo, (LPVOID*)&originalGetaddrinfo);
 
-    MH_CreateHook((LPVOID)(baseAddress + GiveItemsOnReward), &detourGiveItemsOnReward, (LPVOID*)&originalGiveItemsOnReward);
-    MH_CreateHook((LPVOID)(baseAddress + GiveItemsOnPickup), &detourGiveItemsOnPickup, (LPVOID*)&originalGiveItemsOnPickup);
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnReward), &detourGiveItemsOnReward, (LPVOID*)&originalGiveItemsOnReward);
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnPickup), &detourGiveItemsOnPickup, (LPVOID*)&originalGiveItemsOnPickup);
     
-    MH_CreateHook((LPVOID)(baseAddress + AddItemsToInventory), &detourAddItemsToInventory, (LPVOID*)&originalAddItemsToInventory);
-    originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + CreatePopUpStruct);
-    MH_CreateHook((LPVOID)(baseAddress + ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddItemsToInventory), &detourAddItemsToInventory, (LPVOID*)&originalAddItemsToInventory);
+    originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + FunctionOffsets::CreatePopUpStruct);
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
 
     MH_EnableHook(MH_ALL_HOOKS);
 
@@ -184,7 +215,7 @@ bool Hooks::initHooks() {
 int prevHp, curHp = -1;
 bool Hooks::playerJustDied() {
     prevHp = curHp;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x74, 0xFC }), &curHp, sizeof(int), NULL);
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &curHp, sizeof(int), NULL);
     if (prevHp != 0 && curHp == 0) {
         return true;
     }
@@ -193,12 +224,12 @@ bool Hooks::playerJustDied() {
 
 void Hooks::killPlayer() {
     int zeroHp = 0;
-    WriteProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x74, 0xFC }), &zeroHp, sizeof(int), NULL);
+    WriteProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &zeroHp, sizeof(int), NULL);
 }
 
 bool Hooks::isPlayerInGame() {
-    DWORD value;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, 0x1150414, { 0x74 }), &value, sizeof(DWORD), NULL);
+    int value;
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::PlayerCtrl), &value, sizeof(int), NULL);
     if (value != 0) {
         return true;
     }

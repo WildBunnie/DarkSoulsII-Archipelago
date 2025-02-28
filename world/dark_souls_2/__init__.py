@@ -44,6 +44,8 @@ class DS2World(World):
             region = self.create_region(region_name)
             for location_data in location_table[region_name]:
                 if location_data.ngp and not self.options.enable_ngp: continue
+                if location_data.sotfs and not self.options.game_version == "sotfs": continue
+                if location_data.vanilla and not self.options.game_version == "vanilla": continue
                 location = self.create_location(location_data.name, region, location_data.default_items)
                 region.locations.append(location)
             regions[region_name] = region
@@ -102,14 +104,10 @@ class DS2World(World):
     def create_items(self):
         pool : list[DS2Item] = []
 
-        num_locations = len(self.multiworld.get_locations(self.player))
-
-        placed_items = []
         # set the soul of nashandra at the original location
         # to use it for the game completion logic
         item = self.create_item("Soul of Nashandra")
         self.multiworld.get_location("[Drangleic] Nashandra drop", self.player).place_locked_item(item)
-        placed_items.append("Soul of Nashandra")
         # set the four old souls at the original location
         # to use it for the shrine of winter logic
         # having a check for lighting the primal bonfires would probably be better
@@ -117,25 +115,26 @@ class DS2World(World):
         self.multiworld.get_location("[SinnersRise] Lost Sinner drop", self.player).place_locked_item(self.create_item("Soul of the Lost Sinner"))
         self.multiworld.get_location("[IronKeep] Old Iron King drop", self.player).place_locked_item(self.create_item("Old Iron King Soul"))
         self.multiworld.get_location("[Tseldora] Duke's Dear Freja drop", self.player).place_locked_item(self.create_item("Soul of the Duke's Dear Freja"))
-        placed_items.extend(["Soul of the Rotten","Soul of the Lost Sinner","Old Iron King Soul","Soul of the Duke's Dear Freja"])
         # set the giant's kinship at the original location
         # because killing the giant lord is necessary to kill nashandra
         self.multiworld.get_location("[MemoryJeigh] Giant Lord drop", self.player).place_locked_item(self.create_item("Giant's Kinship"))
-        placed_items.append("Giant's Kinship")
 
-        # make sure all the progression items are in the pool
-        for progression_item in progression_items:
-            if progression_item in placed_items: continue
-            item = self.create_item(progression_item)
-            pool.append(item)
-
-        assert len(pool) <= num_locations, "item pool cannot fit all the progression items" 
+        max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
 
         # initial attempt at filling the item pool with the default items
         items_in_pool = [item.name for item in pool]
         for location in self.multiworld.get_unfilled_locations(self.player):
             
-            item_name = random.choice(location.default_items)
+            # check if location contains a progression item
+            index = self.get_progression_item(location.default_items)
+
+            # if the location contains a progression item
+            # we add that item to the pool, otherwise pick one randomly
+            if index != -1:
+                item_name = location.default_items[index]
+            else:
+                item_name = random.choice(location.default_items)
+
             item_data = next((item for item in item_list if item.name == item_name), None)
             assert item_data, "location's default item not in item list"
 
@@ -150,11 +149,11 @@ class DS2World(World):
 
         # fill the rest of the pool with filler items
         filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip]
-        for _ in range(num_locations - len(pool)):
+        for _ in range(max_pool_size - len(pool)):
             item = self.create_item(random.choice(filler_items).name)
             pool.append(item)
 
-        assert len(pool) == num_locations, "item pool is under-filled or over-filled"
+        assert len(pool) == max_pool_size, "item pool is under-filled or over-filled"
 
         self.multiworld.itempool += pool
 
@@ -162,6 +161,14 @@ class DS2World(World):
         code = self.item_name_to_id[name]
         classification = ItemClassification.progression if name in progression_items else ItemClassification.filler
         return DS2Item(name, classification, code, self.player)
+
+    # given a list, returns the index of the first progression item
+    # if no progression item is found inside the list, returns -1
+    def get_progression_item(self, list):
+        for index,item in enumerate(list):
+            if item in progression_items:
+                return index
+        return -1
 
     def set_rules(self):
         self.set_connection_rule("Path to Shaded Woods", "Shaded Woods", lambda state: state.has("Fragrant Branch of Yore", self.player))
