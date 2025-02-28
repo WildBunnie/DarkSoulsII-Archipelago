@@ -37,6 +37,11 @@ The mod works with a single `dinput8.dll` file.
 - make sure you have vcpkg, it should be installed together with visual studio, and then run `vcpkg integrate install`
 - set the correct platform (x86 for vanilla, x64 for scholar) and build
 
+## Credits
+https://github.com/SeanPesce/DLL_Wrapper_Generator
+https://github.com/black-sliver/apclientpp
+https://github.com/pseudostripy/DS2S-META
+
 ## Special Thank you
 
 [pseudostripy](https://github.com/pseudostripy) (developer of [META](https://github.com/pseudostripy/DS2S-META)) for answering all my questions and helping out when i was lost
