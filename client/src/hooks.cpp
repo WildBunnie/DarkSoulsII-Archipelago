@@ -260,7 +260,7 @@ bool Hooks::initHooks() {
     originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + FunctionOffsets::CreatePopUpStruct);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
 
-    MH_CreateHook((LPVOID)(baseAddress + 0x503620), &detourGetItemNameFromId, (LPVOID*)&originalGetItemNameFromId);
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetItemNameFromId), &detourGetItemNameFromId, (LPVOID*)&originalGetItemNameFromId);
 
     MH_EnableHook(MH_ALL_HOOKS);
 
