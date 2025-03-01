@@ -49,6 +49,8 @@ typedef void(__cdecl* createPopupStructure_t)(UINT_PTR displayStruct, ItemStruct
 // this function displays the item popup
 typedef void(__thiscall* showItemPopup_t)(UINT_PTR thisPtr, UINT_PTR displayStruct);
 
+// this function given an itemId return a pointer to the item's name
+typedef const wchar_t* (__cdecl* getItemNameFromId_t)(INT32 arg1, INT32 itemId);
 
 getaddrinfo_t originalGetaddrinfo = nullptr;
 
@@ -58,6 +60,8 @@ giveItemsOnPickup_t originalGiveItemsOnPickup = nullptr;
 addItemsToInventory_t originalAddItemsToInventory = nullptr;
 createPopupStructure_t originalCreatePopupStructure = nullptr;
 showItemPopup_t originalShowItemPopup = nullptr;
+
+getItemNameFromId_t originalGetItemNameFromId = nullptr;
 
 uintptr_t baseAddress;
 
@@ -74,7 +78,7 @@ uintptr_t Hooks::GetPointerAddress(uintptr_t gameBaseAddr, uintptr_t address, st
 }
 
 // TODO: receive the other item information like amount, upgrades and infusions
-void Hooks::giveItems(std::vector<int> ids) {
+void Hooks::giveItems(std::vector<int> ids, bool onlyShow) {
 
     if (ids.size() > 8) {
         return;
@@ -96,11 +100,49 @@ void Hooks::giveItems(std::vector<int> ids) {
 
     UINT_PTR displayStruct = (UINT_PTR)VirtualAlloc(nullptr, 0x110, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-    originalAddItemsToInventory(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::AvailableItemBag), &itemStruct, ids.size(), 0);
+    if (!onlyShow) {
+        originalAddItemsToInventory(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::AvailableItemBag), &itemStruct, ids.size(), 0);
+    }
     originalCreatePopupStructure(displayStruct, &itemStruct, ids.size(), 1);
     originalShowItemPopup(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::ItemGiveWindow), displayStruct);
 
     VirtualFree((LPVOID)displayStruct, 0, MEM_RELEASE);
+}
+
+std::wstring removeSpecialCharacters(const std::wstring& input) {
+    std::set<wchar_t> allowedChars = {
+        L'-', L'\'', L',', L' ', L':'
+    };
+
+    std::wstring output;
+    for (wchar_t ch : input) {
+        // Keep the character if it's alphanumeric or in the allowed special characters list
+        if (std::isalnum(ch) || allowedChars.find(ch) != allowedChars.end()) {
+            output += ch;
+        }
+    }
+    return output;
+}
+
+std::wstring messageToDisplay;
+int unusedItemId = 60375000;
+void Hooks::showLocationRewardMessage(int32_t locationId) {
+    if (!locationRewards.contains(locationId)) {
+        return;
+    }
+    locationReward reward = locationRewards[locationId];
+
+    // the game uses utf-16 so we convert to wide string
+    std::wstring player_name_wide(reward.player_name.begin(), reward.player_name.end());
+    std::wstring item_name_wide(reward.item_name.begin(), reward.item_name.end());
+
+    // remove most special characters, since things like # crash the game
+    player_name_wide = removeSpecialCharacters(player_name_wide);
+    item_name_wide = removeSpecialCharacters(item_name_wide);
+
+    messageToDisplay = player_name_wide + L"'s " + item_name_wide;
+
+    giveItems({ unusedItemId }, true);
 }
 
 // ============================= HOOKS =============================
@@ -127,6 +169,7 @@ void __cdecl detourGiveItemsOnReward(UINT_PTR thisPtr, UINT_PTR pItemLot, INT id
     if (GameHooks->locationsToCheck.contains(itemLotId)) {
         GameHooks->checkedLocations.push_back(itemLotId);
         GameHooks->locationsToCheck.erase(itemLotId);
+        GameHooks->showLocationRewardMessage(itemLotId);
         return;
     }
 
@@ -146,6 +189,7 @@ void detourGiveItemsOnPickupLogic(int32_t itemLotId){
     if (itemLotId != 0 && GameHooks->locationsToCheck.contains(itemLotId)) {
         GameHooks->checkedLocations.push_back(itemLotId);
         GameHooks->locationsToCheck.erase(itemLotId);
+        GameHooks->showLocationRewardMessage(itemLotId);
         giveNextItem = false;
         showNextItem = false;
     }
@@ -191,6 +235,15 @@ void __cdecl detourShowItemPopup(UINT_PTR thisPtr, UINT_PTR displayStruct) {
     return originalShowItemPopup(thisPtr, displayStruct);
 }
 
+const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
+
+    if (itemId == unusedItemId) {
+        return messageToDisplay.c_str();
+    }
+
+    return originalGetItemNameFromId(arg1, itemId);
+}
+
 bool Hooks::initHooks() {
 
     HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
@@ -206,6 +259,8 @@ bool Hooks::initHooks() {
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddItemsToInventory), &detourAddItemsToInventory, (LPVOID*)&originalAddItemsToInventory);
     originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + FunctionOffsets::CreatePopUpStruct);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
+
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetItemNameFromId), &detourGetItemNameFromId, (LPVOID*)&originalGetItemNameFromId);
 
     MH_EnableHook(MH_ALL_HOOKS);
 

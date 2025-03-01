@@ -55,6 +55,10 @@ BOOL CArchipelago::Initialise(std::string URI) {
 
 		GameHooks->locationsToCheck = ap->get_missing_locations();
 
+		// ask for the items that are in each location
+		std::list<int64_t> locationsList(GameHooks->locationsToCheck.begin(), GameHooks->locationsToCheck.end());
+		ap->LocationScouts(locationsList);
+
 		ap->Get({ Core->getSaveIdKey() });
 	});
 
@@ -75,6 +79,23 @@ BOOL CArchipelago::Initialise(std::string URI) {
 			else {
 				spdlog::error("error setting save id");
 			}
+		}
+	});
+
+	// response to the ap->LocationScouts
+	// contains the items that are in each location
+	ap->set_location_info_handler([](const std::list<APClient::NetworkItem>& items) {
+		for (const auto& item : items) {
+			std::string player_name = ap->get_player_alias(item.player);
+			std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));
+			
+			// we only care about the locations 
+			// that have items for other player
+			if (player_name == Core->pSlotName) {
+				continue;
+			}
+
+			GameHooks->locationRewards[item.location] = { item_name, player_name };
 		}
 	});
 	
