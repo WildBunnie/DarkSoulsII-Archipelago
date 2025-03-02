@@ -253,10 +253,10 @@ const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
 
 void Hooks::patchWeaponRequirements() {
     // makes it so the function that checks requirements on onehand/twohand return without checking
-    PatchMemory(baseAddress + PatchesOffsets::noWeaponReqPatchAddr, Patches::noWeaponReqPatch);
+    PatchMemory(baseAddress + PatchesOffsets::noWeaponReqPatchOffset, Patches::noWeaponReqPatch);
     // makes it so it doesnt load the values for the requirements to show in the menu
     // this is mostly to not show the "unable to use this item efficiently" message
-    PatchMemory(baseAddress + PatchesOffsets::menuWeaponReqPatchAddr, Patches::menuWeaponReqPatch);
+    PatchMemory(baseAddress + PatchesOffsets::menuWeaponReqPatchOffset, Patches::menuWeaponReqPatch);
 }
 
 bool Hooks::initHooks() {
