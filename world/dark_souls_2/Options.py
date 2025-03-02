@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 from Options import PerGameCommonOptions, DeathLink, Toggle, Choice
-    
+
+class RemoveWeaponRequirements(Toggle):
+    """Remove the requirements to wield weapons"""
+    no_weapon_req = "Remove Weapon Requirements"
+
 class EnableDLCsOption(Toggle):
     """Include items and locations exclusive to the DLCs"""
     display_name = "Enable DLCs"
@@ -23,5 +27,6 @@ class GameVersion(Choice):
 class DS2Options(PerGameCommonOptions):
     game_version: GameVersion
     death_link: DeathLink
+    no_weapon_req: RemoveWeaponRequirements
     enable_dlcs: EnableDLCsOption
     enable_ngp: EnableNGPOption

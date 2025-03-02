@@ -193,4 +193,4 @@ class DS2World(World):
         set_rule(self.multiworld.get_entrance(f"{fromRegion} -> {toRegion}", self.player), state)
 
     def fill_slot_data(self) -> dict:
-        return self.options.as_dict("death_link","game_version")
+        return self.options.as_dict("death_link","game_version","no_weapon_req")

@@ -251,7 +251,7 @@ const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
     return originalGetItemNameFromId(arg1, itemId);
 }
 
-void initPatches() {
+void Hooks::patchWeaponRequirements() {
     // makes it so the function that checks requirements on onehand/twohand return without checking
     PatchMemory(baseAddress + PatchesOffsets::noWeaponReqPatchAddr, Patches::noWeaponReqPatch);
     // makes it so it doesnt load the values for the requirements to show in the menu
@@ -278,8 +278,6 @@ bool Hooks::initHooks() {
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetItemNameFromId), &detourGetItemNameFromId, (LPVOID*)&originalGetItemNameFromId);
 
     MH_EnableHook(MH_ALL_HOOKS);
-
-    initPatches();
 
     return true;
 }
