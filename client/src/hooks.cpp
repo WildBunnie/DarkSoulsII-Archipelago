@@ -77,6 +77,13 @@ uintptr_t Hooks::GetPointerAddress(uintptr_t gameBaseAddr, uintptr_t address, st
     return pointeraddress += offsets.at(offsets.size() - 1); // adding the last offset
 }
 
+void PatchMemory(uintptr_t address, const std::vector<BYTE>& bytes) {
+    DWORD oldProtect;
+    VirtualProtect(reinterpret_cast<void*>(address), bytes.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
+    memcpy(reinterpret_cast<void*>(address), bytes.data(), bytes.size());
+    VirtualProtect(reinterpret_cast<void*>(address), bytes.size(), oldProtect, &oldProtect);
+}
+
 // TODO: receive the other item information like amount, upgrades and infusions
 void Hooks::giveItems(std::vector<int> ids, bool onlyShow) {
 
@@ -244,6 +251,14 @@ const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
     return originalGetItemNameFromId(arg1, itemId);
 }
 
+void initPatches() {
+    // makes it so the function that checks requirements on onehand/twohand return without checking
+    PatchMemory(baseAddress + PatchesOffsets::noWeaponReqPatchAddr, Patches::noWeaponReqPatch);
+    // makes it so it doesnt load the values for the requirements to show in the menu
+    // this is mostly to not show the "unable to use this item efficiently" message
+    PatchMemory(baseAddress + PatchesOffsets::menuWeaponReqPatchAddr, Patches::menuWeaponReqPatch);
+}
+
 bool Hooks::initHooks() {
 
     HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
@@ -263,6 +278,8 @@ bool Hooks::initHooks() {
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetItemNameFromId), &detourGetItemNameFromId, (LPVOID*)&originalGetItemNameFromId);
 
     MH_EnableHook(MH_ALL_HOOKS);
+
+    initPatches();
 
     return true;
 }
