@@ -29,6 +29,8 @@ VOID ClientCore::Start()
     CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)Core->InputCommand, NULL, NULL, NULL);
     
     while (true) {
+        if (Core->fatalError) return;
+
         acplg->update();
         
         Core->HandleDeathLink();
@@ -80,6 +82,12 @@ VOID ClientCore::InputCommand()
             spdlog::info("Sorry did not understand that.");
         }
     }
+}
+
+VOID ClientCore::Panic(std::string message)
+{
+    spdlog::info("ERROR: {}", message);
+    Core->fatalError = true;
 }
 
 VOID ClientCore::HandleDeathLink()
