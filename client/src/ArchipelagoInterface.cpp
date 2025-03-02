@@ -43,6 +43,14 @@ BOOL CArchipelago::Initialise(std::string URI) {
 		if (data.contains("death_link")) {
 			GameHooks->isDeathLink = (data.at("death_link") != 0);
 		}
+		if (data.contains("game_version")) {
+			GameVersion chosenVersion = static_cast<GameVersion>(data.at("game_version"));;
+			if (chosenVersion != Core->gameVersion) {
+				Core->Panic("The client's game version does not match the version chosen on the config file, " 
+							"please change to the correct version or change the config file and generate a new game.");
+				return;
+			}
+		}
 
 		std::list<std::string> tags;
 		if (GameHooks->isDeathLink) {
@@ -135,6 +143,13 @@ BOOL CArchipelago::Initialise(std::string URI) {
 	});
 
 	ap->set_print_json_handler([](const std::list<APClient::TextNode>& msg) {
+		
+		// make sure we dont show a message
+		// after the fatal error message
+		if (Core->fatalError) {
+			return;
+		}
+
 		auto message = ap->render_json(msg, APClient::RenderFormat::TEXT);
 		spdlog::info(message);
 	});
