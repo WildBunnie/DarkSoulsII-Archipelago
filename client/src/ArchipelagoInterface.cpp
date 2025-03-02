@@ -51,6 +51,9 @@ BOOL CArchipelago::Initialise(std::string URI) {
 				return;
 			}
 		}
+		if (data.contains("no_weapon_req") && data.at("no_weapon_req") == 1) {
+			GameHooks->patchWeaponRequirements();
+		}
 
 		std::list<std::string> tags;
 		if (GameHooks->isDeathLink) {
