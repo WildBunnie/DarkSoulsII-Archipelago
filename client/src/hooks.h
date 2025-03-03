@@ -20,7 +20,6 @@ struct locationReward {
 class Hooks {
 public:
     bool initHooks();
-    uintptr_t GetPointerAddress(uintptr_t gameBaseAddr, uintptr_t address, std::vector<uintptr_t> offsets);
     void giveItems(std::vector<int> ids, bool onlyShow = false);
     void showLocationRewardMessage(int32_t locationId);
     void patchWeaponRequirements();

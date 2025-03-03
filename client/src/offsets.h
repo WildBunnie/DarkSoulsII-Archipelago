@@ -17,6 +17,7 @@ namespace FunctionOffsets {
     uintptr_t CreatePopUpStruct = 0x5D950;
     uintptr_t ShowItemPopup = 0x501080;
     uintptr_t GetItemNameFromId = 0x503620;
+    uintptr_t AddShopItemToInventory = 0x1b9b30;
 #endif
 };
 

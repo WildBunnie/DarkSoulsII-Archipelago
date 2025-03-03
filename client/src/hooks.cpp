@@ -41,7 +41,8 @@ typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, UINT_PTR idk1, U
 typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, UINT_PTR idk1);
 #endif
 
-
+// this function adds the item bought from the shop to the players inventory
+typedef char(__thiscall* addShopItemToInventory_t)(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3);
 // this function adds the item to the players inventory
 typedef char(__thiscall* addItemsToInventory_t)(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3);
 // this function creates the structure that is passed to the function that displays the item popup
@@ -57,6 +58,7 @@ getaddrinfo_t originalGetaddrinfo = nullptr;
 giveItemsOnReward_t originalGiveItemsOnReward = nullptr;
 giveItemsOnPickup_t originalGiveItemsOnPickup = nullptr;
 
+addShopItemToInventory_t originalAddShopItemToInventory = nullptr;
 addItemsToInventory_t originalAddItemsToInventory = nullptr;
 createPopupStructure_t originalCreatePopupStructure = nullptr;
 showItemPopup_t originalShowItemPopup = nullptr;
@@ -65,7 +67,7 @@ getItemNameFromId_t originalGetItemNameFromId = nullptr;
 
 uintptr_t baseAddress;
 
-uintptr_t Hooks::GetPointerAddress(uintptr_t gameBaseAddr, uintptr_t address, std::vector<uintptr_t> offsets)
+uintptr_t GetPointerAddress(uintptr_t gameBaseAddr, uintptr_t address, std::vector<uintptr_t> offsets)
 {
     uintptr_t offset_null = NULL;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(gameBaseAddr + address), &offset_null, sizeof(offset_null), 0);
@@ -131,7 +133,7 @@ std::wstring removeSpecialCharacters(const std::wstring& input) {
     return output;
 }
 
-std::wstring messageToDisplay;
+std::wstring messageToDisplay = L"message not set";
 int unusedItemId = 60375000;
 void Hooks::showLocationRewardMessage(int32_t locationId) {
     if (!locationRewards.contains(locationId)) {
@@ -217,6 +219,16 @@ void __cdecl detourGiveItemsOnPickup(UINT_PTR thisPtr, UINT_PTR idk1) {
 #endif
 
 #ifdef _M_IX86
+#elif defined(_M_X64)
+char __cdecl detourAddShopItemToInventory(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3) {
+#endif
+    int32_t shopLineupId;
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(param_2 + 0x38), &shopLineupId, sizeof(shopLineupId), NULL);
+    spdlog::debug("just bought: {}", shopLineupId);
+    return originalAddShopItemToInventory(thisPtr, param_2, param_3);
+}
+
+#ifdef _M_IX86
 char __fastcall detourAddItemsToInventory(UINT_PTR thisPtr, void* Unknown, ItemStruct* itemsList, INT amountToGive, INT param_3) {
 #elif defined(_M_X64)
 char __cdecl detourAddItemsToInventory(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3) {
@@ -271,6 +283,7 @@ bool Hooks::initHooks() {
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnReward), &detourGiveItemsOnReward, (LPVOID*)&originalGiveItemsOnReward);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnPickup), &detourGiveItemsOnPickup, (LPVOID*)&originalGiveItemsOnPickup);
     
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddShopItemToInventory), &detourAddShopItemToInventory, (LPVOID*)&originalAddShopItemToInventory);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddItemsToInventory), &detourAddItemsToInventory, (LPVOID*)&originalAddItemsToInventory);
     originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + FunctionOffsets::CreatePopUpStruct);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
