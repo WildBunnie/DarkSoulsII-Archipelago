@@ -40,9 +40,9 @@ typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, UINT_PTR idk1, U
 #elif defined(_M_X64)
 typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, UINT_PTR idk1);
 #endif
+// this function is called when the player buys an item
+typedef char(__thiscall* giveShopItem_t)(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3);
 
-// this function adds the item bought from the shop to the players inventory
-typedef char(__thiscall* addShopItemToInventory_t)(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3);
 // this function adds the item to the players inventory
 typedef char(__thiscall* addItemsToInventory_t)(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3);
 // this function creates the structure that is passed to the function that displays the item popup
@@ -58,7 +58,7 @@ getaddrinfo_t originalGetaddrinfo = nullptr;
 giveItemsOnReward_t originalGiveItemsOnReward = nullptr;
 giveItemsOnPickup_t originalGiveItemsOnPickup = nullptr;
 
-addShopItemToInventory_t originalAddShopItemToInventory = nullptr;
+giveShopItem_t originalGiveShopItem = nullptr;
 addItemsToInventory_t originalAddItemsToInventory = nullptr;
 createPopupStructure_t originalCreatePopupStructure = nullptr;
 showItemPopup_t originalShowItemPopup = nullptr;
@@ -220,12 +220,12 @@ void __cdecl detourGiveItemsOnPickup(UINT_PTR thisPtr, UINT_PTR idk1) {
 
 #ifdef _M_IX86
 #elif defined(_M_X64)
-char __cdecl detourAddShopItemToInventory(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3) {
+char __cdecl detourGiveShopItem(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3) {
 #endif
     int32_t shopLineupId;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(param_2 + 0x38), &shopLineupId, sizeof(shopLineupId), NULL);
     spdlog::debug("just bought: {}", shopLineupId);
-    return originalAddShopItemToInventory(thisPtr, param_2, param_3);
+    return originalGiveShopItem(thisPtr, param_2, param_3);
 }
 
 #ifdef _M_IX86
@@ -282,8 +282,8 @@ bool Hooks::initHooks() {
 
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnReward), &detourGiveItemsOnReward, (LPVOID*)&originalGiveItemsOnReward);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnPickup), &detourGiveItemsOnPickup, (LPVOID*)&originalGiveItemsOnPickup);
-    
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddShopItemToInventory), &detourAddShopItemToInventory, (LPVOID*)&originalAddShopItemToInventory);
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveShopItem), &detourGiveShopItem, (LPVOID*)&originalGiveShopItem);
+
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddItemsToInventory), &detourAddItemsToInventory, (LPVOID*)&originalAddItemsToInventory);
     originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + FunctionOffsets::CreatePopUpStruct);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
