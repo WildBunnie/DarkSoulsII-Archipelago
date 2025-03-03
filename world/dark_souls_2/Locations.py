@@ -9,8 +9,8 @@ class LocationData:
     code: int
     name: str
     default_items: list[str]
-    sotfs: Optional[bool] = False   # wheter the location is only in sotfs
-    vanilla: Optional[bool] = False # wheter the location is only in vanilla
+    sotfs: Optional[bool] = False   # whether the location is only in sotfs
+    vanilla: Optional[bool] = False # whether the location is only in vanilla
     ngp: Optional[bool] = False
 
 dlc_regions = ["Shulva", "Brume Tower", "Eleum Loyce"]
@@ -84,7 +84,7 @@ location_table = {
         LocationData(10105150, "[FOFG] Wooden chest next to king's door", ['Amber Herb'], sotfs=True),
         LocationData(10106000, "[FOFG] At the end of the small stream", ['Soul of a Lost Undead']),
         LocationData(10106010, "[FOFG] First corpse at rooftop near Soldier's Rest bonfire", ['Soul of a Nameless Soldier', 'Cracked Red Eye Orb']),
-        LocationData(10106020, "Lifegem", ['Lifegem']),
+        LocationData(10106020, "[FOFG] At the right of the water stream right before the bonfire", ['Lifegem'], vanilla=True),
         LocationData(10106030, "[FOFG] Next to turtle in seashore hall", ['Amber Herb']),
         LocationData(10106050, "[FOFG] Drop onto tree branch from upper floor of Cardinal Tower", ['Divine Blessing']),
         LocationData(10106060, "[FOFG] Behind a shelf in small side room after the first fog gate", ['Wood Bolt']),
@@ -588,6 +588,7 @@ location_table = {
     ],
     "Dragon Aerie": [
         LocationData(600000, "[DragonShrine] Ancient dragon drop", ['Ashen Mist Heart', 'Soul of a Giant', 'Petrified Dragon Bone']),
+        LocationData(1787000, "[DragonShrine] Gift from ancient dragon when speaking to him", ['Ashen Mist Heart']),
         LocationData(10275000, "[DragonShrine] Metal chest in a side room right after the bonfire", ['Bonfire Ascetic']),
         LocationData(10275010, "[DragonShrine] Wooden chest on right side of the stairs", ['Titanite Slab']),
         LocationData(10275020, "[DragonShrine] Wooden chest on roof on the path to the left of the second Drakekeeper", ['Twinkling Titanite']),
@@ -1356,7 +1357,6 @@ location_table = {
     #     LocationData(1783040, "[Chariot] Gift from Titchy Gren after Brotherhood of Blood Rank 3", ['Scythe of Nahr Alma', 'Nahr Alma Hood', 'Nahr Alma Robes']),
     #     LocationData(1784000, "[Tseldora] Gift from Cromwell when over 35FTH", ['Ring of Resistance']),
     #     LocationData(1785040, "[Heides] Gift from Blue Sentinel Targray after getting to 3rd rank in the Blue Sentinels", ["Targray's Helm", "Targray's Armor", "Targray's Manifers", "Targray's Leggings"]),
-    #     LocationData(1787000, "[DragonShrine] Gift from ancient dragon when speaking to him", ['Ashen Mist Heart']),
     #     LocationData(1788000, "[DLC3] Gift from Alsanna after bringing her 5 Loyce souls", ['Loyce Gauntlets', 'Loyce Leggings']),
     #     LocationData(1788010, "[DLC3] Gift from Alsanna after bringing her 15 Loyce souls", ['Loyce Armor']),
     #     LocationData(1788020, "[DLC3] Gift from Alsanna after bringing her 35 Loyce souls", ['Loyce Helm']),
