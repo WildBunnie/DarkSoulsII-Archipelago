@@ -85,7 +85,8 @@ class DS2World(World):
 
         regions["Drangleic Castle"].connect(regions["Throne of Want"])
         regions["Drangleic Castle"].connect(regions["Chasm of the Abyss"])
-        regions["Drangleic Castle"].connect(regions["Shrine of Amana"])
+        regions["Drangleic Castle"].connect(regions["King's Passage"])
+        regions["King's Passage"].connect(regions["Shrine of Amana"])
         regions["Shrine of Amana"].connect(regions["Undead Crypt"])
         
         regions["Aldia's Keep"].connect(regions["Dragon Aerie"])
@@ -179,6 +180,7 @@ class DS2World(World):
                                  state.has("Soul of the Lost Sinner", self.player) and
                                  state.has("Old Iron King Soul", self.player) and
                                  state.has("Soul of the Duke's Dear Freja", self.player))
+        self.set_connection_rule("Drangleic Castle", "King's Passage", lambda state: state.has("Key to King's Passage", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "Giant's Memory", lambda state: state.has("King's Ring", self.player) and state.has("Ashen Mist Heart", self.player))
         self.set_connection_rule("Drangleic Castle", "Throne of Want", lambda state: state.has("King's Ring", self.player))
         
