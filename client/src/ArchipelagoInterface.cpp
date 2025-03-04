@@ -67,7 +67,11 @@ BOOL CArchipelago::Initialise(std::string URI) {
 		GameHooks->locationsToCheck = ap->get_missing_locations();
 
 		// ask for the items that are in each location
-		std::list<int64_t> locationsList(GameHooks->locationsToCheck.begin(), GameHooks->locationsToCheck.end());
+		std::list<int64_t> locationsList;
+		std::set<int64_t> missingLocations = ap->get_missing_locations();
+		std::set<int64_t> checkedLocations = ap->get_checked_locations();
+		locationsList.insert(locationsList.end(), checkedLocations.begin(), checkedLocations.end());
+		locationsList.insert(locationsList.end(), missingLocations.begin(), missingLocations.end());
 		ap->LocationScouts(locationsList);
 
 		ap->Get({ Core->getSaveIdKey() });
@@ -99,15 +103,11 @@ BOOL CArchipelago::Initialise(std::string URI) {
 		for (const auto& item : items) {
 			std::string player_name = ap->get_player_alias(item.player);
 			std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));
-			
-			// we only care about the locations 
-			// that have items for other player
-			if (player_name == Core->pSlotName) {
-				continue;
-			}
+			bool isLocal = player_name == Core->pSlotName;
 
-			GameHooks->locationRewards[item.location] = { item_name, player_name };
+			GameHooks->locationRewards[item.location] = {item.item, item_name, player_name, isLocal};
 		}
+		GameHooks->overrideShopParams();
 	});
 	
 	ap->set_slot_disconnected_handler([]() {

@@ -21,6 +21,15 @@ struct ItemStruct {
     Item items[8];
 };
 
+struct ParamRow {
+    uint8_t padding1[4];
+    uint32_t paramId;
+    uint8_t padding2[4];
+    uint32_t rewardOffset;
+    uint8_t padding3[4];
+    uint32_t unknown;
+};
+
 // function that allows us to get the itemLotId on giveItemsOnPickup
 #ifdef _M_IX86
 extern "C" int __cdecl getItemLotId(UINT_PTR thisPtr, UINT_PTR arg1, UINT_PTR arg2, UINT_PTR baseAddress);
@@ -44,6 +53,8 @@ typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, UINT_PTR idk1);
 typedef char(__thiscall* giveShopItem_t)(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3);
 
 // this function adds the item to the players inventory
+typedef void(__thiscall* addShopItemToInventory_t)(UINT_PTR, UINT_PTR, UINT_PTR);
+// this function adds the item to the players inventory
 typedef char(__thiscall* addItemsToInventory_t)(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3);
 // this function creates the structure that is passed to the function that displays the item popup
 typedef void(__cdecl* createPopupStructure_t)(UINT_PTR displayStruct, ItemStruct* items, INT amountOfItems, INT displayMode);
@@ -57,8 +68,9 @@ getaddrinfo_t originalGetaddrinfo = nullptr;
 
 giveItemsOnReward_t originalGiveItemsOnReward = nullptr;
 giveItemsOnPickup_t originalGiveItemsOnPickup = nullptr;
-
 giveShopItem_t originalGiveShopItem = nullptr;
+
+addShopItemToInventory_t originalAddShopItemToInventory = nullptr;
 addItemsToInventory_t originalAddItemsToInventory = nullptr;
 createPopupStructure_t originalCreatePopupStructure = nullptr;
 showItemPopup_t originalShowItemPopup = nullptr;
@@ -66,6 +78,14 @@ showItemPopup_t originalShowItemPopup = nullptr;
 getItemNameFromId_t originalGetItemNameFromId = nullptr;
 
 uintptr_t baseAddress;
+int unusedItemForShop = 60375000;
+int unusedItemForPopup = 65240000;
+std::wstring messageToDisplay = L"archipelago message";
+
+// this strategy with the booleans is not the best
+// but if we dont call the original the item wont be removed from the map
+bool giveNextItem = true;
+bool showNextItem = true;
 
 uintptr_t GetPointerAddress(uintptr_t gameBaseAddr, uintptr_t address, std::vector<uintptr_t> offsets)
 {
@@ -86,8 +106,36 @@ void PatchMemory(uintptr_t address, const std::vector<BYTE>& bytes) {
     VirtualProtect(reinterpret_cast<void*>(address), bytes.size(), oldProtect, &oldProtect);
 }
 
+void Hooks::overrideShopParams() {
+    uintptr_t shopParamPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, ParamOffsets::ShopLineupParam);
+    ParamRow *rowPtr = reinterpret_cast<ParamRow*>(shopParamPtr+0x3C);
+
+    for (int i = 0; i < 10000; ++i) {        
+        if (rowPtr[i].paramId == 0) return; // return if we reach the end
+        if (!locationRewards.contains(rowPtr[i].paramId)) continue; // skip if its not an archipelago location
+
+        uintptr_t rewardPtr = shopParamPtr + rowPtr[i].rewardOffset;
+        locationReward archipelagoReward = locationRewards[rowPtr[i].paramId];
+
+        if (archipelagoReward.isLocal) {
+            WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &archipelagoReward.item_id, sizeof(uint32_t), NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &unusedItemForShop, sizeof(uint32_t), NULL);
+        }
+
+        uint8_t amount = 1;
+        uintptr_t amountPtr = rewardPtr + 0x20;
+        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)amountPtr, &amount, sizeof(uint8_t), NULL);
+
+        float_t price_rate = 1.0f;
+        uintptr_t ratePtr = rewardPtr + 0x1C;
+        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)ratePtr, &price_rate, sizeof(float_t), NULL);
+    }
+}
+
 // TODO: receive the other item information like amount, upgrades and infusions
-void Hooks::giveItems(std::vector<int> ids, bool onlyShow) {
+void Hooks::giveItems(std::vector<int> ids) {
 
     if (ids.size() > 8) {
         return;
@@ -109,11 +157,13 @@ void Hooks::giveItems(std::vector<int> ids, bool onlyShow) {
 
     UINT_PTR displayStruct = (UINT_PTR)VirtualAlloc(nullptr, 0x110, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-    if (!onlyShow) {
+    if (giveNextItem) {
         originalAddItemsToInventory(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::AvailableItemBag), &itemStruct, ids.size(), 0);
     }
     originalCreatePopupStructure(displayStruct, &itemStruct, ids.size(), 1);
-    originalShowItemPopup(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::ItemGiveWindow), displayStruct);
+    if (showNextItem) {
+        originalShowItemPopup(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::ItemGiveWindow), displayStruct);
+    }
 
     VirtualFree((LPVOID)displayStruct, 0, MEM_RELEASE);
 }
@@ -133,25 +183,31 @@ std::wstring removeSpecialCharacters(const std::wstring& input) {
     return output;
 }
 
-std::wstring messageToDisplay = L"message not set";
-int unusedItemId = 60375000;
 void Hooks::showLocationRewardMessage(int32_t locationId) {
     if (!locationRewards.contains(locationId)) {
         return;
     }
+
     locationReward reward = locationRewards[locationId];
+
+    // we don't want to show this message
+    // for item from our world
+    if (reward.isLocal) {
+        return;
+    }
 
     // the game uses utf-16 so we convert to wide string
     std::wstring player_name_wide(reward.player_name.begin(), reward.player_name.end());
     std::wstring item_name_wide(reward.item_name.begin(), reward.item_name.end());
 
-    // remove most special characters, since things like # crash the game
-    player_name_wide = removeSpecialCharacters(player_name_wide);
-    item_name_wide = removeSpecialCharacters(item_name_wide);
-
     messageToDisplay = player_name_wide + L"'s " + item_name_wide;
 
-    giveItems({ unusedItemId }, true);
+    // remove most special characters, since things like # crash the game
+    messageToDisplay = removeSpecialCharacters(messageToDisplay);
+
+    showNextItem = true;
+    giveNextItem = false;
+    giveItems({ unusedItemForPopup });
 }
 
 // ============================= HOOKS =============================
@@ -185,10 +241,6 @@ void __cdecl detourGiveItemsOnReward(UINT_PTR thisPtr, UINT_PTR pItemLot, INT id
     return originalGiveItemsOnReward(thisPtr, pItemLot, idk1, idk2, idk3);
 }
 
-// this strategy with the booleans is not the best
-// but if we dont call the original the item wont be removed from the map
-bool giveNextItem = true;
-bool showNextItem = true;
 void detourGiveItemsOnPickupLogic(int32_t itemLotId){
     spdlog::debug("picked up: {}", itemLotId);
 
@@ -223,9 +275,30 @@ void __cdecl detourGiveItemsOnPickup(UINT_PTR thisPtr, UINT_PTR idk1) {
 char __cdecl detourGiveShopItem(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3) {
 #endif
     int32_t shopLineupId;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(param_2 + 0x38), &shopLineupId, sizeof(shopLineupId), NULL);
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(param_2 + 0x10), &shopLineupId, sizeof(shopLineupId), NULL);
     spdlog::debug("just bought: {}", shopLineupId);
+
+    if (GameHooks->locationsToCheck.contains(shopLineupId)) {
+        GameHooks->checkedLocations.push_back(shopLineupId);
+        GameHooks->locationsToCheck.erase(shopLineupId);
+        GameHooks->showLocationRewardMessage(shopLineupId);
+        giveNextItem = false;
+        showNextItem = false;
+    }
+
     return originalGiveShopItem(thisPtr, param_2, param_3);
+}
+
+#ifdef _M_IX86
+#elif defined(_M_X64)
+void __cdecl detourAddShopItemToInventory(UINT_PTR thisPtr, UINT_PTR param_2, UINT_PTR param_3) {
+#endif
+    if (!giveNextItem) {
+        giveNextItem = true;
+        return;
+    }
+
+    return originalAddShopItemToInventory(thisPtr, param_2, param_3);
 }
 
 #ifdef _M_IX86
@@ -256,8 +329,11 @@ void __cdecl detourShowItemPopup(UINT_PTR thisPtr, UINT_PTR displayStruct) {
 
 const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
 
-    if (itemId == unusedItemId) {
+    if (itemId == unusedItemForPopup) {
         return messageToDisplay.c_str();
+    }
+    if (itemId == unusedItemForShop) {
+        return L"archipelago item";
     }
 
     return originalGetItemNameFromId(arg1, itemId);
@@ -284,6 +360,7 @@ bool Hooks::initHooks() {
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnPickup), &detourGiveItemsOnPickup, (LPVOID*)&originalGiveItemsOnPickup);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveShopItem), &detourGiveShopItem, (LPVOID*)&originalGiveShopItem);
 
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddShopItemToInventory), &detourAddShopItemToInventory, (LPVOID*)&originalAddShopItemToInventory);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddItemsToInventory), &detourAddItemsToInventory, (LPVOID*)&originalAddItemsToInventory);
     originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + FunctionOffsets::CreatePopUpStruct);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);

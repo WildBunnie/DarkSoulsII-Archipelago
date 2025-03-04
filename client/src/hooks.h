@@ -13,16 +13,19 @@
 
 
 struct locationReward {
+    int64_t item_id;
     std::string item_name;
     std::string player_name;
+    bool isLocal; // wheter the item is local to our world
 };
 
 class Hooks {
 public:
     bool initHooks();
-    void giveItems(std::vector<int> ids, bool onlyShow = false);
+    void giveItems(std::vector<int> ids);
     void showLocationRewardMessage(int32_t locationId);
     void patchWeaponRequirements();
+    void overrideShopParams();
 
     bool playerJustDied();
     bool isPlayerInGame();
