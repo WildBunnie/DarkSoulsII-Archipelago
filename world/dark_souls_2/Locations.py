@@ -9,8 +9,8 @@ class LocationData:
     code: int
     name: str
     default_items: list[str]
-    sotfs: Optional[bool] = False   # wheter the location is only in sotfs
-    vanilla: Optional[bool] = False # wheter the location is only in vanilla
+    sotfs: Optional[bool] = False   # whether the location is only in sotfs
+    vanilla: Optional[bool] = False # whether the location is only in vanilla
     ngp: Optional[bool] = False
 
 dlc_regions = ["Shulva", "Brume Tower", "Eleum Loyce"]
@@ -25,7 +25,7 @@ location_table = {
         LocationData(10026031, "[Betwixt] Under waterfall in NG+", ['Smooth & Silky Stone'], ngp=True),
         LocationData(10026040, "[Betwixt] One ledge down from the crow nest", ['Soul of a Nameless Soldier']),
         LocationData(10026050, "[Betwixt] Behind the wagon next to bonfire", ['Soul of a Lost Undead', 'Torch']),
-        LocationData(10026060, "[Betwixt] Behind a door in small alcove", ['Cracked Red Eye Orb']),
+        LocationData(10026060, "[Betwixt] Behind a door in small alcove", ['Rotunda Lockstone']), # this is not the default item
         LocationData(10026070, "[Betwixt] On path after the backstab tutorial", ['Dagger']),
         LocationData(10026080, "[Betwixt] Next to fog gate and archer", ['Lifegem']),
         LocationData(10026090, "[Betwixt] Other side of the jumpable gap", ['Amber Herb']),
@@ -84,7 +84,7 @@ location_table = {
         LocationData(10105150, "[FOFG] Wooden chest next to king's door", ['Amber Herb'], sotfs=True),
         LocationData(10106000, "[FOFG] At the end of the small stream", ['Soul of a Lost Undead']),
         LocationData(10106010, "[FOFG] First corpse at rooftop near Soldier's Rest bonfire", ['Soul of a Nameless Soldier', 'Cracked Red Eye Orb']),
-        LocationData(10106020, "Lifegem", ['Lifegem']),
+        LocationData(10106020, "[FOFG] At the right of the water stream right before the bonfire", ['Lifegem'], vanilla=True),
         LocationData(10106030, "[FOFG] Next to turtle in seashore hall", ['Amber Herb']),
         LocationData(10106050, "[FOFG] Drop onto tree branch from upper floor of Cardinal Tower", ['Divine Blessing']),
         LocationData(10106060, "[FOFG] Behind a shelf in small side room after the first fog gate", ['Wood Bolt']),
@@ -588,6 +588,7 @@ location_table = {
     ],
     "Dragon Aerie": [
         LocationData(600000, "[DragonShrine] Ancient dragon drop", ['Ashen Mist Heart', 'Soul of a Giant', 'Petrified Dragon Bone']),
+        LocationData(1787000, "[DragonShrine] Gift from ancient dragon when speaking to him", ['Ashen Mist Heart']),
         LocationData(10275000, "[DragonShrine] Metal chest in a side room right after the bonfire", ['Bonfire Ascetic']),
         LocationData(10275010, "[DragonShrine] Wooden chest on right side of the stairs", ['Titanite Slab']),
         LocationData(10275020, "[DragonShrine] Wooden chest on roof on the path to the left of the second Drakekeeper", ['Twinkling Titanite']),
@@ -831,8 +832,6 @@ location_table = {
     ],
     "Drangleic Castle": [
         LocationData(309610, "[Drangleic] Twin Dragonriders drop", ['Dragonrider Soul']),
-        LocationData(504000, "[Drangleic] Looking Glass Knight drop", ['Looking Glass Knight Soul']),
-        LocationData(504001, "[Drangleic] Looking Glass Knight drop in NG+", ['Looking Glass Knight Soul', 'Ring of Steel Protection+2'], ngp=True),
         LocationData(506100, "[Drangleic] Darklurker drop", ['Darklurker Soul']), # ?????
         LocationData(20215000, "[Drangleic] Metal chest one level down from the Forgotten Chamber bonfire", ["Hunter's Blackbow", 'Iron Arrow']),
         LocationData(20215010, "[Drangleic] Wooden chest in acid pool", ['Corrosive Urn']),
@@ -851,7 +850,6 @@ location_table = {
         LocationData(20215120, "[Drangleic] Metal chest in room after the soul-catching golem", ['Old Knight Hammer']),
         LocationData(20215130, "[Drangleic] Metal chest in alcove of one of the doors in the multi-door Sentinel room (2)", ['Mastodon Greatsword']),
         LocationData(20215140, "[Drangleic] Metal chest in room after the soul-catching golem (2)", ["Caitha's Chime", 'Soul Greatsword']),
-        LocationData(20215150, "[Drangleic] Metal chest after looking glass knight", ['Soul Bolt', 'Spell Quartz Ring+2', 'Bonfire Ascetic']),
         LocationData(20215160, "[Drangleic] Metal chest on left-hand side behind wellager", ['Sublime Bone Dust'], sotfs=True),
         LocationData(20215170, "[Drangleic] Wooden chest in the poison dart trap room", ['Large Soul of a Brave Warrior', 'Twinkling Titanite'], sotfs=True),
         LocationData(20216000, "[Drangleic] In alcove of one of the doors in the multi-door Sentinel room", ["Pharros' Lockstone"]),
@@ -862,16 +860,21 @@ location_table = {
         LocationData(20216040, "[Drangleic] In the room with cursed painting of Nashandra", ['Large Soul of a Brave Warrior', 'Twinkling Titanite'], vanilla=True),
         LocationData(20216040, "[Drangleic] In the room with cursed painting of Nashandra", ['Fire Greatarrow', 'Destructive Greatarrow'], sotfs=True),
         LocationData(20216050, "[Drangleic] Next to Forgotten Chamber bonfire", ['Soul of a Brave Warrior']),
+        LocationData(20216090, "[Drangleic] Behind a rock on the path towards drangleic castle", ['Holy Water Urn']),
+        LocationData(20216100, "[Drangleic] Corpse in the desert sorceress room", ['Repair Powder', 'Flame Butterfly']),
+        LocationData(20216110, "[Drangleic] In front of the stairs right after the multi-door sentinel room", ['Frozen Flower'], sotfs=True),
+        LocationData(20216130, "[Drangleic] In the room with cursed painting of Nashandra (2)", ['Petrified Dragon Bone'], sotfs=True),
+        LocationData(20216140, "[Drangleic] In the room with cursed painting of Nashandra (3)", ['Torch'], sotfs=True),
+    ],
+    "King's Passage": [
+        LocationData(504000, "[Drangleic] Looking Glass Knight drop", ['Looking Glass Knight Soul']),
+        LocationData(504001, "[Drangleic] Looking Glass Knight drop in NG+", ['Looking Glass Knight Soul', 'Ring of Steel Protection+2'], ngp=True),
+        LocationData(20215150, "[Drangleic] Metal chest after looking glass knight", ['Soul Bolt', 'Spell Quartz Ring+2', 'Bonfire Ascetic']),
         LocationData(20216060, "[Drangleic] Between the stone horse-knights", ['Lifegem']),
         LocationData(20216061, "[Drangleic] Between the stone horse-knights in NG+", ['Old Radiant Lifegem', 'Petrified Dragon Bone'], ngp=True),
         LocationData(20216070, "[Drangleic] Between the stone horse-knights (2)", ['Soul of a Proud Knight', 'Twinkling Titanite']),
         LocationData(20216080, "[Drangleic] First right side in mirror knight approach corridor", ['Alluring Skull']),
-        LocationData(20216090, "[Drangleic] Behind a rock on the path towards drangleic castle", ['Holy Water Urn']),
-        LocationData(20216100, "[Drangleic] Corpse in the desert sorceress room", ['Repair Powder', 'Flame Butterfly']),
-        LocationData(20216110, "[Drangleic] In front of the stairs right after the multi-door sentinel room", ['Frozen Flower'], sotfs=True),
         LocationData(20216120, "[Drangleic] Between the stone horse-knights (3)", ['Petrified Something'], sotfs=True),
-        LocationData(20216130, "[Drangleic] In the room with cursed painting of Nashandra (2)", ['Petrified Dragon Bone'], sotfs=True),
-        LocationData(20216140, "[Drangleic] In the room with cursed painting of Nashandra (3)", ['Torch'], sotfs=True),
     ],
     "Undead Crypt": [
         LocationData(333000, "[Crypt] Velstadt drop", ['Soul of Velstadt']),
@@ -1354,7 +1357,6 @@ location_table = {
     #     LocationData(1783040, "[Chariot] Gift from Titchy Gren after Brotherhood of Blood Rank 3", ['Scythe of Nahr Alma', 'Nahr Alma Hood', 'Nahr Alma Robes']),
     #     LocationData(1784000, "[Tseldora] Gift from Cromwell when over 35FTH", ['Ring of Resistance']),
     #     LocationData(1785040, "[Heides] Gift from Blue Sentinel Targray after getting to 3rd rank in the Blue Sentinels", ["Targray's Helm", "Targray's Armor", "Targray's Manifers", "Targray's Leggings"]),
-    #     LocationData(1787000, "[DragonShrine] Gift from ancient dragon when speaking to him", ['Ashen Mist Heart']),
     #     LocationData(1788000, "[DLC3] Gift from Alsanna after bringing her 5 Loyce souls", ['Loyce Gauntlets', 'Loyce Leggings']),
     #     LocationData(1788010, "[DLC3] Gift from Alsanna after bringing her 15 Loyce souls", ['Loyce Armor']),
     #     LocationData(1788020, "[DLC3] Gift from Alsanna after bringing her 35 Loyce souls", ['Loyce Helm']),

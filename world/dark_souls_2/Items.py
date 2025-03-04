@@ -39,6 +39,8 @@ progression_items: list[str] = [
     "Fragrant Branch of Yore",
     "King's Ring",
     "Soldier Key",
+    "Key to King's Passage",
+    "Rotunda Lockstone",
     "Silvercat Ring",
     "Ashen Mist Heart",
     "Giant's Kinship",
