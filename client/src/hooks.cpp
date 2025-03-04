@@ -21,6 +21,13 @@ struct ItemStruct {
     Item items[8];
 };
 
+#ifdef _M_IX86
+struct ParamRow {
+    uint32_t paramId;
+    uint32_t rewardOffset;
+    uint32_t unknown;
+};
+#elif defined(_M_X64)
 struct ParamRow {
     uint8_t padding1[4];
     uint32_t paramId;
@@ -29,6 +36,7 @@ struct ParamRow {
     uint8_t padding3[4];
     uint32_t unknown;
 };
+#endif
 
 // function that allows us to get the itemLotId on giveItemsOnPickup
 #ifdef _M_IX86
@@ -107,10 +115,19 @@ void PatchMemory(uintptr_t address, const std::vector<BYTE>& bytes) {
 }
 
 void Hooks::overrideShopParams() {
-    uintptr_t shopParamPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, ParamOffsets::ShopLineupParam);
-    ParamRow *rowPtr = reinterpret_cast<ParamRow*>(shopParamPtr+0x3C);
 
-    for (int i = 0; i < 10000; ++i) {        
+#ifdef _M_IX86
+    // for some reason in vanilla when you go through the start menu
+    // they always override the params with the defaults
+    // this patch makes the game not override the ShopLineupParam (and maybe others?)
+    // this doesnt happen in sotfs
+    PatchMemory(baseAddress + 0x316A9F, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+#endif
+
+    uintptr_t shopParamPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, ParamOffsets::ShopLineupParam);
+    ParamRow *rowPtr = reinterpret_cast<ParamRow*>(shopParamPtr+0x44-sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x40
+
+    for (int i = 0; i < 10000; ++i) {      
         if (rowPtr[i].paramId == 0) return; // return if we reach the end
         if (!locationRewards.contains(rowPtr[i].paramId)) continue; // skip if its not an archipelago location
 
@@ -124,13 +141,23 @@ void Hooks::overrideShopParams() {
             WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &unusedItemForShop, sizeof(uint32_t), NULL);
         }
 
-        uint8_t amount = 1;
-        uintptr_t amountPtr = rewardPtr + 0x20;
-        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)amountPtr, &amount, sizeof(uint8_t), NULL);
+        //float_t enable_flag = -1.0f;
+        //uintptr_t enablePtr = rewardPtr + 0x8;
+        //WriteProcessMemory(GetCurrentProcess(), (LPVOID*)enablePtr, &enable_flag, sizeof(float_t), NULL);
+
+        // make sure items are not removed from the shops
+        // so that the player doesnt lose any checks
+        float_t disable_flag = -1.0f;
+        uintptr_t disablePtr = rewardPtr + 0xC;
+        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)disablePtr, &disable_flag, sizeof(float_t), NULL);
 
         float_t price_rate = 1.0f;
         uintptr_t ratePtr = rewardPtr + 0x1C;
         WriteProcessMemory(GetCurrentProcess(), (LPVOID*)ratePtr, &price_rate, sizeof(float_t), NULL);
+
+        uint8_t amount = 1;
+        uintptr_t amountPtr = rewardPtr + 0x20;
+        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)amountPtr, &amount, sizeof(uint8_t), NULL);  
     }
 }
 
@@ -271,11 +298,13 @@ void __cdecl detourGiveItemsOnPickup(UINT_PTR thisPtr, UINT_PTR idk1) {
 #endif
 
 #ifdef _M_IX86
+char __fastcall detourGiveShopItem(UINT_PTR thisPtr, void* Unknown, UINT_PTR param_2, INT param_3) {
 #elif defined(_M_X64)
 char __cdecl detourGiveShopItem(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3) {
 #endif
     int32_t shopLineupId;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(param_2 + 0x10), &shopLineupId, sizeof(shopLineupId), NULL);
+    uintptr_t ptr = param_2 + 2 * sizeof(uintptr_t); // 0x8 in x32 and 0x10 in x64
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)ptr, &shopLineupId, sizeof(shopLineupId), NULL);
     spdlog::debug("just bought: {}", shopLineupId);
 
     if (GameHooks->locationsToCheck.contains(shopLineupId)) {
@@ -289,10 +318,8 @@ char __cdecl detourGiveShopItem(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3)
     return originalGiveShopItem(thisPtr, param_2, param_3);
 }
 
-#ifdef _M_IX86
-#elif defined(_M_X64)
+#ifdef _M_X64
 void __cdecl detourAddShopItemToInventory(UINT_PTR thisPtr, UINT_PTR param_2, UINT_PTR param_3) {
-#endif
     if (!giveNextItem) {
         giveNextItem = true;
         return;
@@ -300,6 +327,7 @@ void __cdecl detourAddShopItemToInventory(UINT_PTR thisPtr, UINT_PTR param_2, UI
 
     return originalAddShopItemToInventory(thisPtr, param_2, param_3);
 }
+#endif
 
 #ifdef _M_IX86
 char __fastcall detourAddItemsToInventory(UINT_PTR thisPtr, void* Unknown, ItemStruct* itemsList, INT amountToGive, INT param_3) {
@@ -360,7 +388,9 @@ bool Hooks::initHooks() {
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnPickup), &detourGiveItemsOnPickup, (LPVOID*)&originalGiveItemsOnPickup);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveShopItem), &detourGiveShopItem, (LPVOID*)&originalGiveShopItem);
 
+#ifdef _M_X64
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddShopItemToInventory), &detourAddShopItemToInventory, (LPVOID*)&originalAddShopItemToInventory);
+#endif
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddItemsToInventory), &detourAddItemsToInventory, (LPVOID*)&originalAddItemsToInventory);
     originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + FunctionOffsets::CreatePopUpStruct);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
