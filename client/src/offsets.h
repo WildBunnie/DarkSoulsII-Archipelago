@@ -74,7 +74,9 @@ namespace PatchesOffsets {
 namespace ParamOffsets {
 #ifdef _M_IX86
     std::vector<uintptr_t> ShopLineupParam = { 0x60, 0x58, 0x94, 0x0 };
+    std::vector<uintptr_t> ItemParam = { 0x60, 0x10, 0x94, 0x0 };;
 #elif defined(_M_X64)
     std::vector<uintptr_t> ShopLineupParam = { 0xA8, 0xB0, 0xD8, 0x0 };
+    std::vector<uintptr_t> ItemParam = { 0xA8, 0x20, 0xD8, 0x0 };
 #endif
 }

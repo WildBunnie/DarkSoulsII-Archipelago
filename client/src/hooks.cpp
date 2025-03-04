@@ -1,6 +1,7 @@
 #include "hooks.h"
 #include "offsets.h"
 #include <spdlog/spdlog.h>
+#include "ds2.h"
 
 extern Hooks* GameHooks;
 
@@ -114,6 +115,29 @@ void PatchMemory(uintptr_t address, const std::vector<BYTE>& bytes) {
     VirtualProtect(reinterpret_cast<void*>(address), bytes.size(), oldProtect, &oldProtect);
 }
 
+void overrideItemPrices() {
+
+    uintptr_t itemPramPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, ParamOffsets::ItemParam);
+    ParamRow* rowPtr = reinterpret_cast<ParamRow*>(itemPramPtr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x40
+
+    std::set<int64_t> itemIds;
+
+    // only override prices for items in the item pool
+    for (const auto& entry : GameHooks->locationRewards) {
+        itemIds.insert(entry.second.item_id);
+    }
+
+    for (int i = 0; i < 10000; ++i) {
+        if (rowPtr[i].paramId == 0) return; // return if we reach the end
+        if (!itemIds.contains(rowPtr[i].paramId)) continue;
+        uintptr_t rewardPtr = itemPramPtr + rowPtr[i].rewardOffset;
+
+        uint32_t price = 1;
+        uintptr_t pricePtr = rewardPtr + 0x30;
+        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)pricePtr, &price, sizeof(uint32_t), NULL);
+    }
+}
+
 void Hooks::overrideShopParams() {
 
 #ifdef _M_IX86
@@ -123,6 +147,10 @@ void Hooks::overrideShopParams() {
     // this doesnt happen in sotfs
     PatchMemory(baseAddress + 0x316A9F, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 #endif
+
+    // set all items base prices to 1 so that we can
+    // set the values properly in the shop params
+    overrideItemPrices();
 
     uintptr_t shopParamPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, ParamOffsets::ShopLineupParam);
     ParamRow *rowPtr = reinterpret_cast<ParamRow*>(shopParamPtr+0x44-sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x40
@@ -151,7 +179,7 @@ void Hooks::overrideShopParams() {
         uintptr_t disablePtr = rewardPtr + 0xC;
         WriteProcessMemory(GetCurrentProcess(), (LPVOID*)disablePtr, &disable_flag, sizeof(float_t), NULL);
 
-        float_t price_rate = 1.0f;
+        float_t price_rate = shopPrices[rowPtr[i].paramId];
         uintptr_t ratePtr = rewardPtr + 0x1C;
         WriteProcessMemory(GetCurrentProcess(), (LPVOID*)ratePtr, &price_rate, sizeof(float_t), NULL);
 
