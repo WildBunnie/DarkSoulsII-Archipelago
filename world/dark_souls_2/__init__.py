@@ -139,6 +139,8 @@ class DS2World(World):
             item_data = next((item for item in item_list if item.name == item_name), None)
             assert item_data, "location's default item not in item list"
 
+            # skip sotfs items if we are not in sotfs
+            if item_data.sotfs and not self.options.game_version == "sotfs": continue
             # skip unwanted items
             if item_data.skip: continue
             # dont allow duplicates
@@ -149,7 +151,7 @@ class DS2World(World):
             pool.append(item)
 
         # fill the rest of the pool with filler items
-        filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip]
+        filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip and not item.sotfs]
         for _ in range(max_pool_size - len(pool)):
             item = self.create_item(random.choice(filler_items).name)
             pool.append(item)

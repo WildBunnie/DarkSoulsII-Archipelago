@@ -25,6 +25,7 @@ class ItemData:
     code: int
     name: str
     category: ItemCategory
+    sotfs: Optional[bool] = False # whether the location is only in sotfs
 
     # if true, item will not be added to the item pool
     skip: Optional[bool] = False
@@ -130,6 +131,7 @@ item_list: list[ItemData] = [
     ItemData(1990000, "Drakeblood Greatsword", ItemCategory.WEAPON),
     ItemData(1995000, "Loyce Greatsword", ItemCategory.WEAPON),
     ItemData(1996000, "Charred Loyce Greatsword", ItemCategory.WEAPON),
+    ItemData(1997000, "Greatsword of the Forlorn", ItemCategory.WEAPON, sotfs=True),
     ItemData(2000000, "Hand Axe", ItemCategory.WEAPON),
     ItemData(2010000, "Battle Axe", ItemCategory.WEAPON),
     ItemData(2020000, "Bandit Axe", ItemCategory.WEAPON),
@@ -199,6 +201,7 @@ item_list: list[ItemData] = [
     ItemData(3050000, "Scythe of Nahr Alma", ItemCategory.WEAPON),
     ItemData(3060000, "Bone Scythe", ItemCategory.WEAPON),
     ItemData(3070000, "Scythe of Want", ItemCategory.WEAPON),
+    ItemData(3080000, "Scythe of the Forlorn", ItemCategory.WEAPON, sotfs=True),
     ItemData(3200000, "Lucerne", ItemCategory.WEAPON),
     ItemData(3210000, "Scythe", ItemCategory.WEAPON),
     ItemData(3220000, "Halberd", ItemCategory.WEAPON),
@@ -759,6 +762,10 @@ item_list: list[ItemData] = [
     ItemData(26900101, "Ivory King Armor", ItemCategory.ARMOR),
     ItemData(26900102, "Ivory King Gauntlets", ItemCategory.ARMOR),
     ItemData(26900103, "Ivory King Leggings", ItemCategory.ARMOR),
+    ItemData(26940100, "Hood of the Forlorn", ItemCategory.ARMOR, sotfs=True),
+    ItemData(26940101, "Armor of the Forlorn", ItemCategory.ARMOR, sotfs=True),
+    ItemData(26940102, "Gauntlets of the Forlorn", ItemCategory.ARMOR, sotfs=True),
+    ItemData(26940103, "Leggings of the Forlorn", ItemCategory.ARMOR, sotfs=True),
     ItemData(27210101, "Llewellyn Armor", ItemCategory.ARMOR),
     ItemData(27210102, "Llewellyn Gloves", ItemCategory.ARMOR),
     ItemData(27210103, "Llewellyn Shoes", ItemCategory.ARMOR),
