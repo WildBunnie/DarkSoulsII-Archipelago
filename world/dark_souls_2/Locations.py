@@ -25,7 +25,7 @@ location_table = {
         LocationData(10026031, "[Betwixt] Under waterfall in NG+", ['Smooth & Silky Stone'], ngp=True),
         LocationData(10026040, "[Betwixt] One ledge down from the crow nest", ['Soul of a Nameless Soldier']),
         LocationData(10026050, "[Betwixt] Behind the wagon next to bonfire", ['Soul of a Lost Undead', 'Torch']),
-        LocationData(10026060, "[Betwixt] Behind a door in small alcove", ['Cracked Red Eye Orb']),
+        LocationData(10026060, "[Betwixt] Behind a door in small alcove", ['Rotunda Lockstone']), # this is not the default item
         LocationData(10026070, "[Betwixt] On path after the backstab tutorial", ['Dagger']),
         LocationData(10026080, "[Betwixt] Next to fog gate and archer", ['Lifegem']),
         LocationData(10026090, "[Betwixt] Other side of the jumpable gap", ['Amber Herb']),

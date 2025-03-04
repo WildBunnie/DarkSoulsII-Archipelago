@@ -172,6 +172,7 @@ class DS2World(World):
         return -1
 
     def set_rules(self):
+        self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotunda Lockstone", self.player))
         self.set_connection_rule("Path to Shaded Woods", "Shaded Woods", lambda state: state.has("Fragrant Branch of Yore", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "Lost Bastille", lambda state: state.has("Soldier Key", self.player))
         self.set_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("King's Ring", self.player))
