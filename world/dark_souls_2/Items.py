@@ -63,7 +63,8 @@ progression_items: list[str] = [
     "House Key",
     "Tseldora Den Key",
     "Iron Key",
-    "Brightstone Key"
+    "Brightstone Key",
+    "Dull Ember"
 ]
 
 item_list: list[ItemData] = [
