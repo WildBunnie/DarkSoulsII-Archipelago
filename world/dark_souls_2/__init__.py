@@ -216,7 +216,6 @@ class DS2World(World):
             (state.has_group("fire_res_ring", player, 1) or
              state.has_group("fire_res_pyro", player, 2) or
              state.has_group("fire_res_darkpyro", player, 2)))
-        self.set_location_rule(self.multiworld.get_location("[Drangleic] Looking Glass Knight drop", self.player), lambda state: state.has("Key to King's Passage"))
         self.set_location_rule(self.multiworld.get_location("[FOFG] First corpse in the lower fire area", self.player), lambda state: state.has("Iron Key"))
         self.set_location_rule(self.multiworld.get_location("[FOFG] Second corpse in the lower fire area", self.player), lambda state: state.has("Iron Key"))
         self.set_location_rule(self.multiworld.get_location("[Tseldora] Metal chest in Tseldora den", self.player), lambda state: state.has("Tseldora Den Key"))
