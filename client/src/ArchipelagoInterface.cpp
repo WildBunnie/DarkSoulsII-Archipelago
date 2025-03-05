@@ -43,6 +43,17 @@ BOOL CArchipelago::Initialise(std::string URI) {
 		if (data.contains("death_link")) {
 			GameHooks->isDeathLink = (data.at("death_link") != 0);
 		}
+		if (data.contains("game_version")) {
+			GameVersion chosenVersion = static_cast<GameVersion>(data.at("game_version"));;
+			if (chosenVersion != Core->gameVersion) {
+				Core->Panic("The client's game version does not match the version chosen on the config file, " 
+							"please change to the correct version or change the config file and generate a new game.");
+				return;
+			}
+		}
+		if (data.contains("no_weapon_req") && data.at("no_weapon_req") == 1) {
+			GameHooks->patchWeaponRequirements();
+		}
 
 		std::list<std::string> tags;
 		if (GameHooks->isDeathLink) {
@@ -54,6 +65,14 @@ BOOL CArchipelago::Initialise(std::string URI) {
 		Core->pTeamNumber = ap->get_team_number();
 
 		GameHooks->locationsToCheck = ap->get_missing_locations();
+
+		// ask for the items that are in each location
+		std::list<int64_t> locationsList;
+		std::set<int64_t> missingLocations = ap->get_missing_locations();
+		std::set<int64_t> checkedLocations = ap->get_checked_locations();
+		locationsList.insert(locationsList.end(), checkedLocations.begin(), checkedLocations.end());
+		locationsList.insert(locationsList.end(), missingLocations.begin(), missingLocations.end());
+		ap->LocationScouts(locationsList);
 
 		ap->Get({ Core->getSaveIdKey() });
 	});
@@ -76,6 +95,19 @@ BOOL CArchipelago::Initialise(std::string URI) {
 				spdlog::error("error setting save id");
 			}
 		}
+	});
+
+	// response to the ap->LocationScouts
+	// contains the items that are in each location
+	ap->set_location_info_handler([](const std::list<APClient::NetworkItem>& items) {
+		for (const auto& item : items) {
+			std::string player_name = ap->get_player_alias(item.player);
+			std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));
+			bool isLocal = player_name == Core->pSlotName;
+
+			GameHooks->locationRewards[item.location] = {item.item, item_name, player_name, isLocal};
+		}
+		GameHooks->overrideShopParams();
 	});
 	
 	ap->set_slot_disconnected_handler([]() {
@@ -114,6 +146,13 @@ BOOL CArchipelago::Initialise(std::string URI) {
 	});
 
 	ap->set_print_json_handler([](const std::list<APClient::TextNode>& msg) {
+		
+		// make sure we dont show a message
+		// after the fatal error message
+		if (Core->fatalError) {
+			return;
+		}
+
 		auto message = ap->render_json(msg, APClient::RenderFormat::TEXT);
 		spdlog::info(message);
 	});

@@ -4,17 +4,28 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <map>
 #include <WinSock2.h>
 #include <winsock.h>
 #include <Ws2tcpip.h>
 #include <minhook.h>
 #include <iostream>
 
+
+struct locationReward {
+    int64_t item_id;
+    std::string item_name;
+    std::string player_name;
+    bool isLocal; // wheter the item is local to our world
+};
+
 class Hooks {
 public:
     bool initHooks();
-    uintptr_t GetPointerAddress(uintptr_t gameBaseAddr, uintptr_t address, std::vector<uintptr_t> offsets);
     void giveItems(std::vector<int> ids);
+    void showLocationRewardMessage(int32_t locationId);
+    void patchWeaponRequirements();
+    void overrideShopParams();
 
     bool playerJustDied();
     bool isPlayerInGame();
@@ -22,6 +33,7 @@ public:
 
     std::set<int64_t> locationsToCheck;
     std::list<int64_t> checkedLocations;
+    std::map<int64_t, locationReward> locationRewards;
     bool isDeathLink;
 
 #ifdef _M_IX86

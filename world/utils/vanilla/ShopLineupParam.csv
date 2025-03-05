@@ -1,0 +1,689 @@
+ID,Name,item_id,Unk00,enable_flag,disable_flag,material_id,duplicate_item_id,Unk01,price_rate,quantity,
+1,UNKNOWN,0,10,-1,-1,0,0,0,1,255
+30700000,[Head of Vengarl] Claymore,1820000,10,-1,-1,0,0,0,1,255
+30700001,[Head of Vengarl] Greatsword,5210000,10,-1,-1,0,0,0,1,255
+30700002,[Head of Vengarl] Red Rust Sword,1330000,10,102010,-1,0,0,0,1,1
+30700003,[Head of Vengarl] Red Rust Scimitar,1660000,10,102010,-1,0,0,0,1,1
+30700100,[Head of Vengarl] Red Rust Shield,11450000,10,102010,-1,0,0,0,1,1
+30700300,[Head of Vengarl] Magic Barrier,32190000,10,-1,-1,0,0,0,1,1
+30700400,,40300000,10,-1,-1,0,0,0,1,1
+30700600,[Head of Vengarl] Gold Pine Resin,60250000,10,-1,-1,0,0,0,1,255
+30700601,[Head of Vengarl] Lightning Urn,60560000,10,-1,-1,0,0,0,1,255
+30700602,[Head of Vengarl] Destructive Greatarrow,60900000,10,-1,-1,0,0,0,1,255
+50600100,,11330000,10,-1,-1,0,0,0,1,1
+50600200,,25100100,10,-1,-1,0,0,0,1,1
+50600201,,25100101,10,-1,-1,0,0,0,1,1
+50600202,,25100102,10,-1,-1,0,0,0,1,1
+50600203,,25100103,10,-1,-1,0,0,0,1,1
+50600300,[Grave Warden Agdayne] Soul Spear,31090000,10,-1,-1,0,0,0,1,1
+50600301,[Grave Warden Agdayne] Soul Vortex,31150000,10,-1,-1,0,0,0,1,1
+50600302,[Grave Warden Agdayne] Soul Appease,32170000,10,-1,-1,0,0,0,1,1
+50600303,[Grave Warden Agdayne] Warmth,33200000,10,-1,-1,0,0,0,1,1
+50600401,[Grave Warden Agdayne] Ring of Thorns+1,40530001,10,-1,-1,0,0,0,1,1
+50600600,[Grave Warden Agdayne] Human Effigy,60151000,10,-1,-1,0,0,0,1,13
+50600601,[Grave Warden Agdayne] Elizabeth Mushroom,60035000,10,-1,-1,0,0,0,1,13
+50600602,[Grave Warden Agdayne] Dark Arrow,60810000,10,-1,-1,0,0,0,1,255
+50600603,[Grave Warden Agdayne] Dark Bolt,60960000,10,-1,-1,0,0,0,1,255
+70400000,[Laddersmith Gilligan - Earthen Peak] Reinforced Club,2430000,10,-1,201850,0,0,0,0.8,255
+70400001,[Laddersmith Gilligan - Earthen Peak] Claws,3410000,10,-1,201850,0,0,0,0.8,255
+70400002,[Laddersmith Gilligan - Earthen Peak] Whip,3600000,10,-1,201850,0,0,0,0.8,255
+70400003,[Laddersmith Gilligan - Earthen Peak] Wooden Shield,11400000,10,-1,201850,0,0,0,0.8,255
+70400004,[Laddersmith Gilligan - Majula] Reinforced Club,2430000,10,201850,-1,0,0,0,1,255
+70400005,[Laddersmith Gilligan - Majula] Claws,3410000,10,201850,-1,0,0,0,1,255
+70400006,[Laddersmith Gilligan - Majula] Whip,3600000,10,201850,-1,0,0,0,1,255
+70400007,[Laddersmith Gilligan - Majula] Wooden Shield,11400000,10,201850,-1,0,0,0,1,255
+70400200,[Laddersmith Gilligan - Earthen Peak] Thief Mask,21020100,10,-1,201850,0,0,0,0.8,255
+70400201,[Laddersmith Gilligan - Earthen Peak] Black Leather Armor,21020101,10,-1,201850,0,0,0,0.8,255
+70400202,[Laddersmith Gilligan - Earthen Peak] Black Leather Gloves,21020102,10,-1,201850,0,0,0,0.8,255
+70400203,[Laddersmith Gilligan - Earthen Peak] Black Leather Boots,21020103,10,-1,201850,0,0,0,0.8,255
+70400204,[Laddersmith Gilligan - Majula] Thief Mask,21020100,10,201850,-1,0,0,0,1,255
+70400205,[Laddersmith Gilligan - Majula] Black Leather Armor,21020101,10,201850,-1,0,0,0,1,255
+70400206,[Laddersmith Gilligan - Majula] Black Leather Gloves,21020102,10,201850,-1,0,0,0,1,255
+70400207,[Laddersmith Gilligan - Majula] Black Leather Boots,21020103,10,201850,-1,0,0,0,1,255
+70400500,[Laddersmith Gilligan - Earthen Peak] Ladder Miniature,50950000,10,-1,201850,0,50950000,0,0.8,1
+70400501,[Laddersmith Gilligan - Majula] Ladder Miniature,50950000,10,201850,-1,0,50950000,0,1,1
+70400600,[Laddersmith Gilligan - Earthen Peak] Aromatic Ooze,60240000,10,-1,201850,0,0,0,0.8,255
+70400601,[Laddersmith Gilligan - Earthen Peak] Lacerating Knife,60600000,10,-1,201850,0,0,0,0.8,255
+70400602,[Laddersmith Gilligan - Earthen Peak] Bleeding Serum,60290000,10,-1,201850,0,0,0,0.8,255
+70400603,[Laddersmith Gilligan - Majula] Aromatic Ooze,60240000,10,201850,-1,0,0,0,1,255
+70400604,[Laddersmith Gilligan - Majula] Lacerating Knife,60600000,10,201850,-1,0,0,0,1,255
+70400605,[Laddersmith Gilligan - Majula] Bleeding Serum,60290000,10,201850,-1,0,0,0,1,255
+72110000,[Chancellor Wellager] Flamberge,1810000,10,-1,-1,0,0,0,1,255
+72110001,[Chancellor Wellager] Lucerne,3200000,10,-1,-1,0,0,1,1,255
+72110002,[Chancellor Wellager - Looking Glass Knight] Black Flamestone Dagger,5500000,10,100958,-1,0,0,2,1,1
+72110003,[Chancellor Wellager - Looking Glass Knight] Yellow Quartz Longsword,5510000,10,100958,-1,0,0,3,1,1
+72110004,[Chancellor Wellager - Looking Glass Knight] Bound Hand Axe,5520000,10,100958,-1,0,0,4,1,1
+72110005,[Chancellor Wellager - Looking Glass Knight] Homunculus Mace,5530000,10,100958,-1,0,0,5,1,1
+72110006,[Chancellor Wellager - Looking Glass Knight] Transgressor's Staff,5540000,10,100958,-1,0,0,6,1,1
+72110007,[Chancellor Wellager - NG+2] Curved Twinblade,5360000,10,100110,-1,0,0,7,1,1
+72110008,[Chancellor Wellager - NG+2] Crescent Sickle,3040000,10,100110,-1,0,0,8,1,1
+72110100,[Chancellor Wellager - Looking Glass Knight] Black Flamestone Parma,11800000,10,100958,-1,0,0,20,1,1
+72110101,[Chancellor Wellager - Looking Glass Knight] Yellow Quartz Shield,11810000,10,100958,-1,0,0,21,1,1
+72110102,[Chancellor Wellager - Looking Glass Knight] Bound Wooden Shield,11820000,10,100958,-1,0,0,22,1,1
+72110103,[Chancellor Wellager - Looking Glass Knight] Homunculus Wooden Shield,11830000,10,100958,-1,0,0,23,1,1
+72110104,[Chancellor Wellager - Looking Glass Knight] Transgressor's Leather Shield,11840000,10,100958,-1,0,0,24,1,1
+72110105,[Chancellor Wellager - NG+2] Spirit Tree Shield,11300000,10,100110,-1,0,0,25,1,1
+72110300,[Chancellor Wellager - NG+2] Wrath of the Gods,32110000,10,100110,-1,0,0,0,1,1
+72110301,[Chancellor Wellager - NG+2] Bountiful Sunlight,32080000,10,100110,-1,0,0,0,1,1
+72110302,[Chancellor Wellager - NG+2] Great Chaos Fireball,33040000,10,100110,-1,0,0,0,1,1
+72110303,[Chancellor Wellager] Great Magic Barrier,32200000,10,-1,-1,0,0,0,1,1
+72110400,[Chancellor Wellager] Bracing Knuckle Ring+1,40120001,10,-1,-1,0,0,0,1,1
+72110600,[Chancellor Wellager] Old Radiant Lifegem,60030000,10,-1,-1,0,0,0,1,10
+72110601,[Chancellor Wellager] Wilted Dusk Herb,60060000,10,-1,-1,0,0,0,1,10
+72110602,[Chancellor Wellager] Divine Blessing,60105000,10,-1,-1,0,0,0,1,1
+72110603,[Chancellor Wellager] Repair Powder,60410000,10,-1,-1,0,0,0,1,255
+72110604,[Chancellor Wellager] Magic Arrow,60780000,10,-1,-1,0,0,0,1,255
+72110605,[Chancellor Wellager] Lightning Arrow,60790000,10,-1,-1,0,0,0,1,255
+72110606,[Chancellor Wellager] Magic Bolt,60930000,10,-1,-1,0,0,0,1,255
+72110607,[Chancellor Wellager] Lightning Bolt,60940000,10,-1,-1,0,0,0,1,255
+72500300,[Darkdiver Grandahl] Cast Light,31270000,10,-1,-1,0,0,0,1,1
+72500301,[Darkdiver Grandahl] Dark Orb,34010000,10,-1,-1,0,0,0,1,1
+72500302,[Darkdiver Grandahl] Dark Hail,34020000,10,-1,-1,0,0,0,1,1
+72500303,[Darkdiver Grandahl] Darkstorm,35020000,10,-1,-1,0,0,0,1,1
+72500304,[Darkdiver Grandahl] Profound Still,35090000,10,-1,-1,0,0,0,1,1
+72500600,[Darkdiver Grandahl] Human Effigy,60151000,10,-1,-1,0,0,0,1,3
+72500601,[Darkdiver Grandahl] Bonfire Ascetic,60527000,10,-1,-1,0,0,0,1,10
+72600400,[Lonesome Gavlan - No-man's Wharf] Ring of Giants,40290000,10,-1,102346,0,0,0,1,1
+72600401,[Lonesome Gavlan - Harvest Valley] Ring of Giants,40290000,10,102346,102349,0,0,0,1.2,1
+72600402,[Lonesome Gavlan - Doors of Pharros] Ring of Giants,40290000,10,102349,-1,0,0,0,1.4,1
+72600600,[Lonesome Gavlan] Poison Moss,60070000,10,-1,102349,0,0,0,1,20
+72600601,[Lonesome Gavlan] Rotten Pine Resin,60280000,10,-1,102349,0,0,0,1,20
+72600602,[Lonesome Gavlan] Poison Throwing Knife,60590000,10,-1,102349,0,0,0,1,20
+72600603,[Lonesome Gavlan] Poison Arrow,60820000,10,-1,102349,0,0,0,1,20
+72600604,[Lonesome Gavlan - Doors of Pharros] Poison Moss,60070000,10,102349,-1,0,0,0,1,255
+72600605,[Lonesome Gavlan - Doors of Pharros] Rotten Pine Resin,60280000,10,102349,-1,0,0,0,1,255
+72600606,[Lonesome Gavlan - Doors of Pharros] Poison Throwing Knife,60590000,10,102349,-1,0,0,0,1,255
+72600607,[Lonesome Gavlan - Doors of Pharros] Poison Arrow,60820000,10,102349,-1,0,0,0,1,255
+75400000,[Merchant Hag Melentia] Broken Straight Sword,1200000,500,-1,-1,0,0,0,1,255
+75400001,[Merchant Hag Melentia] Hand Axe,2000000,500,-1,-1,0,0,0,1,255
+75400002,[Merchant Hag Melentia] Club,2400000,500,-1,-1,0,0,0,1,255
+75400003,[Merchant Hag Melentia] Caestus,3500000,10,-1,-1,0,0,0,1,255
+75400004,[Merchant Hag Melentia - Grave Warden Agdayne] Darkdrift,1760000,500,104010,-1,0,0,0,1,1
+75400005,[Merchant Hag Melentia - Lucatiel of Mirrah] Mirrah Greatsword,1910000,500,104190,-1,0,0,0,1,1
+75400006,[Merchant Hag Melentia - Titchy Gren] Scythe of Nahr Alma,3050000,500,104380,-1,0,0,0,1,1
+75400100,[Merchant Hag Melentia - Benhart of Jugo] Benhart's Parma,11005000,500,104160,-1,0,0,0,1,1
+75400101,[Merchant Hag Melentia - Mild Mannered Pate] Pate's Shield,11620000,500,104170,-1,0,0,0,1,1
+75400200,[Merchant Hag Melentia] Traveling Merchant Hat,21140100,500,-1,-1,0,0,0,1,255
+75400201,[Merchant Hag Melentia] Traveling Merchant Coat,21140101,500,-1,-1,0,0,0,1,255
+75400202,[Merchant Hag Melentia] Traveling Merchant Gloves,21140102,500,-1,-1,0,0,0,1,255
+75400203,[Merchant Hag Melentia] Traveling Merchant Boots,21140103,500,-1,-1,0,0,0,1,255
+75400204,[Merchant Hag Melentia - Grave Warden Agdayne] Agdayne's Black Robe,25060101,500,104010,-1,0,0,0,1,1
+75400205,[Merchant Hag Melentia - Grave Warden Agdayne] Agdayne's Cuffs,25060102,500,104010,-1,0,0,0,1,1
+75400206,[Merchant Hag Melentia - Creighton the Wanderer] Creighton's Chainmail,27420101,500,104150,-1,0,0,0,1,1
+75400207,[Merchant Hag Melentia - Creighton the Wanderer] Creighton's Chain Gloves,27420102,500,104150,-1,0,0,0,1,1
+75400208,[Merchant Hag Melentia - Creighton the Wanderer] Creighton's Chain Leggings,27420103,500,104150,-1,0,0,0,1,1
+75400209,[Merchant Hag Melentia - Benhart of Jugo] Benhart's Knight Helm,27430100,500,104160,-1,0,0,0,1,1
+75400210,[Merchant Hag Melentia - Benhart of Jugo] Benhart's Armor,27430101,500,104160,-1,0,0,0,1,1
+75400211,[Merchant Hag Melentia - Benhart of Jugo] Benhart's Gauntlets,27430102,500,104160,-1,0,0,0,1,1
+75400212,[Merchant Hag Melentia - Benhart of Jugo] Benhart's Boots,27430103,500,104160,-1,0,0,0,1,1
+75400213,[Merchant Hag Melentia - Mild Mannered Pate] Pate's Helm,21010100,500,104170,-1,0,0,0,1,1
+75400214,[Merchant Hag Melentia - Mild Mannered Pate] Pate's Armor,21010101,500,104170,-1,0,0,0,1,1
+75400215,[Merchant Hag Melentia - Mild Mannered Pate] Pate's Gloves,21010102,500,104170,-1,0,0,0,1,1
+75400216,[Merchant Hag Melentia - Mild Mannered Pate] Pate's Trousers,21010103,500,104170,-1,0,0,0,1,1
+75400217,[Merchant Hag Melentia - Cale the Cartographer] Cale's Leather Armor,27510101,500,104180,-1,0,0,0,1,1
+75400218,[Merchant Hag Melentia - Cale the Cartographer] Cale's Shoes,27510103,500,104180,-1,0,0,0,1,1
+75400219,[Merchant Hag Melentia - Lucatiel of Mirrah] Lucatiel's Vest,27520101,500,104190,-1,0,0,0,1,1
+75400220,[Merchant Hag Melentia - Lucatiel of Mirrah] Lucatiel's Gloves,27520102,500,104190,-1,0,0,0,1,1
+75400221,[Merchant Hag Melentia - Lucatiel of Mirrah] Lucatiel's Trousers,27520103,500,104190,-1,0,0,0,1,1
+75400222,[Merchant Hag Melentia - Straid of Olaphis] Black Robes,27680101,500,104310,-1,0,0,0,1,1
+75400223,[Merchant Hag Melentia - Straid of Olaphis] Black Gloves,27680102,500,104310,-1,0,0,0,1,1
+75400224,[Merchant Hag Melentia - Straid of Olaphis] Black Boots,27680103,500,104310,-1,0,0,0,1,1
+75400225,[Merchant Hag Melentia - Licia of Lindeldt] Saint's Hood,27690100,500,104320,-1,0,0,0,1,1
+75400226,[Merchant Hag Melentia - Licia of Lindeldt] Saint's Dress,27690101,500,104320,-1,0,0,0,1,1
+75400227,[Merchant Hag Melentia - Licia of Lindeldt] Saint's Long Gloves,27690102,500,104320,-1,0,0,0,1,1
+75400228,[Merchant Hag Melentia - Licia of Lindeldt] Saint's Trousers,27690103,500,104320,-1,0,0,0,1,1
+75400229,[Merchant Hag Melentia - Felkin the Outcast] Hexer's Hood,27700100,500,104330,-1,0,0,0,1,1
+75400230,[Merchant Hag Melentia - Felkin the Outcast] Hexer's Robes,27700101,500,104330,-1,0,0,0,1,1
+75400231,[Merchant Hag Melentia - Felkin the Outcast] Hexer's Gloves,27700102,500,104330,-1,0,0,0,1,1
+75400232,[Merchant Hag Melentia - Felkin the Outcast] Hexer's Boots,27700103,500,104330,-1,0,0,0,1,1
+75400233,[Merchant Hag Melentia - Royal Sorcerer Navlaan] Chaos Robe,27710101,500,104340,-1,0,0,0,1,1
+75400234,[Merchant Hag Melentia - Royal Sorcerer Navlaan] Chaos Gloves,27710102,500,104340,-1,0,0,0,1,1
+75400235,[Merchant Hag Melentia - Royal Sorcerer Navlaan] Chaos Boots,27710103,500,104340,-1,0,0,0,1,1
+75400236,[Merchant Hag Melentia - Titchy Gren] Nahr Alma Robes,27830101,500,104380,-1,0,0,0,1,1
+75400237,[Merchant Hag Melentia - Blue Sentinel Targray] Targray's Helm,27950100,500,104400,-1,0,0,0,1,1
+75400238,[Merchant Hag Melentia - Blue Sentinel Targray] Targray's Armor,27950101,500,104400,-1,0,0,0,1,1
+75400239,[Merchant Hag Melentia - Blue Sentinel Targray] Targray's Manifers,27950102,500,104400,-1,0,0,0,1,1
+75400240,[Merchant Hag Melentia - Blue Sentinel Targray] Targray's Leggings,27950103,500,104400,-1,0,0,0,1,1
+75400300,[Merchant Hag Melentia] Soul Arrow,31010000,100,-1,-1,0,0,0,1,1
+75400301,[Merchant Hag Melentia] Heal,32010000,10,-1,-1,0,0,0,1,1
+75400500,[Merchant Hag Melentia] Lenigrast's Key,50870000,1000,-1,-1,0,0,0,1,1
+75400600,[Merchant Hag Melentia - Forest of Fallen Giants] Lifegem,60010000,500,-1,203850,0,0,0,1,10
+75400601,[Merchant Hag Melentia - Majula] Lifegem,60010000,500,203850,-1,0,0,0,1,255
+75400602,[Merchant Hag Melentia - Lost Sinner] Radiant Lifegem,60020000,50,100963,-1,0,0,0,1,10
+75400603,[Merchant Hag Melentia] Amber Herb,60040000,50,-1,-1,0,0,0,1,3
+75400604,[Merchant Hag Melentia] Throwing Knife,60540000,10,-1,-1,0,0,0,1,255
+75400605,[Merchant Hag Melentia] Witching Urn,60550000,50,-1,-1,0,0,0,1,255
+75400606,[Merchant Hag Melentia] Firebomb,60570000,10,-1,-1,0,0,0,1,255
+75400607,[Merchant Hag Melentia] Human Effigy,60151000,50,-1,-1,0,0,0,0.5,5
+75400608,[Merchant Hag Melentia] Pharros' Lockstone,60536000,50,-1,-1,0,0,0,1,1
+75400609,[Merchant Hag Melentia] Brightbug,60239000,6000,100620,100621,0,0,0,1,3
+75400610,[Merchant Hag Melentia - 1 Major Boss] Brightbug,60239000,6000,100621,100622,0,0,0,2,3
+75400611,[Merchant Hag Melentia - 2 Major Bosses] Brightbug,60239000,6000,100622,100623,0,0,0,3,3
+75400612,[Merchant Hag Melentia - 3 Major Bosses] Brightbug,60239000,6000,100623,100624,0,0,0,4,3
+75400613,[Merchant Hag Melentia - 4 Major Bosses] Brightbug,60239000,6000,100624,100625,0,0,0,6,3
+75400614,[Merchant Hag Melentia - 5 Major Bosses] Brightbug,60239000,6000,100625,100626,0,0,0,8,3
+75600600,[The Rat King] Common Fruit,60200000,10,-1,-1,0,0,0,1,255
+75600601,[The Rat King] Red Leech Troches,60210000,10,-1,-1,0,0,0,1,255
+75600602,[The Rat King] Triclops Snake Troches,60230000,10,-1,-1,0,0,0,1,255
+75600603,[The Rat King] Dung Pie,60595000,10,-1,-1,0,0,0,1,255
+75600604,[The Rat King] Corrosive Urn,60610000,10,-1,-1,0,0,0,1,255
+76100000,[Maughlin the Armourer] Iron Parma,11020000,10,-1,-1,0,0,0,1,255
+76100001,[Maughlin the Armourer] Silver Eagle Kite Shield,11220000,10,-1,-1,0,0,0,1,255
+76100002,[Maughlin the Armourer] Twin Dragon Greatshield,11500000,10,-1,-1,0,0,0,1,255
+76100200,[Maughlin the Armourer] Standard Helm,27440100,10,-1,-1,0,0,0,1,255
+76100201,[Maughlin the Armourer] Hard Leather Armor,27440101,10,-1,-1,0,0,0,1,255
+76100202,[Maughlin the Armourer] Hard Leather Gauntlets,27440102,10,-1,-1,0,0,0,1,255
+76100203,[Maughlin the Armourer] Hard Leather Boots,27440103,10,-1,-1,0,0,0,1,255
+76100204,[Maughlin the Armourer] Falconer Helm,23130100,10,-1,-1,0,0,0,1,255
+76100205,[Maughlin the Armourer] Falconer Armor,23130101,10,-1,-1,0,0,0,1,255
+76100206,[Maughlin the Armourer] Falconer Gloves,23130102,10,-1,-1,0,0,0,1,255
+76100207,[Maughlin the Armourer] Falconer Boots,23130103,10,-1,-1,0,0,0,1,255
+76100208,[Maughlin the Armourer] Infantry Armor,22031101,10,-1,-1,0,0,0,1,255
+76100209,[Maughlin the Armourer] Infantry Gloves,22031102,10,-1,-1,0,0,0,1,255
+76100210,[Maughlin the Armourer] Infantry Boots,22031103,10,-1,-1,0,0,0,1,255
+76100211,[Maughlin the Armourer - 1000 Souls] Royal Soldier Helm,22021100,10,102611,102612,0,0,0,1,255
+76100212,[Maughlin the Armourer - 1000 Souls] Royal Soldier Armor,22021101,10,102611,102612,0,0,0,1,255
+76100213,[Maughlin the Armourer - 1000 Souls] Royal Soldier Gauntlet,22021102,10,102611,102612,0,0,0,1,255
+76100214,[Maughlin the Armourer - 1000 Souls] Royal Soldier Leggings,22021103,10,102611,102612,0,0,0,1,255
+76100215,[Maughlin the Armourer - 1000 Souls] Elite Knight Helm,21060100,10,102611,102612,0,0,0,1,255
+76100216,[Maughlin the Armourer - 1000 Souls] Elite Knight Armor,21060101,10,102611,102612,0,0,0,1,255
+76100217,[Maughlin the Armourer - 1000 Souls] Elite Knight Gloves,21060102,10,102611,102612,0,0,0,1,255
+76100218,[Maughlin the Armourer - 1000 Souls] Elite Knight Leggings,21060103,10,102611,102612,0,0,0,1,255
+76100219,[Maughlin the Armourer - 1000 Souls] Royal Soldier Helm,22021100,10,102612,-1,0,0,0,1,255
+76100220,[Maughlin the Armourer - 1000 Souls] Royal Soldier Armor,22021101,10,102612,-1,0,0,0,1,255
+76100221,[Maughlin the Armourer - 1000 Souls] Royal Soldier Gauntlets,22021102,10,102612,-1,0,0,0,1,255
+76100222,[Maughlin the Armourer - 1000 Souls] Royal Soldier Leggings,22021103,10,102612,-1,0,0,0,1,255
+76100223,[Maughlin the Armourer - 1000 Souls] Elite Knight Helm,21060100,10,102612,-1,0,0,0,1,255
+76100224,[Maughlin the Armourer - 1000 Souls] Elite Knight Armor,21060101,10,102612,-1,0,0,0,1,255
+76100225,[Maughlin the Armourer - 1000 Souls] Elite Knight Gloves,21060102,10,102612,-1,0,0,0,1,255
+76100226,[Maughlin the Armourer - 1000 Souls] Elite Knight Leggings,21060103,10,102612,-1,0,0,0,1,255
+76100227,[Maughlin the Armourer - 15000 Souls] Alva Helm,21490100,10,102612,-1,0,0,0,1,255
+76100228,[Maughlin the Armourer - 15000 Souls] Alva Armor,21490101,10,102612,-1,0,0,0,1,255
+76100229,[Maughlin the Armourer - 15000 Souls] Alva Gauntlets,21490102,10,102612,-1,0,0,0,1,255
+76100230,[Maughlin the Armourer - 15000 Souls] Alva Leggings,21490103,10,102612,-1,0,0,0,1,255
+76100235,[Maughlin the Armourer - Smelter Demon] Smelter Demon Helm,23050100,500,102601,-1,0,0,0,1,1
+76100236,[Maughlin the Armourer - Smelter Demon] Smelter Demon Armor,23050101,500,102601,-1,0,0,0,1,1
+76100237,[Maughlin the Armourer - Smelter Demon] Smelter Demon Gauntlets,23050102,500,102601,-1,0,0,0,1,1
+76100238,[Maughlin the Armourer - Smelter Demon] Smelter Demon Leggings,23050103,500,102601,-1,0,0,0,1,1
+76100239,[Maughlin the Armourer - Looking Glass Knight] Looking Glass Mask,25040100,500,102602,-1,0,0,0,1,1
+76100240,[Maughlin the Armourer - Looking Glass Knight] Looking Glass Armor,25040101,500,102602,-1,0,0,0,1,1
+76100241,[Maughlin the Armourer - Looking Glass Knight] Looking Glass Gauntlets,25040102,500,102602,-1,0,0,0,1,1
+76100242,[Maughlin the Armourer - Looking Glass Knight] Looking Glass Leggings,25040103,500,102602,-1,0,0,0,1,1
+76100243,[Maughlin the Armourer - Lost Sinner] Penal Mask,26260100,500,102603,-1,0,0,0,1,1
+76100244,[Maughlin the Armourer - Lost Sinner] Penal Straightjacket,26260101,500,102603,-1,0,0,0,1,1
+76100245,[Maughlin the Armourer - Lost Sinner] Penal Handcuffs,26260102,500,102603,-1,0,0,0,1,1
+76100246,[Maughlin the Armourer - Lost Sinner] Penal Skirt,26260103,500,102603,-1,0,0,0,1,1
+76100247,[Maughlin the Armourer - Velstadt] Velstadt's Helm,23330100,500,102605,-1,0,0,0,1,1
+76100248,[Maughlin the Armourer - Velstadt] Velstadt's Armor,23330101,500,102605,-1,0,0,0,1,1
+76100249,[Maughlin the Armourer - Velstadt] Velstadt's Gauntlets,23330102,500,102605,-1,0,0,0,1,1
+76100250,[Maughlin the Armourer - Velstadt] Velstadt's Leggings,23330103,500,102605,-1,0,0,0,1,1
+76100251,[Maughlin the Armourer - Thorne Defenders] Throne Defender Helm,23320100,500,102604,-1,0,0,0,1,1
+76100252,[Maughlin the Armourer - Thorne Defenders] Throne Defender Armor,23320101,500,102604,-1,0,0,0,1,1
+76100253,[Maughlin the Armourer - Thorne Defenders] Throne Defender Gauntlets,23320102,500,102604,-1,0,0,0,1,1
+76100254,[Maughlin the Armourer - Thorne Defenders] Throne Defender Leggings,23320103,500,102604,-1,0,0,0,1,1
+76100255,[Maughlin the Armourer - Thorne Defenders] Throne Watcher Helm,23340100,500,102604,-1,0,0,0,1,1
+76100256,[Maughlin the Armourer - Thorne Defenders] Throne Watcher Armor,23340101,500,102604,-1,0,0,0,1,1
+76100257,[Maughlin the Armourer - Thorne Defenders] Throne Watcher Gauntlets,23340102,500,102604,-1,0,0,0,1,1
+76100258,[Maughlin the Armourer - Thorne Defenders] Throne Watcher Leggings,23340103,500,102604,-1,0,0,0,1,1
+76100259,[Maughlin the Armourer - 15000 Souls- NG+3] Moon Butterfly Hat,21470100,10,102607,-1,0,0,0,1,1
+76100260,[Maughlin the Armourer - 15000 Souls- NG+2] Moon Butterfly Wings,21470101,10,102606,-1,0,0,0,1,1
+76100261,[Maughlin the Armourer - 15000 Souls- NG+2] Moon Butterfly Cuffs,21470102,10,102606,-1,0,0,0,1,1
+76100262,[Maughlin the Armourer - 15000 Souls- NG+2] Moon Butterfly Skirt,21470103,10,102606,-1,0,0,0,1,1
+76100263,[Maughlin the Armourer - Burnt Ivory King- 50 Loyce Souls] Ivory King Helm,26900100,10,103303,-1,0,0,0,1,1
+76100264,[Maughlin the Armourer - Burnt Ivory King- 50 Loyce Souls] Ivory King Armor,26900101,10,103303,-1,0,0,0,1,1
+76100265,[Maughlin the Armourer - Burnt Ivory King- 50 Loyce Souls] Ivory King Gauntlets,26900102,10,103303,-1,0,0,0,1,1
+76100266,[Maughlin the Armourer - Burnt Ivory King- 50 Loyce Souls] Ivory King Leggings,26900103,10,103303,-1,0,0,0,1,1
+76200300,[Stone Trader Chloanne] Soul Appease,32170000,10,-1,-1,0,0,0,1,1
+76200301,[Stone Trader Chloanne] Dead Again,34050000,10,-1,-1,0,0,0,1,1
+76200600,[Stone Trader Chloanne] Titanite Shard,60970000,10,-1,100952,0,0,0,1,10
+76200601,[Stone Trader Chloanne - Old Iron King] Titanite Shard,60970000,10,100952,-1,0,0,0,1,255
+76200602,[Stone Trader Chloanne - Old Iron King] Large Titanite Shard,60975000,10,100952,100958,0,0,0,1,10
+76200603,[Stone Trader Chloanne - Looking Glass Knight] Large Titanite Shard,60975000,10,100958,-1,0,0,0,1,255
+76200604,[Stone Trader Chloanne - Velstadt] Titanite Chunk,60980000,10,100975,100973,0,0,0,1,10
+76200605,[Stone Trader Chloanne - Nashandra] Titanite Chunk,60980000,10,100973,-1,0,0,0,1,255
+76200606,[Stone Trader Chloanne - Velstadt] Titanite Slab,60990000,10,100975,-1,0,0,0,1,1
+76200607,[Stone Trader Chloanne - Velstadt] Twinkling Titanite,61000000,10,100975,-1,0,0,0,1,3
+76200608,[Stone Trader Chloanne - Velstadt] Petrified Dragon Bone,61030000,10,100975,-1,0,0,0,1,3
+76200609,[Stone Trader Chloanne - Velstadt] Faintstone,61060000,10,100975,-1,0,0,0,1,3
+76200610,[Stone Trader Chloanne - Velstadt] Boltstone,61070000,10,100975,-1,0,0,0,1,3
+76200611,[Stone Trader Chloanne - Velstadt] Firedrake Stone,61080000,10,100975,-1,0,0,0,1,3
+76200612,[Stone Trader Chloanne - Velstadt] Darknight Stone,61090000,10,100975,-1,0,0,0,1,3
+76200613,[Stone Trader Chloanne - Looking Glass Knight] Poison Stone,61100000,10,100958,-1,0,0,0,1,3
+76200614,[Stone Trader Chloanne - Looking Glass Knight] Bleed Stone,61110000,10,100958,-1,0,0,0,1,3
+76200615,[Stone Trader Chloanne - Velstadt] Raw Stone,61130000,10,100975,-1,0,0,0,1,3
+76200616,[Stone Trader Chloanne - Velstadt] Magic Stone,61140000,10,100975,-1,0,0,0,1,3
+76200617,[Stone Trader Chloanne - Velstadt] Old Mundane Stone,61150000,10,100975,-1,0,0,0,1,3
+76200618,[Stone Trader Chloanne] Bonfire Ascetic,60527000,10,-1,-1,0,0,0,1,1
+76300300,[Rosabeth of Melfia] Fireball,33010000,10,-1,-1,0,0,0,1,1
+76300301,[Rosabeth of Melfia] Fire Orb,33020000,10,-1,-1,0,0,0,1,1
+76300302,[Rosabeth of Melfia] Combustion,33080000,10,-1,-1,0,0,0,1,1
+76300303,[Rosabeth of Melfia] Poison Mist,33110000,10,-1,-1,0,0,0,1,1
+76300304,[Rosabeth of Melfia] Flash Sweat,33180000,10,-1,-1,0,0,0,1,1
+76300305,[Rosabeth of Melfia] Iron Flesh,33190000,10,-1,-1,0,0,0,1,1
+76300400,[Rosabeth of Melfia] Flame Quartz Ring,40070000,10,-1,-1,0,0,0,1,1
+76300401,[Rosabeth of Melfia] Thunder Quartz Ring,40080000,10,-1,-1,0,0,0,1,1
+76300402,[Rosabeth of Melfia] Dark Quartz Ring,40090000,10,-1,-1,0,0,0,1,1
+76300600,[Rosabeth of Melfia] Small Blue Burr,60160000,10,-1,-1,0,0,0,1,255
+76300601,[Rosabeth of Melfia] Small Yellow Burr,60170000,10,-1,-1,0,0,0,1,255
+76300602,[Rosabeth of Melfia] Small Orange Burr,60180000,10,-1,-1,0,0,0,1,255
+76300603,[Rosabeth of Melfia] Fire Seed,60538000,10,-1,-1,0,0,0,1,3
+76400000,[Blacksmith Lenigrast] Longsword,1220000,10,-1,-1,0,0,0,1,255
+76400001,[Blacksmith Lenigrast] Broadsword,1230000,10,-1,-1,0,0,0,1,255
+76400002,[Blacksmith Lenigrast] Estoc,1400000,500,-1,-1,0,0,0,1,255
+76400003,[Blacksmith Lenigrast] Rapier,1500000,10,-1,-1,0,0,0,1,255
+76400004,[Blacksmith Lenigrast] Falchion,1600000,10,-1,-1,0,0,0,1,255
+76400005,[Blacksmith Lenigrast] Battle Axe,2010000,10,-1,-1,0,0,0,1,255
+76400006,[Blacksmith Lenigrast] Mace,2410000,10,-1,-1,0,0,0,1,255
+76400007,[Blacksmith Lenigrast] Spear,2800000,10,-1,-1,0,0,0,1,255
+76400600,[Blacksmith Lenigrast] Wood Arrow,60760000,10,-1,-1,0,0,0,1,255
+76400601,[Blacksmith Lenigrast] Iron Arrow,60770000,10,-1,-1,0,0,0,1,50
+76400602,[Blacksmith Lenigrast] Wood Bolt,60910000,10,-1,-1,0,0,0,1,255
+76400603,[Blacksmith Lenigrast] Heavy Bolt,60920000,10,-1,-1,0,0,0,1,50
+76400604,[Blacksmith Lenigrast] Titanite Shard,60970000,10,-1,-1,0,0,0,0.8,10
+76400605,[Blacksmith Lenigrast] Repair Powder,60410000,10,-1,-1,0,0,0,1,1
+76430000,[Steady Hand McDuff] Uchigatana,1700000,10,-1,102682,0,0,0,1,1
+76430001,[Steady Hand McDuff] Bastard Sword,1800000,10,-1,102682,0,0,0,1,1
+76430002,[Steady Hand McDuff] Greataxe,2210000,10,-1,102682,0,0,0,1,1
+76430003,[Steady Hand McDuff] Winged Spear,2810000,10,-1,102682,0,0,0,1,1
+76430004,[Steady Hand McDuff] Scythe,3210000,10,-1,102682,0,0,0,1,1
+76430005,[Steady Hand McDuff] Long Bow,4210000,10,-1,102682,0,0,0,1,1
+76430006,[Steady Hand McDuff] Light Crossbow,4600000,10,-1,102682,0,0,0,1,1
+76430007,[Steady Hand McDuff - Unknown Event] Uchigatana,1700000,10,102682,-1,0,0,0,1,255
+76430008,[Steady Hand McDuff - Unknown Event] Bastard Sword,1800000,10,102682,-1,0,0,0,1,255
+76430009,[Steady Hand McDuff - Unknown Event] Greataxe,2210000,10,102682,-1,0,0,0,1,255
+76430010,[Steady Hand McDuff - Unknown Event] Winged Spear,2810000,10,102682,-1,0,0,0,1,255
+76430011,[Steady Hand McDuff - Unknown Event] Scythe,3210000,10,102682,-1,0,0,0,1,255
+76430012,[Steady Hand McDuff - Unknown Event] Long Bow,4210000,10,102682,-1,0,0,0,1,255
+76430013,[Steady Hand McDuff - Unknown Event] Light Crossbow,4600000,10,102682,-1,0,0,0,1,255
+76430100,[Steady Hand McDuff] Royal Kite Shield,11430000,10,-1,102682,0,0,0,1,1
+76430102,[Steady Hand McDuff - Unknown Event] Royal Kite Shield,11430000,10,102682,-1,0,0,0,1,255
+76430600,[Steady Hand McDuff] Wood Arrow,60760000,10,-1,-1,0,0,0,1,255
+76430601,[Steady Hand McDuff] Iron Arrow,60770000,10,-1,-1,0,0,0,1,255
+76430602,[Steady Hand McDuff] Wood Bolt,60910000,10,-1,-1,0,0,0,1,255
+76430603,[Steady Hand McDuff] Heavy Bolt,60920000,10,-1,-1,0,0,0,1,255
+76430604,[Steady Hand McDuff] Iron Greatarrow,60850000,10,-1,-1,0,0,0,1,255
+76430605,[Steady Hand McDuff] Large Titanite Shard,60975000,10,-1,-1,0,0,0,1,255
+76430606,[Steady Hand McDuff] Repair Powder,60410000,10,-1,-1,0,0,0,1,1
+76600000,[Carhillion of the Fold] Sorcerer's Staff,3800000,10,-1,-1,0,0,0,1,255
+76600300,[Carhillion of the Fold] Soul Arrow,31010000,10,-1,100420,0,0,0,1,1
+76600301,[Carhillion of the Fold] Great Soul Arrow,31020000,10,-1,100420,0,0,0,1,1
+76600302,[Carhillion of the Fold] Heavy Soul Arrow,31030000,10,-1,100420,0,0,0,1,1
+76600303,[Carhillion of the Fold] Great Heavy Soul Arrow,31040000,10,-1,100420,0,0,0,1,1
+76600304,[Carhillion of the Fold] Shockwave,31110000,10,-1,100420,0,0,0,1,1
+76600305,[Carhillion of the Fold] Soul Spear Barrage,31120000,10,-1,100420,0,0,0,1,1
+76600306,[Carhillion of the Fold] Magic Weapon,31180000,10,-1,100420,0,0,0,1,1
+76600307,[Carhillion of the Fold] Yearn,31220000,10,-1,100420,0,0,0,1,1
+76600308,[Carhillion of the Fold - Shrine of Winter] Soul Arrow,31010000,10,100420,-1,0,0,0,1,255
+76600309,[Carhillion of the Fold - Shrine of Winter] Great Soul Arrow,31020000,10,100420,-1,0,0,0,1,255
+76600310,[Carhillion of the Fold - Shrine of Winter] Heavy Soul Arrow,31030000,10,100420,-1,0,0,0,1,255
+76600311,[Carhillion of the Fold - Shrine of Winter] Great Heavy Soul Arrow,31040000,10,100420,-1,0,0,0,1,255
+76600312,[Carhillion of the Fold - Shrine of Winter] Shockwave,31110000,10,100420,-1,0,0,0,1,255
+76600313,[Carhillion of the Fold - Shrine of Winter] Soul Spear Barrage,31120000,10,100420,-1,0,0,0,1,255
+76600314,[Carhillion of the Fold - Shrine of Winter] Magic Weapon,31180000,10,100420,-1,0,0,0,1,255
+76600315,[Carhillion of the Fold - Shrine of Winter] Yearn,31220000,10,100420,-1,0,0,0,1,255
+76600400,[Carhillion of the Fold] Spell Quartz Ring,40060000,10,-1,-1,0,0,0,1,1
+76600401,[Carhillion of the Fold] Clear Bluestone Ring,40330000,10,-1,-1,0,0,0,1,1
+76600600,[Carhillion of the Fold] Amber Herb,60040000,10,-1,-1,0,0,0,1,10
+76600601,[Carhillion of the Fold] Twilight Herb,60050000,10,-1,-1,0,0,0,1,5
+76600602,[Carhillion of the Fold] Simpleton's Spice,51010000,10,-1,-1,0,0,0,1,1
+76800300,[Straid of Olaphis] Homing Soul Arrow,31050000,10,-1,-1,0,0,0,1,1
+76800301,[Straid of Olaphis] Resplendent Life,32070000,10,-1,-1,0,0,0,1,1
+76800302,[Straid of Olaphis - Velstadt] Great Lightning Spear,32150000,10,100975,-1,0,0,0,1,1
+76800303,[Straid of Olaphis] Unveil,32240000,10,-1,-1,0,0,0,1,1
+76800304,[Straid of Olaphis - Velstadt] Sunlight Blade,32260000,10,100975,-1,0,0,0,1,1
+76800305,[Straid of Olaphis] Lingering Flame,33140000,10,-1,-1,0,0,0,1,1
+76800306,[Straid of Olaphis] Flame Swathe,33150000,10,-1,-1,0,0,0,1,1
+76800307,[Straid of Olaphis] Dark Orb,34010000,10,-1,-1,0,0,0,1,1
+76800308,[Straid of Olaphis] Dark Hail,34020000,10,-1,-1,0,0,0,1,1
+76800309,[Straid of Olaphis] Dark Fog,34030000,10,-1,-1,0,0,0,1,1
+76800310,[Straid of Olaphis] Affinity,34040000,10,-1,-1,0,0,0,1,1
+76800311,[Straid of Olaphis] Strong Magic Shield,31210000,10,-1,-1,0,0,0,1,1
+76800312,[Straid of Olaphis] Cast Light,31270000,10,-1,-1,0,0,0,1,1
+76800400,[Straid of Olaphis] Ring of Knowledge,40210000,10,-1,-1,0,0,0,1,1
+76800401,[Straid of Olaphis] Lingering Dragoncrest Ring,40320000,10,-1,-1,0,0,0,1,1
+76800402,[Straid of Olaphis] Agape Ring,42000000,10,100780,-1,0,0,0,1,1
+76800600,[Straid of Olaphis] Rouge Water,60110000,10,-1,-1,0,0,0,1,3
+76801000,[Straid of Olaphis - Soul of the Pursuer] Pursuer's Ultra Greatsword,5270000,10,100968,100100,64000000,0,0,1,255
+76801001,[Straid of Olaphis - Soul of the Pursuer] Pursuer's Greatshield,11610000,10,100968,100100,64000000,0,0,1,255
+76801002,[Straid of Olaphis - Soul of the Last Giant] Giant Stone Axe,2250000,10,100971,100100,64010000,0,0,1,255
+76801003,[Straid of Olaphis - Dragonrider Soul] Dragonrider's Halberd,3290000,10,100959,100100,64020000,0,0,1,255
+76801004,[Straid of Olaphis - Dragonrider Soul] Dragonrider Bow,4240000,10,100959,100100,64020000,0,0,1,255
+76801005,[Straid of Olaphis - Dragonrider Soul] Dragonrider Twinblade,5330000,10,100959,100100,64020000,0,0,1,255
+76801006,[Straid of Olaphis - Dragonrider Soul] Dragonrider Greatshield,11560000,10,100959,100100,64020000,0,0,1,255
+76801007,[Straid of Olaphis - Flexile Sentry Soul] Warped Sword,1620000,10,100961,100100,64040000,0,0,1,255
+76801008,[Straid of Olaphis - Flexile Sentry Soul] Barbed Club,2560000,10,100961,100100,64040000,0,0,1,255
+76801009,[Straid of Olaphis - Flexile Sentry Soul] Arced Sword,5010000,10,100961,100100,64040000,0,0,1,255
+76801010,[Straid of Olaphis - Executioner's Chariot Soul] Chariot Lance,2940000,10,100953,100100,64070000,0,0,1,255
+76801011,[Straid of Olaphis - Executioner's Chariot Soul] Shield Crossbow,4630000,10,100953,100100,64070000,0,0,1,255
+76801012,[Straid of Olaphis - Skeleton Lord's Soul] Roaring Halberd,3320000,10,100954,100100,64080000,0,0,1,255
+76801013,[Straid of Olaphis - Skeleton Lord's Soul] Bone Scythe,3060000,10,100955,100100,64090000,0,0,1,255
+76801014,[Straid of Olaphis - Mytha- the Baneful Queen Soul] Mytha's Bent Blade,1040000,10,100956,100100,64100000,0,0,1,255
+76801015,[Straid of Olaphis - Smelter Demon Soul] Smelter Sword,5220000,10,100964,100100,64110000,0,0,1,255
+76801016,[Straid of Olaphis - Demon of Song Soul] Spotted Whip,3630000,10,100950,100100,64190000,0,0,1,255
+76801017,[Straid of Olaphis - Belfry Gargoyle Soul] Gargoyle Bident,2895000,10,101001,100100,64290000,0,0,1,255
+76801100,[Straid of Olaphis - Ruin Sentinel Soul] Heavy Homing Soul Arrow,31060000,10,100962,100100,64050000,0,0,1,255
+76801101,[Straid of Olaphis - Royal Rat Vanguard Soul] Toxic Mist,33120000,10,100965,100100,64130000,0,0,1,255
+76801102,[Straid of Olaphis - Scorpioness Najka Soul] Soul Shower,31130000,10,100957,100100,64150000,0,0,1,255
+76801103,[Straid of Olaphis - Royal Rat Authority Soul] Acid Surge,33130000,10,100967,100100,64160000,0,0,1,255
+76801104,[Straid of Olaphis - Soul of Velstadt] Sacred Oath,32230000,10,100975,100100,64200000,0,0,1,255
+76801105,[Straid of Olaphis - Giant Lord Soul] Repel,34080000,10,100972,100100,64240000,0,0,1,255
+76801106,[Straid of Olaphis - Darklurker Soul] Lifedrain Patch,35080000,10,100979,100100,64280000,0,0,1,255
+76801107,[Straid of Olaphis - Old Witch Soul] Flame Weapon,33170000,10,101102,-1,64300000,0,0,1,255
+76801108,[Straid of Olaphis - Old King Soul] Blinding Bolt,32180000,10,101101,-1,64310000,0,0,1,255
+76801109,[Straid of Olaphis - Old Dead One Soul] Numbness,34100000,10,101103,-1,64320000,0,0,1,255
+76801110,[Straid of Olaphis - Old Paledrake Soul] Crystal Soul Spear,31100000,10,101100,-1,64330000,0,0,1,255
+76801111,[Straid of Olaphis - Soul of Nadalia- Bride of Ash] Outcry,33320000,10,101210,-1,64540000,0,0,1,255
+76801200,[Straid of Olaphis - Soul of the Pursuer] Pursuer's Ultra Greatsword,5270000,10,100100,-1,64000000,0,0,1,255
+76801201,[Straid of Olaphis - Soul of the Pursuer] Pursuer's Greatshield,11610000,10,100100,-1,64000000,0,0,1,255
+76801202,[Straid of Olaphis - Soul of the Last Giant] Giant Stone Axe,2250000,10,100100,-1,64010000,0,0,1,255
+76801203,[Straid of Olaphis - Dragonrider Soul] Dragonrider's Halberd,3290000,10,100100,-1,64020000,0,0,1,255
+76801204,[Straid of Olaphis - Dragonrider Soul] Dragonrider Bow,4240000,10,100100,-1,64020000,0,0,1,255
+76801205,[Straid of Olaphis - Dragonrider Soul] Dragonrider Twinblade,5330000,10,100100,-1,64020000,0,0,1,255
+76801206,[Straid of Olaphis - Dragonrider Soul] Dragonrider Greatshield,11560000,10,100100,-1,64020000,0,0,1,255
+76801207,[Straid of Olaphis - Flexile Sentry Soul] Warped Sword,1620000,10,100100,-1,64040000,0,0,1,255
+76801208,[Straid of Olaphis - Flexile Sentry Soul] Barbed Club,2560000,10,100100,-1,64040000,0,0,1,255
+76801209,[Straid of Olaphis - Flexile Sentry Soul] Arced Sword,5010000,10,100100,-1,64040000,0,0,1,255
+76801210,[Straid of Olaphis - Executioner's Chariot Soul] Chariot Lance,2940000,10,100100,-1,64070000,0,0,1,255
+76801211,[Straid of Olaphis - Executioner's Chariot Soul] Shield Crossbow,4630000,10,100100,-1,64070000,0,0,1,255
+76801212,[Straid of Olaphis - Skeleton Lord's Soul] Roaring Halberd,3320000,10,100100,-1,64080000,0,0,1,255
+76801213,[Straid of Olaphis - Skeleton Lord's Soul] Bone Scythe,3060000,10,100100,-1,64090000,0,0,1,255
+76801214,[Straid of Olaphis - Mytha- the Baneful Queen Soul] Mytha's Bent Blade,1040000,10,100100,-1,64100000,0,0,1,255
+76801215,[Straid of Olaphis - Smelter Demon Soul] Smelter Sword,5220000,10,100100,-1,64110000,0,0,1,255
+76801216,[Straid of Olaphis - Demon of Song Soul] Spotted Whip,3630000,10,100100,-1,64190000,0,0,1,255
+76801217,[Straid of Olaphis - Belfry Gargoyle Soul] Gargoyle Bident,2895000,10,100100,-1,64290000,0,0,1,255
+76801300,[Straid of Olaphis - Ruin Sentinel Soul] Heavy Homing Soul Arrow,31060000,10,100100,-1,64050000,0,0,1,255
+76801301,[Straid of Olaphis - Royal Rat Vanguard Soul] Toxic Mist,33120000,10,100100,-1,64130000,0,0,1,255
+76801302,[Straid of Olaphis - Scorpioness Najka Soul] Soul Shower,31130000,10,100100,-1,64150000,0,0,1,255
+76801303,[Straid of Olaphis - Royal Rat Authority Soul] Acid Surge,33130000,10,100100,-1,64160000,0,0,1,255
+76801304,[Straid of Olaphis - Soul of Velstadt] Sacred Oath,32230000,10,100100,-1,64200000,0,0,1,255
+76801305,[Straid of Olaphis - Giant Lord Soul] Repel,34080000,10,100100,-1,64240000,0,0,1,255
+76801306,[Straid of Olaphis - Darklurker Soul] Lifedrain Patch,35080000,10,100100,-1,64280000,0,0,1,255
+76900000,[Licia of Lindeldt] Cleric's Sacred Chime,4010000,10,-1,-1,0,0,0,1,255
+76900300,[Licia of Lindeldt] Heal,32010000,10,-1,100420,0,0,0,1,1
+76900301,[Licia of Lindeldt] Med Heal,32020000,10,-1,100420,0,0,0,1,1
+76900302,[Licia of Lindeldt] Great Heal Excerpt,32030000,10,-1,100420,0,0,0,1,1
+76900303,[Licia of Lindeldt] Replenishment,32060000,10,-1,100420,0,0,0,1,1
+76900304,[Licia of Lindeldt] Resplendent Life,32070000,10,-1,100420,0,0,0,1,1
+76900305,[Licia of Lindeldt] Caressing Prayer,32090000,10,-1,100420,0,0,0,1,1
+76900306,[Licia of Lindeldt] Force,32100000,10,-1,100420,0,0,0,1,1
+76900307,[Licia of Lindeldt] Lightning Spear,32140000,10,-1,100420,0,0,0,1,1
+76900308,[Licia of Lindeldt] Homeward,32210000,10,-1,100420,0,0,0,1,1
+76900309,[Licia of Lindeldt] Guidance,32220000,10,-1,100420,0,0,0,1,1
+76900310,[Licia of Lindeldt - Shrine of Winter] Heal,32010000,10,100420,-1,0,0,0,1,255
+76900311,[Licia of Lindeldt - Shrine of Winter] Med Heal,32020000,10,100420,-1,0,0,0,1,255
+76900312,[Licia of Lindeldt - Shrine of Winter] Great Heal Excerpt,32030000,10,100420,-1,0,0,0,1,255
+76900313,[Licia of Lindeldt - Shrine of Winter] Replenishment,32060000,10,100420,-1,0,0,0,1,255
+76900314,[Licia of Lindeldt - Shrine of Winter] Resplendent Life,32070000,10,100420,-1,0,0,0,1,255
+76900315,[Licia of Lindeldt - Shrine of Winter] Caressing Prayer,32090000,10,100420,-1,0,0,0,1,255
+76900316,[Licia of Lindeldt - Shrine of Winter] Force,32100000,10,100420,-1,0,0,0,1,255
+76900317,[Licia of Lindeldt - Shrine of Winter] Lightning Spear,32140000,10,100420,-1,0,0,0,1,255
+76900318,[Licia of Lindeldt - Shrine of Winter] Homeward,32210000,10,100420,-1,0,0,0,1,255
+76900319,[Licia of Lindeldt - Shrine of Winter] Guidance,32220000,10,100420,-1,0,0,0,1,255
+76900400,[Licia of Lindeldt] Ring of Prayer,40220000,10,-1,-1,0,0,0,1,1
+77000000,[Felkin the Outcast] Archdrake Staff,3860000,10,-1,-1,0,0,0,1,255
+77000001,[Felkin the Outcast] Archdrake Chime,4060000,10,-1,-1,0,0,0,1,255
+77000300,[Felkin the Outcast] Dark Orb,34010000,10,-1,-1,0,0,0,1,1
+77000301,[Felkin the Outcast] Dark Weapon,34060000,10,-1,-1,0,0,0,1,1
+77000302,[Felkin the Outcast] Resonant Flesh,35060000,10,-1,-1,0,0,0,1,1
+77000303,[Felkin the Outcast] Resonant Weapon,35070000,10,-1,-1,0,0,0,1,1
+77000304,[Felkin the Outcast] Magic Barrier,32190000,10,-1,-1,0,0,0,1,1
+77000305,[Felkin the Outcast] Resonant Soul,35030000,10,-1,-1,0,0,0,1,1
+77000306,[Felkin the Outcast] Great Resonant Soul,35040000,10,-1,-1,0,0,0,1,1
+77000400,[Felkin the Outcast] Ring of Life Protection,40310000,10,-1,-1,0,0,0,1,1
+77000600,[Felkin the Outcast] Dark Pine Resin,60270000,10,-1,-1,0,0,0,1,255
+77100200,[Royal Sorcerer Navlaan] Moon Hat,21230100,10,-1,-1,0,0,0,1,255
+77100201,[Royal Sorcerer Navlaan] Astrologist's Robe,21230101,10,-1,-1,0,0,0,1,255
+77100202,[Royal Sorcerer Navlaan] Astrologist's Gauntlets,21230102,10,-1,-1,0,0,0,1,255
+77100203,[Royal Sorcerer Navlaan] Astrologist's Bottoms,21230103,10,-1,-1,0,0,0,1,255
+77100204,[Royal Sorcerer Navlaan] Black Witch Hat,21501100,10,-1,-1,0,0,0,1,255
+77100205,[Royal Sorcerer Navlaan] Black Witch Robe,21500101,10,-1,-1,0,0,0,1,255
+77100206,[Royal Sorcerer Navlaan] Black Witch Gloves,21500102,10,-1,-1,0,0,0,1,255
+77100207,[Royal Sorcerer Navlaan] Black Witch Trousers,21500103,10,-1,-1,0,0,0,1,255
+77100300,[Royal Sorcerer Navlaan] Great Magic Weapon,31190000,10,-1,-1,0,0,0,1,255
+77100301,[Royal Sorcerer Navlaan] Strong Magic Shield,31210000,10,-1,-1,0,0,0,1,255
+77100400,[Royal Sorcerer Navlaan] Thunder Quartz Ring+2,40080002,10,-1,-1,0,0,0,1,1
+77100500,[Royal Sorcerer Navlaan] Bonfire Ascetic,60527000,10,-1,-1,0,0,0,1,10
+77100600,[Royal Sorcerer Navlaan] Dragon Charm,60100000,10,-1,-1,0,0,0,1,5
+77100601,[Royal Sorcerer Navlaan] Crimson Water,60120000,10,-1,-1,0,0,0,1,5
+77100602,[Royal Sorcerer Navlaan] Lightning Greatarrow,60870000,10,-1,-1,0,0,0,1,255
+77100603,[Royal Sorcerer Navlaan] Fire Greatarrow,60880000,10,-1,-1,0,0,0,1,255
+77100604,[Royal Sorcerer Navlaan] Destructive Greatarrow,60900000,10,-1,-1,0,0,0,1,255
+77200200,[Magerold of Lanafir] Spiked Bandit Helm,22110100,500,-1,-1,0,0,0,1,255
+77200201,[Magerold of Lanafir] Bandit Armor,22110101,500,-1,-1,0,0,0,1,255
+77200202,[Magerold of Lanafir] Bandit Gauntlets,22110102,500,-1,-1,0,0,0,1,255
+77200203,[Magerold of Lanafir] Bandit Boots,22110103,500,-1,-1,0,0,0,1,255
+77200204,[Magerold of Lanafir] Jester's Cap,21210100,500,-1,-1,0,0,0,1,255
+77200205,[Magerold of Lanafir] Jester's Robes,21210101,500,-1,-1,0,0,0,1,255
+77200206,[Magerold of Lanafir] Jester's Gloves,21210102,500,-1,-1,0,0,0,1,255
+77200207,[Magerold of Lanafir] Jester's Tights,21210103,500,-1,-1,0,0,0,1,255
+77200208,[Magerold of Lanafir - NG+2] Dragonrider Helm,26100100,10,102822,-1,0,0,0,1,1
+77200209,[Magerold of Lanafir - NG+2] Dragonrider Armor,26100101,10,102822,-1,0,0,0,1,1
+77200210,[Magerold of Lanafir - NG+2] Dragonrider Gauntlets,26100102,10,102822,-1,0,0,0,1,1
+77200211,[Magerold of Lanafir - NG+2] Dragonrider Leggings,26100103,10,102822,-1,0,0,0,1,1
+77200212,[Magerold of Lanafir - Fume Knight] Raime's Helm,26750100,10,101061,-1,0,0,0,1,1
+77200213,[Magerold of Lanafir - Fume Knight] Raime's Armor,26750101,10,101061,-1,0,0,0,1,1
+77200214,[Magerold of Lanafir - Fume Knight] Raime's Gauntlets,26750102,10,101061,-1,0,0,0,1,1
+77200215,[Magerold of Lanafir - Fume Knight] Raime's Leggings,26750103,10,101061,-1,0,0,0,1,1
+77200216,[Magerold of Lanafir - Sir Alonne] Alonne's Helm,26800100,10,101062,-1,0,0,0,1,1
+77200217,[Magerold of Lanafir - Sir Alonne] Alonne's Armor,26800101,10,101062,-1,0,0,0,1,1
+77200218,[Magerold of Lanafir - Sir Alonne] Alonne's Gauntlets,26800102,10,101062,-1,0,0,0,1,1
+77200219,[Magerold of Lanafir - Sir Alonne] Alonne's Leggings,26800103,10,101062,-1,0,0,0,1,1
+77200300,[Magerold of Lanafir] Soul Arrow,31010000,10,-1,-1,0,0,0,1,1
+77200301,[Magerold of Lanafir] Great Soul Arrow,31020000,10,-1,-1,0,0,0,1,1
+77200302,[Magerold of Lanafir] Heavy Soul Arrow,31030000,10,-1,-1,0,0,0,1,1
+77200303,[Magerold of Lanafir] Great Heavy Soul Arrow,31040000,10,-1,-1,0,0,0,1,1
+77200304,[Magerold of Lanafir] Dark Hail,34020000,10,-1,-1,0,0,0,1,1
+77200305,[Magerold of Lanafir] Darkstorm,35020000,10,-1,-1,0,0,0,1,1
+77200306,[Magerold of Lanafir] Fall Control,31240000,10,-1,-1,0,0,0,1,1
+77200400,[Magerold of Lanafir] Cursebite Ring,40130000,10,-1,-1,0,0,0,1,1
+77200500,[Magerold of Lanafir] Hello Carving,60470000,10,-1,-1,0,60470000,0,1,1
+77200501,[Magerold of Lanafir] Thank You Carving,60480000,10,-1,-1,0,60480000,0,1,1
+77200502,[Magerold of Lanafir] I'm Sorry Carving,60490000,10,-1,-1,0,60490000,0,1,1
+77200503,[Magerold of Lanafir] Very Good! Carving,60500000,10,-1,-1,0,60500000,0,1,1
+77200600,[Magerold of Lanafir] Green Blossom,60310000,10,-1,-1,0,0,0,1,10
+77200601,[Magerold of Lanafir] Charcoal Pine Resin,60260000,10,-1,-1,0,0,0,1,255
+77200602,[Magerold of Lanafir] Black Firebomb,60575000,10,-1,-1,0,0,0,1,255
+77200603,[Magerold of Lanafir] Rusted Coin,60320000,10,-1,-1,0,0,0,1,5
+77200604,[Magerold of Lanafir] Repair Powder,60410000,10,-1,-1,0,0,0,1,1
+77200605,[Magerold of Lanafir] Human Effigy,60151000,10,-1,-1,0,0,0,1,1
+77200606,[Magerold of Lanafir] Fragrant Branch of Yore,60537000,10,-1,-1,0,0,0,1,1
+77600000,[Weaponsmith Ornifex] Monastery Scimitar,5000000,10,-1,-1,0,0,0,1,255
+77600001,[Weaponsmith Ornifex] Manikin Claws,5340000,10,-1,-1,0,0,0,1,255
+77600002,[Weaponsmith Ornifex] Manikin Knife,2830000,10,-1,-1,0,0,0,1,255
+77600003,[Weaponsmith Ornifex] Lion Greataxe,4220000,10,-1,-1,0,0,0,1,255
+77600004,[Weaponsmith Ornifex] Silverblack Sickle,4610000,10,-1,-1,0,0,0,1,255
+77600300,[Weaponsmith Ornifex] Homing Soul Arrow,31050000,10,-1,-1,0,0,0,1,1
+77600301,[Weaponsmith Ornifex] Homing Soulmass,31070000,10,-1,-1,0,0,0,1,1
+77600302,[Weaponsmith Ornifex] Fall Control,31240000,10,-1,-1,0,0,0,1,1
+77600600,[Weaponsmith Ornifex] Flame Butterfly,60430000,10,-1,-1,0,0,0,1,255
+77600601,[Weaponsmith Ornifex] Fire Arrow,60800000,10,-1,-1,0,0,0,1,255
+77600602,[Weaponsmith Ornifex] Fire Bolt,60950000,10,-1,-1,0,0,0,1,255
+77600603,[Weaponsmith Ornifex] Green Blossom,60310000,10,-1,100973,0,0,0,1,10
+77600604,[Weaponsmith Ornifex] Amber Herb,60040000,10,-1,100973,0,0,0,1,10
+77600605,[Weaponsmith Ornifex - Nashandra] Green Blossom,60310000,10,100973,-1,0,0,0,1,255
+77600606,[Weaponsmith Ornifex - Nashandra] Twilight Herb,60040000,10,100973,-1,0,0,0,1,255
+77601000,[Weaponsmith Ornifex - Old Dragonslayer Soul] Dragonslayer Spear,2896000,10,100960,100100,64030000,0,0,1,255
+77601001,[Weaponsmith Ornifex - Soul of the Lost Sinner] Lost Sinner's Sword,5295000,10,100963,100100,64060000,0,0,1,255
+77601002,[Weaponsmith Ornifex - Old Iron King Soul] Iron King Hammer,2660000,10,100952,100100,64120000,0,0,1,255
+77601003,[Weaponsmith Ornifex - Soul of the Rotten] Butcher's Knife,2090000,10,100966,100100,64140000,0,0,1,255
+77601004,[Weaponsmith Ornifex - Soul of the Duke's Dear Freja] Spider's Silk,1430000,10,100951,100100,64170000,0,0,1,255
+77601005,[Weaponsmith Ornifex - Soul of the Duke's Dear Freja] Spider Fang,1670000,10,100951,100100,64170000,0,0,1,255
+77601006,[Weaponsmith Ornifex - Looking Glass Knight Soul] Thorned Greatsword,1860000,10,100958,100100,64180000,0,0,1,255
+77601007,[Weaponsmith Ornifex - Looking Glass Knight Soul] King's Mirror,11550000,10,100958,100100,64180000,0,0,1,255
+77601008,[Weaponsmith Ornifex - Soul of Velstadt] Sacred Chime Hammer,2750000,10,100975,100100,64200000,0,0,1,255
+77601009,[Weaponsmith Ornifex - Soul of the King] Ruler's Sword,1900000,10,100904,100100,64210000,0,0,1,255
+77601010,[Weaponsmith Ornifex - Soul of the King] King's Ultra Greatsword,5240000,10,100904,100100,64210000,0,0,1,255
+77601011,[Weaponsmith Ornifex - Soul of the King] King's Shield,11260000,10,100904,100100,64210000,0,0,1,255
+77601012,[Weaponsmith Ornifex - Guardian Dragon Soul] Spitfire Spear,2850000,10,100970,100100,64220000,0,0,1,255
+77601013,[Weaponsmith Ornifex - Guardian Dragon Soul] Drakewing Ultra Greatsword,5230000,10,100970,100100,64220000,0,0,1,255
+77601014,[Weaponsmith Ornifex - Ancient Dragon Soul] Curved Dragon Greatsword,5040000,10,100905,100100,64230000,0,0,1,255
+77601015,[Weaponsmith Ornifex - Soul of Nashandra] Scythe of Want,3070000,10,100973,100100,64250000,0,0,1,255
+77601016,[Weaponsmith Ornifex - Soul of Nashandra] Chime of Want,4050000,10,100973,100100,64250000,0,0,1,255
+77601017,[Weaponsmith Ornifex - Soul of Nashandra] Bow of Want,4280000,10,100973,100100,64250000,0,0,1,255
+77601018,[Weaponsmith Ornifex - Throne Defender Soul] Defender Greatsword,1960000,10,100974,100100,64260000,0,0,1,255
+77601019,[Weaponsmith Ornifex - Throne Defender Soul] Defender's Shield,11475000,10,100974,100100,64260000,0,0,1,255
+77601020,[Weaponsmith Ornifex - Throne Watcher Soul] Watcher Greatsword,1970000,10,100974,100100,64270000,0,0,1,255
+77601021,[Weaponsmith Ornifex - Throne Watcher Soul] Watcher's Shield,11185000,10,100974,100100,64270000,0,0,1,255
+77601022,[Weaponsmith Ornifex - Old Paledrake Soul] Moonlight Greatsword,1871000,10,101100,-1,64330000,0,0,1,255
+77601023,[Weaponsmith Ornifex - Old Dead One Soul] Crypt Blacksword,5280000,10,101103,-1,64320000,0,0,1,255
+77601024,[Weaponsmith Ornifex - Old Witch Soul] Chaos Blade,1720000,10,101102,-1,64300000,0,0,1,255
+77601025,[Weaponsmith Ornifex - Old King Soul] Dragonslayer Greatbow,4420000,10,101101,-1,64310000,0,0,1,255
+77601026,[Weaponsmith Ornifex - Soul of Sinh- the Slumbering Dragon] Yorgh's Spear,2855000,10,101201,-1,64500000,0,0,1,255
+77601027,[Weaponsmith Ornifex - Soul of Elana- Squalid Queen] Wrathful Axe,3370000,10,101200,-1,64530000,0,0,1,255
+77601028,[Weaponsmith Ornifex - Soul of Nadalia- Bride of Ash] Chime of Screams,4120000,10,101210,-1,64540000,0,0,1,255
+77601029,[Weaponsmith Ornifex - Soul of the Fume Knight] Fume Sword,1290000,10,101211,-1,64510000,0,0,1,255
+77601030,[Weaponsmith Ornifex - Soul of the Fume Knight] Fume Ultra Greatsword,5250000,10,101211,-1,64510000,0,0,1,255
+77601031,[Weaponsmith Ornifex - Soul of Sir Alonne] Bewitched Alonne Sword,1790000,10,101212,-1,64560000,0,0,1,255
+77601032,[Weaponsmith Ornifex - Smelter Demon Soul] Aged Smelter Sword,5225000,10,101213,-1,64110000,0,0,1,255
+77601033,[Weaponsmith Ornifex - Soul of Aava- the King's Pet] Ivory Straight Sword,1390000,10,101221,-1,64520000,0,0,1,255
+77601034,[Weaponsmith Ornifex - Soul of Zallen- the King's Pet] Loyce Shield,11290000,10,101222,-1,64590000,0,0,1,255
+77601035,[Weaponsmith Ornifex - Soul of Lud- the King's Pet] Loyce Greatsword,1995000,10,101222,-1,64610000,0,0,1,255
+77601036,[Weaponsmith Ornifex - Soul of the Ivory King] Ivory King Ultra Greatsword,5255000,10,101223,-1,64580000,0,0,1,255
+77601037,[Weaponsmith Ornifex - Soul of Alsanna- Silent Oracle] Eleum Loyce,1630000,10,101220,-1,64550000,0,0,1,255
+77601100,[Weaponsmith Ornifex - Old Dragonslayer Soul] Dragonslayer Spear,2896000,10,100100,-1,64030000,0,0,1,255
+77601101,[Weaponsmith Ornifex - Soul of the Lost Sinner] Lost Sinner's Sword,5295000,10,100100,-1,64060000,0,0,1,255
+77601102,[Weaponsmith Ornifex - Old Iron King Soul] Iron King Hammer,2660000,10,100100,-1,64120000,0,0,1,255
+77601103,[Weaponsmith Ornifex - Soul of the Rotten] Butcher's Knife,2090000,10,100100,-1,64140000,0,0,1,255
+77601104,[Weaponsmith Ornifex - Soul of the Duke's Dear Freja] Spider's Silk,1430000,10,100100,-1,64170000,0,0,1,255
+77601105,[Weaponsmith Ornifex - Soul of the Duke's Dear Freja] Spider Fang,1670000,10,100100,-1,64170000,0,0,1,255
+77601106,[Weaponsmith Ornifex - Looking Glass Knight Soul] Thorned Greatsword,1860000,10,100100,-1,64180000,0,0,1,255
+77601107,[Weaponsmith Ornifex - Looking Glass Knight Soul] King's Mirror,11550000,10,100100,-1,64180000,0,0,1,255
+77601108,[Weaponsmith Ornifex - Soul of Velstadt] Sacred Chime Hammer,2750000,10,100100,-1,64200000,0,0,1,255
+77601109,[Weaponsmith Ornifex - Soul of the King] Ruler's Sword,1900000,10,100100,-1,64210000,0,0,1,255
+77601110,[Weaponsmith Ornifex - Soul of the King] King's Ultra Greatsword,5240000,10,100100,-1,64210000,0,0,1,255
+77601111,[Weaponsmith Ornifex - Soul of the King] King's Shield,11260000,10,100100,-1,64210000,0,0,1,255
+77601112,[Weaponsmith Ornifex - Guardian Dragon Soul] Spitfire Spear,2850000,10,100100,-1,64220000,0,0,1,255
+77601113,[Weaponsmith Ornifex - Guardian Dragon Soul] Drakewing Ultra Greatsword,5230000,10,100100,-1,64220000,0,0,1,255
+77601114,[Weaponsmith Ornifex - Ancient Dragon Soul] Curved Dragon Greatsword,5040000,10,100100,-1,64230000,0,0,1,255
+77601115,[Weaponsmith Ornifex - Soul of Nashandra] Scythe of Want,3070000,10,100100,-1,64250000,0,0,1,255
+77601116,[Weaponsmith Ornifex - Soul of Nashandra] Chime of Want,4050000,10,100100,-1,64250000,0,0,1,255
+77601117,[Weaponsmith Ornifex - Soul of Nashandra] Bow of Want,4280000,10,100100,-1,64250000,0,0,1,255
+77601118,[Weaponsmith Ornifex - Throne Defender Soul] Defender Greatsword,1960000,10,100100,-1,64260000,0,0,1,255
+77601119,[Weaponsmith Ornifex - Throne Defender Soul] Defender's Shield,11475000,10,100100,-1,64260000,0,0,1,255
+77601120,[Weaponsmith Ornifex - Throne Watcher Soul] Watcher Greatsword,1970000,10,100100,-1,64270000,0,0,1,255
+77601121,[Weaponsmith Ornifex - Throne Watcher Soul] Watcher's Shield,11185000,10,100100,-1,64270000,0,0,1,255
+77602000,[Weaponsmith Ornifex - Old Dragonslayer Soul] Dragonslayer Spear,2896000,10,100960,100100,64030000,0,0,0,255
+77602001,[Weaponsmith Ornifex - Soul of the Lost Sinner] Lost Sinner's Sword,5295000,10,100963,100100,64060000,0,0,0,255
+77602002,[Weaponsmith Ornifex - Old Iron King Soul] Iron King Hammer,2660000,10,100952,100100,64120000,0,0,0,255
+77602003,[Weaponsmith Ornifex - Soul of the Rotten] Butcher's Knife,2090000,10,100966,100100,64140000,0,0,0,255
+77602004,[Weaponsmith Ornifex - Soul of the Duke's Dear Freja] Spider's Silk,1430000,10,100951,100100,64170000,0,0,0,255
+77602005,[Weaponsmith Ornifex - Soul of the Duke's Dear Freja] Spider Fang,1670000,10,100951,100100,64170000,0,0,0,255
+77602006,[Weaponsmith Ornifex - Looking Glass Knight Soul] Thorned Greatsword,1860000,10,100958,100100,64180000,0,0,0,255
+77602007,[Weaponsmith Ornifex - Looking Glass Knight Soul] King's Mirror,11550000,10,100958,100100,64180000,0,0,0,255
+77602008,[Weaponsmith Ornifex - Soul of Velstadt] Sacred Chime Hammer,2750000,10,100975,100100,64200000,0,0,0,255
+77602009,[Weaponsmith Ornifex - Soul of the King] Ruler's Sword,1900000,10,100904,100100,64210000,0,0,0,255
+77602010,[Weaponsmith Ornifex - Soul of the King] King's Ultra Greatsword,5240000,10,100904,100100,64210000,0,0,0,255
+77602011,[Weaponsmith Ornifex - Soul of the King] King's Shield,11260000,10,100904,100100,64210000,0,0,0,255
+77602012,[Weaponsmith Ornifex - Guardian Dragon Soul] Spitfire Spear,2850000,10,100970,100100,64220000,0,0,0,255
+77602013,[Weaponsmith Ornifex - Guardian Dragon Soul] Drakewing Ultra Greatsword,5230000,10,100970,100100,64220000,0,0,0,255
+77602014,[Weaponsmith Ornifex - Ancient Dragon Soul] Curved Dragon Greatsword,5040000,10,100905,100100,64230000,0,0,0,255
+77602015,[Weaponsmith Ornifex - Soul of Nashandra] Scythe of Want,3070000,10,100973,100100,64250000,0,0,0,255
+77602016,[Weaponsmith Ornifex - Soul of Nashandra] Chime of Want,4050000,10,100973,100100,64250000,0,0,0,255
+77602017,[Weaponsmith Ornifex - Soul of Nashandra] Bow of Want,4280000,10,100973,100100,64250000,0,0,0,255
+77602018,[Weaponsmith Ornifex - Throne Defender Soul] Defender Greatsword,1960000,10,100974,100100,64260000,0,0,0,255
+77602019,[Weaponsmith Ornifex - Throne Defender Soul] Defender's Shield,11475000,10,100974,100100,64260000,0,0,0,255
+77602020,[Weaponsmith Ornifex - Throne Watcher Soul] Watcher Greatsword,1970000,10,100974,100100,64270000,0,0,0,255
+77602021,[Weaponsmith Ornifex - Throne Watcher Soul] Watcher's Shield,11185000,10,100974,100100,64270000,0,0,0,255
+77602022,[Weaponsmith Ornifex - Old Paledrake Soul] Moonlight Greatsword,1871000,10,101100,-1,64330000,0,0,0,255
+77602023,[Weaponsmith Ornifex - Old Dead One Soul] Crypt Blacksword,5280000,10,101103,-1,64320000,0,0,0,255
+77602024,[Weaponsmith Ornifex - Old Witch Soul] Chaos Blade,1720000,10,101102,-1,64300000,0,0,0,255
+77602025,[Weaponsmith Ornifex - Old King Soul] Dragonslayer Greatbow,4420000,10,101101,-1,64310000,0,0,0,255
+77602026,[Weaponsmith Ornifex - Soul of Sinh- the Slumbering Dragon] Yorgh's Spear,2855000,10,101201,-1,64500000,0,0,0,255
+77602027,[Weaponsmith Ornifex - Soul of Sinh- the Slumbering Dragon] Yorgh's Spear,3370000,10,101200,-1,64530000,0,0,0,255
+77602028,[Weaponsmith Ornifex - Soul of Nadalia- Bride of Ash] Chime of Screams,4120000,10,101210,-1,64540000,0,0,0,255
+77602029,[Weaponsmith Ornifex - Soul of the Fume Knight] Fume Sword,1290000,10,101211,-1,64510000,0,0,0,255
+77602030,[Weaponsmith Ornifex - Soul of the Fume Knight] Fume Ultra Greatsword,5250000,10,101211,-1,64510000,0,0,0,255
+77602031,[Weaponsmith Ornifex - Soul of Sir Alonne] Bewitched Alonne Sword,1790000,10,101212,-1,64560000,0,0,0,255
+77602032,[Weaponsmith Ornifex - Smelter Demon Soul] Aged Smelter Sword,5225000,10,101213,-1,64110000,0,0,0,255
+77602033,[Weaponsmith Ornifex - Soul of Aava- the King's Pet] Ivory Straight Sword,1390000,10,101221,-1,64520000,0,0,0,255
+77602034,[Weaponsmith Ornifex - Soul of Zallen- the King's Pet] Loyce Shield,11290000,10,101222,-1,64590000,0,0,0,255
+77602035,[Weaponsmith Ornifex - Soul of Lud- the King's Pet] Loyce Greatsword,1995000,10,101222,-1,64610000,0,0,0,255
+77602036,[Weaponsmith Ornifex - Soul of the Ivory King] Ivory King Ultra Greatsword,5255000,10,101223,-1,64580000,0,0,0,255
+77602037,[Weaponsmith Ornifex - Soul of Alsanna- Silent Oracle] Eleum Loyce,1630000,10,101220,-1,64550000,0,0,0,255
+77602100,[Weaponsmith Ornifex - Old Dragonslayer Soul] Dragonslayer Spear,2896000,10,100100,-1,64030000,0,0,0,255
+77602101,[Weaponsmith Ornifex - Soul of the Lost Sinner] Lost Sinner's Sword,5295000,10,100100,-1,64060000,0,0,0,255
+77602102,[Weaponsmith Ornifex - Old Iron King Soul] Iron King Hammer,2660000,10,100100,-1,64120000,0,0,0,255
+77602103,[Weaponsmith Ornifex - Soul of the Rotten] Butcher's Knife,2090000,10,100100,-1,64140000,0,0,0,255
+77602104,[Weaponsmith Ornifex - Soul of the Duke's Dear Freja] Spider's Silk,1430000,10,100100,-1,64170000,0,0,0,255
+77602105,[Weaponsmith Ornifex - Soul of the Duke's Dear Freja] Spider Fang,1670000,10,100100,-1,64170000,0,0,0,255
+77602106,[Weaponsmith Ornifex - Looking Glass Knight Soul] Thorned Greatsword,1860000,10,100100,-1,64180000,0,0,0,255
+77602107,[Weaponsmith Ornifex - Looking Glass Knight Soul] King's Mirror,11550000,10,100100,-1,64180000,0,0,0,255
+77602108,[Weaponsmith Ornifex - Soul of Velstadt] Sacred Chime Hammer,2750000,10,100100,-1,64200000,0,0,0,255
+77602109,[Weaponsmith Ornifex - Soul of the King] Ruler's Sword,1900000,10,100100,-1,64210000,0,0,0,255
+77602110,[Weaponsmith Ornifex - Soul of the King] King's Ultra Greatsword,5240000,10,100100,-1,64210000,0,0,0,255
+77602111,[Weaponsmith Ornifex - Soul of the King] King's Shield,11260000,10,100100,-1,64210000,0,0,0,255
+77602112,[Weaponsmith Ornifex - Guardian Dragon Soul] Spitfire Spear,2850000,10,100100,-1,64220000,0,0,0,255
+77602113,[Weaponsmith Ornifex - Guardian Dragon Soul] Drakewing Ultra Greatsword,5230000,10,100100,-1,64220000,0,0,0,255
+77602114,[Weaponsmith Ornifex - Ancient Dragon Soul] Curved Dragon Greatsword,5040000,10,100100,-1,64230000,0,0,0,255
+77602115,[Weaponsmith Ornifex - Soul of Nashandra] Scythe of Want,3070000,10,100100,-1,64250000,0,0,0,255
+77602116,[Weaponsmith Ornifex - Soul of Nashandra] Chime of Want,4050000,10,100100,-1,64250000,0,0,0,255
+77602117,[Weaponsmith Ornifex - Soul of Nashandra] Bow of Want,4280000,10,100100,-1,64250000,0,0,0,255
+77602118,[Weaponsmith Ornifex - Throne Defender Soul] Defender Greatsword,1960000,10,100100,-1,64260000,0,0,0,255
+77602119,[Weaponsmith Ornifex - Throne Defender Soul] Defender's Shield,11475000,10,100100,-1,64260000,0,0,0,255
+77602120,[Weaponsmith Ornifex - Throne Watcher Soul] Watcher Greatsword,1970000,10,100100,-1,64270000,0,0,0,255
+77602121,[Weaponsmith Ornifex - Throne Watcher Soul] Watcher's Shield,11185000,10,100100,-1,64270000,0,0,0,255
+77700200,[Sweet Shalquoir - Royal Rat Authority- Royal Rat Vanguard] Flying Feline Boots,21460103,10,102860,-1,0,0,0,1,1
+77700400,[Sweet Shalquoir] Silvercat Ring,40420000,10,-1,-1,0,0,0,1,1
+77700401,[Sweet Shalquoir] Redeye ring,40430000,10,-1,-1,0,0,0,1,1
+77700402,[Sweet Shalquoir] Name-engraved Ring,40450000,10,-1,-1,0,0,0,1,1
+77700403,[Sweet Shalquoir] Ring of Whispers,40610000,10,-1,-1,0,0,0,1,1
+77700404,[Sweet Shalquoir] Ring of the Evil Eye,40390000,10,-1,-1,0,0,0,1,1
+77700600,[Sweet Shalquoir] Prism Stone,60450000,10,-1,100420,0,0,0,1,10
+77700601,[Sweet Shalquoir] Alluring Skull,60530000,10,-1,100420,0,0,0,1,10
+77700602,[Sweet Shalquoir] Lloyd's Talisman,60531000,10,-1,100420,0,0,0,1,10
+77700603,[Sweet Shalquoir] Homeward Bone,60350000,10,-1,100420,0,0,0,1,10
+77700604,[Sweet Shalquoir - Shrine of Winter] Prism Stone,60450000,10,100420,-1,0,0,0,1,255
+77700605,[Sweet Shalquoir - Shrine of Winter] Alluring Skull,60530000,10,100420,-1,0,0,0,1,255
+77700606,[Sweet Shalquoir - Shrine of Winter] Lloyd's Talisman,60531000,10,100420,-1,0,0,0,1,255
+77700607,[Sweet Shalquoir - Shrine of Winter] Homeward Bone,60350000,10,100420,-1,0,0,0,1,255
+78300000,[Titchy Gren] Great Scythe,3000000,10,-1,-1,0,0,0,1,255
+78300001,[Titchy Gren] Priest's Chime,4030000,10,-1,-1,0,0,0,1,255
+78300200,[Titchy Gren - Skeleton Lords] Bone Crown,22540100,10,100954,-1,0,0,0,1,1
+78300201,[Titchy Gren - Skeleton Lords] Bone King Robe,22540101,10,100954,-1,0,0,0,1,1
+78300202,[Titchy Gren - Skeleton Lords] Bone King Cuffs,22540102,10,100954,-1,0,0,0,1,1
+78300203,[Titchy Gren - Skeleton Lords] Bone King Skirt,22540103,10,100954,-1,0,0,0,1,1
+78300204,[Titchy Gren - Shrine of Winter] Executioner Helm,26180100,10,100420,-1,0,0,0,1,1
+78300205,[Titchy Gren - Shrine of Winter] Executioner Armor,26180101,10,100420,-1,0,0,0,1,1
+78300206,[Titchy Gren - Shrine of Winter] Executioner Gauntlets,26180102,10,100420,-1,0,0,0,1,1
+78300207,[Titchy Gren - Shrine of Winter] Executioner Leggings,26180103,10,100420,-1,0,0,0,1,1
+78300300,[Titchy Gren] Firestorm,33050000,10,-1,-1,0,0,0,1,1
+78300301,[Titchy Gren] Great Combustion,33090000,10,-1,-1,0,0,0,1,1
+78300302,[Titchy Gren] Fire Whip,33100000,10,-1,-1,0,0,0,1,1
+78300400,[Titchy Gren] Delicate String,40540000,10,-1,-1,0,0,0,1,1
+78300600,[Titchy Gren] Red Sign Soapstone,62045000,10,-1,-1,0,0,0,1,1
+78300601,[Titchy Gren] Silver Talisman,60370000,10,-1,-1,0,0,0,1,255
+78300602,[Titchy Gren] Hexing Urn,60580000,10,-1,-1,0,0,0,1,255
+78300603,[Titchy Gren - NG+] Cracked Red Eye Orb,62060000,10,100100,-1,0,0,0,2,255
+78300604,[Titchy Gren] Cracked Red Eye Orb,62060000,10,-1,100100,0,0,0,1,5
+78400200,[Cromwell the Pardoner] White Priest Headpiece,22060100,10,-1,-1,0,0,0,1,1
+78400201,[Cromwell the Pardoner] White Priest Robe,22060101,10,-1,-1,0,0,0,1,1
+78400202,[Cromwell the Pardoner] White Priest Gloves,22060102,10,-1,-1,0,0,0,1,1
+78400203,[Cromwell the Pardoner] White Priest Skirt,22060103,10,-1,-1,0,0,0,1,1
+78400300,[Cromwell the Pardoner] Great Heal,32040000,10,-1,102404,0,0,0,1,1
+78400301,[Cromwell the Pardoner] Replenishment,32060000,10,-1,102404,0,0,0,1,1
+78400302,[Cromwell the Pardoner] Caressing Prayer,32090000,10,-1,102404,0,0,0,1,1
+78400303,[Cromwell the Pardoner] Force,32100000,10,-1,102404,0,0,0,1,1
+78400304,[Cromwell the Pardoner] Emit Force,32120000,10,-1,102404,0,0,0,1,1
+78400305,[Cromwell the Pardoner] Heavenly Thunder,32130000,10,-1,102404,0,0,0,1,1
+78400306,[Cromwell the Pardoner] Perseverance,32250000,10,-1,102404,0,0,0,1,1
+78400307,[Cromwell the Pardoner] Scraps of Life,35010000,10,-1,102404,0,0,0,1,1
+78400308,[Cromwell the Pardoner - Unknown Event] Great Heal,32040000,10,102404,-1,0,0,0,1,255
+78400309,[Cromwell the Pardoner - Unknown Event] Replenishment,32060000,10,102404,-1,0,0,0,1,255
+78400310,[Cromwell the Pardoner - Unknown Event] Caressing Prayer,32090000,10,102404,-1,0,0,0,1,255
+78400311,[Cromwell the Pardoner - Unknown Event] Force,32100000,10,102404,-1,0,0,0,1,255
+78400312,[Cromwell the Pardoner - Unknown Event] Emit Force,32120000,10,102404,-1,0,0,0,1,255
+78400313,[Cromwell the Pardoner - Unknown Event] Heavenly Thunder,32130000,10,102404,-1,0,0,0,1,255
+78400314,[Cromwell the Pardoner - Unknown Event] Perseverance,32250000,10,102404,-1,0,0,0,1,255
+78400315,[Cromwell the Pardoner - Unknown Event] Scraps of Life,35010000,10,102404,-1,0,0,0,1,255
+78400400,[Cromwell the Pardoner] Poisonbite Ring,40100000,10,-1,-1,0,0,0,1,1
+78400401,[Cromwell the Pardoner] Bloodbite Ring,40110000,10,-1,-1,0,0,0,1,1
+78400402,[Cromwell the Pardoner] Cursebite Ring,40130000,10,-1,-1,0,0,0,1,1
+78400600,[Cromwell the Pardoner] Dark Troches,60190000,10,-1,-1,0,0,0,1,255
+78500000,[Blue Sentinel Targray] Morning Star,2420000,10,-1,-1,0,0,0,1,255
+78500001,[Blue Sentinel Targray] Halberd,3220000,10,-1,-1,0,0,0,1,255
+78500300,[Blue Sentinel Targray] Emit Force,32120000,10,-1,-1,0,0,0,1,1
+78500301,[Blue Sentinel Targray] Heavenly Thunder,32130000,10,-1,-1,0,0,0,1,1
+78500600,[Blue Sentinel Targray] Monastery Charm,60090000,10,-1,-1,0,0,0,1,3
+78500601,[Blue Sentinel Targray] Holy Water Urn,60620000,10,-1,-1,0,0,0,1,255
+78500602,[Blue Sentinel Targray] Boltstone,61070000,10,-1,-1,0,0,0,1,255
+78500603,[Blue Sentinel Targray - NG+] Cracked Blue Eye Orb,62050000,10,100100,-1,0,0,0,2,255
