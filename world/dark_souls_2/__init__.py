@@ -261,6 +261,8 @@ class DS2World(World):
                     self.set_location_rule(location.name, lambda state: state.has("Dull Ember", self.player))
                 elif "[Lonesome Gavlan - Doors of Pharros]" in location_table:
                     self.set_location_rule(location.name, lambda state: state.has("Speak with Lonesome Gavlan in Harvest Valley", self.player))
+                elif "Straid of Olaphis" in location.name:
+                    self.set_location_rule(location.name, lambda state: state.has("Fragrant Branch of Yore", self.player))
                 elif " - Shrine of Winter]" in location.name:
                     self.set_location_rule(location.name, lambda state: state.has("Open Shrine of Winter", self.player))
                 elif " - Skeleton Lords]" in location.name:
