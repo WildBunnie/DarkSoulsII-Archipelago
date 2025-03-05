@@ -221,6 +221,7 @@
   <ItemGroup>
     <ClInclude Include="src\ArchipelagoInterface.h" />
     <ClInclude Include="src\Core.h" />
+    <ClInclude Include="src\ds2.h" />
     <ClInclude Include="src\offsets.h" />
     <ClInclude Include="src\hooks.h" />
   </ItemGroup>

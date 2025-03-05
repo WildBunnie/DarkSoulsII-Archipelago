@@ -6,6 +6,8 @@ namespace FunctionOffsets {
 #ifdef _M_IX86
     uintptr_t GiveItemsOnReward = 0x21D3C0;
     uintptr_t GiveItemsOnPickup = 0x25bff0;
+    uintptr_t GiveShopItem = 0x22B340;
+    //uintptr_t AddShopItemToInventory; // this is the same as AddItemsToInventory in vanilla
     uintptr_t AddItemsToInventory = 0x22AD20;
     uintptr_t CreatePopUpStruct = 0x11F430;
     uintptr_t ShowItemPopup = 0x4FA9B0;
@@ -13,6 +15,8 @@ namespace FunctionOffsets {
 #elif defined(_M_X64)
     uintptr_t GiveItemsOnReward = 0x199CC0;
     uintptr_t GiveItemsOnPickup = 0x1E4590; // this is not the same function as in vanilla
+    uintptr_t GiveShopItem = 0x1A76A0;
+    uintptr_t AddShopItemToInventory = 0x1AA810;
     uintptr_t AddItemsToInventory = 0x1A7470;
     uintptr_t CreatePopUpStruct = 0x5D950;
     uintptr_t ShowItemPopup = 0x501080;
@@ -66,3 +70,13 @@ namespace PatchesOffsets {
     uintptr_t menuWeaponReqPatchOffset = 0x201EC0;
 #endif
 };
+
+namespace ParamOffsets {
+#ifdef _M_IX86
+    std::vector<uintptr_t> ShopLineupParam = { 0x60, 0x58, 0x94, 0x0 };
+    std::vector<uintptr_t> ItemParam = { 0x60, 0x10, 0x94, 0x0 };;
+#elif defined(_M_X64)
+    std::vector<uintptr_t> ShopLineupParam = { 0xA8, 0xB0, 0xD8, 0x0 };
+    std::vector<uintptr_t> ItemParam = { 0xA8, 0x20, 0xD8, 0x0 };
+#endif
+}
