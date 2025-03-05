@@ -4,7 +4,7 @@ import random
 from worlds.AutoWorld import World
 from worlds.generic.Rules import set_rule, add_item_rule
 from BaseClasses import Item, ItemClassification, Location, Region
-from .Items import item_list, progression_items, repetable_categories
+from .Items import item_list, progression_items, repetable_categories, group_table
 from .Locations import location_table, dlc_regions
 from .Options import DS2Options
 from typing import Optional
@@ -40,6 +40,7 @@ class DS2World(World):
 
     item_name_to_id = {item_data.name: item_data.code for item_data in item_list}
     location_name_to_id = {location_data.name: location_data.code for region in location_table.keys() for location_data in location_table[region] if location_data.code != None}
+    item_name_groups = group_table
 
     def create_regions(self):
 
