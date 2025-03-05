@@ -45,11 +45,8 @@ progression_items: list[str] = [
     "Silvercat Ring",
     "Ashen Mist Heart",
     "Giant's Kinship",
-    "Soul of the Rotten",
-    "Soul of the Lost Sinner",
-    "Old Iron King Soul",
-    "Soul of the Duke's Dear Freja",
-    "Soul of Nashandra",
+    "Lenigrast's Key",
+    "Dull Ember"
 ]
 
 item_list: list[ItemData] = [
@@ -1144,7 +1141,7 @@ item_list: list[ItemData] = [
     ItemData(60480000, "Thank You Carving", ItemCategory.USABLE_ITEM, skip=True),
     ItemData(60490000, "I'm Sorry Carving", ItemCategory.USABLE_ITEM, skip=True),
     ItemData(60500000, "Very Good! Carving", ItemCategory.USABLE_ITEM, skip=True),
-    ItemData(60510000, "Rubbish", ItemCategory.CONSUMABLE),
+    ItemData(60510000, "Rubbish", ItemCategory.CONSUMABLE, skip=True),
     ItemData(60511000, "Petrified Something", ItemCategory.CONSUMABLE),
     ItemData(60525000, "Estus Flask Shard", ItemCategory.CONSUMABLE),
     ItemData(60526000, "Sublime Bone Dust", ItemCategory.CONSUMABLE),
@@ -1253,18 +1250,18 @@ item_list: list[ItemData] = [
     ItemData(64030000, "Old Dragonslayer Soul", ItemCategory.CONSUMABLE),
     ItemData(64040000, "Flexile Sentry Soul", ItemCategory.CONSUMABLE),
     ItemData(64050000, "Ruin Sentinel Soul", ItemCategory.CONSUMABLE),
-    ItemData(64060000, "Soul of the Lost Sinner", ItemCategory.KEY_ITEM), # changed to key item to not mess with logic
+    ItemData(64060000, "Soul of the Lost Sinner", ItemCategory.CONSUMABLE),
     ItemData(64070000, "Executioner's Chariot Soul", ItemCategory.CONSUMABLE),
     ItemData(64080000, "Skeleton Lord's Soul", ItemCategory.CONSUMABLE),
     ItemData(64090000, "Covetous Demon Soul", ItemCategory.CONSUMABLE),
     ItemData(64100000, "Mytha, the Baneful Queen Soul", ItemCategory.CONSUMABLE),
     ItemData(64110000, "Smelter Demon Soul", ItemCategory.CONSUMABLE),
-    ItemData(64120000, "Old Iron King Soul", ItemCategory.KEY_ITEM), # changed to key item to not mess with logic
+    ItemData(64120000, "Old Iron King Soul", ItemCategory.CONSUMABLE),
     ItemData(64130000, "Royal Rat Vanguard Soul", ItemCategory.CONSUMABLE),
-    ItemData(64140000, "Soul of the Rotten", ItemCategory.KEY_ITEM), # changed to key item to not mess with logic
+    ItemData(64140000, "Soul of the Rotten", ItemCategory.CONSUMABLE),
     ItemData(64150000, "Scorpioness Najka Soul", ItemCategory.CONSUMABLE),
     ItemData(64160000, "Royal Rat Authority Soul", ItemCategory.CONSUMABLE),
-    ItemData(64170000, "Soul of the Duke's Dear Freja", ItemCategory.KEY_ITEM), # changed to key item to not mess with logic
+    ItemData(64170000, "Soul of the Duke's Dear Freja", ItemCategory.CONSUMABLE),
     ItemData(64180000, "Looking Glass Knight Soul", ItemCategory.CONSUMABLE),
     ItemData(64190000, "Demon of Song Soul", ItemCategory.CONSUMABLE),
     ItemData(64200000, "Soul of Velstadt", ItemCategory.CONSUMABLE),
@@ -1272,7 +1269,7 @@ item_list: list[ItemData] = [
     ItemData(64220000, "Guardian Dragon Soul", ItemCategory.CONSUMABLE),
     ItemData(64230000, "Ancient Dragon Soul", ItemCategory.CONSUMABLE),
     ItemData(64240000, "Giant Lord Soul", ItemCategory.CONSUMABLE),
-    ItemData(64250000, "Soul of Nashandra", ItemCategory.KEY_ITEM), # changed to key item to not mess with logic
+    ItemData(64250000, "Soul of Nashandra", ItemCategory.CONSUMABLE),
     ItemData(64260000, "Throne Defender Soul", ItemCategory.CONSUMABLE),
     ItemData(64270000, "Throne Watcher Soul", ItemCategory.CONSUMABLE),
     ItemData(64280000, "Darklurker Soul", ItemCategory.CONSUMABLE),

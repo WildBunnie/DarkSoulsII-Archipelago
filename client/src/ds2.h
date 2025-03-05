@@ -1,6 +1,8 @@
 #pragma once
 #include <map>
 
+// these were calculated by multiplying
+// the base price of the item with the price rate
 std::map<int, int> shopPrices = {
     {30700000, 4300.0},
     {30700001, 5000.0},
