@@ -196,13 +196,35 @@ class DS2World(World):
         self.set_location_rule("Rotate the Majula Rotunda", lambda state: state.has("Rotunda Lockstone", self.player))
         self.set_location_rule("Unpetrify Rosabeth of Melfia", lambda state: state.has("Fragrant Branch of Yore", self.player))
         self.set_location_rule("Open Shrine of Winter", lambda state: 
-                                                            state.has("Defeat the Rotten", self.player) and
-                                                            state.has("Defeat the Lost Sinner", self.player) and
-                                                            state.has("Defeat the Old Iron King", self.player) and
-                                                            state.has("Defeat the Duke's Dear Freja", self.player))
+            (state.has("Defeat the Rotten", self.player) and
+             state.has("Defeat the Lost Sinner", self.player) and
+             state.has("Defeat the Old Iron King", self.player) and
+             state.has("Defeat the Duke's Dear Freja", self.player)))
+        self.set_location_rule(self.multiworld.get_location("[IronKeep] Metal chest in lava at right side of the first big lava room", lambda state:
+            (state.has_group("fire_res_ring", player, 1) or
+             state.has_group("fire_res_pyro", player, 2) or
+             state.has_group("fire_res_darkpyro", player, 2)))
+        self.set_location_rule(self.multiworld.get_location("[IronKeep] Metal chest in lava in the room with changing platforms", lambda state: 
+            (state.has_group("fire_res_ring", player, 1) or
+             state.has_group("fire_res_pyro", player, 2) or
+             state.has_group("fire_res_darkpyro", player, 2)))
+        self.set_location_rule(self.multiworld.get_location("[IronKeep] On lava on the right of bridge by first bonfire", lambda state: 
+            (state.has_group("fire_res_ring", player, 1) or
+             state.has_group("fire_res_pyro", player, 2) or
+             state.has_group("fire_res_darkpyro", player, 2)))
+        self.set_location_rule(self.multiworld.get_location("[IronKeep] On lava next to the first bonfire", lambda state: 
+            (state.has_group("fire_res_ring", player, 1) or
+             state.has_group("fire_res_pyro", player, 2) or
+             state.has_group("fire_res_darkpyro", player, 2)))
+        self.set_location_rule(self.multiworld.get_location("[Drangleic] Looking Glass Knight drop", self.player), lambda state: state.has("Key to King's Passage"))
+        self.set_location_rule(self.multiworld.get_location("[FOFG] First corpse in the lower fire area", self.player), lambda state: state.has("Iron Key"))
+        self.set_location_rule(self.multiworld.get_location("[FOFG] Second corpse in the lower fire area", self.player), lambda state: state.has("Iron Key"))
+        self.set_location_rule(self.multiworld.get_location("[Tseldora] Metal chest in Tseldora den", self.player), lambda state: state.has("Tseldora Den Key"))
+        self.set_location_rule(self.multiworld.get_location("[Tseldora] Wooden chest in Tseldora den", self.player), lambda state: state.has("Tseldora Den Key"))
+        self.set_location_rule(self.multiworld.get_location("[Tseldora] Metal chest behind locked door in pickaxe room", self.player), lambda state: state.has("Brightstone Key"))
         
         self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
-        self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player))
+        self.set_connection_rule("Majula", "Grave of Saints", state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
         self.set_connection_rule("Path to Shaded Woods", "Shaded Woods", lambda state: state.has("Unpetrify Rosabeth of Melfia", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "Lost Bastille", lambda state: state.has("Soldier Key", self.player))
         self.set_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("King's Ring", self.player))
@@ -210,6 +232,9 @@ class DS2World(World):
         self.set_connection_rule("Drangleic Castle", "King's Passage", lambda state: state.has("Key to King's Passage", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "Giant's Memory", lambda state: state.has("King's Ring", self.player) and state.has("Ashen Mist Heart", self.player))
         self.set_connection_rule("Drangleic Castle", "Throne of Want", lambda state: state.has("King's Ring", self.player))
+        self.set_connection_rule("Drangleic Castle", "Shrine of Amana", lambda state: state.has("Key to King's Passage", self.player))
+        self.set_connection_rule("Iron Keep", "Belfry Sol", lambda state: state.has("Pharros' Lockstone", self.player))
+        self.set_connection_rule("Lost Bastille", "Belfry Luna", lambda state: state.has("Pharros' Lockstone", self.player))
 
         set_rule(self.multiworld.get_location("Defeat Nashandra", self.player), lambda state: state.has("Giant's Kinship", self.player))
 
