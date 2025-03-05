@@ -1,4 +1,4 @@
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Set
 from dataclasses import dataclass
 
 from enum import Enum
@@ -1310,12 +1310,10 @@ item_list: list[ItemData] = [
 ]
 
 group_table: Dict[str, Set[str]] = {
-    "fire_res_ring": {"Flame Quartz Ring",
-                      "Flame Quartz Ring +1",
-                      "Flame Quartz Ring +2",
-                      "Flame Quartz Ring +3"},
-       "great_soul": {"Old Iron King Soul",
-                      "Soul of the Rotten",
-                      "Soul of the Lost Sinner",
-                      "Soul of the Duke's Dear Freja"},
+    "fire_res_rings": {
+        "Flame Quartz Ring",
+        "Flame Quartz Ring +1",
+        "Flame Quartz Ring +2",
+        "Flame Quartz Ring +3"
+    },
 }

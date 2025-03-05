@@ -3,7 +3,7 @@ import random
 
 from worlds.AutoWorld import World
 from worlds.generic.Rules import set_rule, add_item_rule
-from BaseClasses import Item, ItemClassification, Location, Region
+from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType
 from .Items import item_list, progression_items, repetable_categories, group_table
 from .Locations import location_table, dlc_regions
 from .Options import DS2Options
@@ -60,7 +60,7 @@ class DS2World(World):
                 if location_data.code == None: # event
                     location = DS2Location(self.player, location_data.name, None, region, None, False)
                 else:
-                    location = self.create_location(location_data.name, region, location_data.default_items, location_data.shop)
+                    location = self.create_location(location_data.name, region, location_data.default_items, location_data.shop, location_data.skip)
                 region.locations.append(location)
             regions[region_name] = region
             self.multiworld.regions.append(region)
@@ -84,9 +84,11 @@ class DS2World(World):
         regions["Heide's Tower of Flame"].connect(regions["Unseen Path to Heide"])
         regions["Unseen Path to Heide"].connect(regions["No-man's Wharf"])
         regions["No-man's Wharf"].connect(regions["Lost Bastille"])
+        regions["Lost Bastille"].connect(regions["Belfry Luna"])
 
         regions["Huntman's Copse"].connect(regions["Earthen Peak"])
         regions["Earthen Peak"].connect(regions["Iron Keep"])
+        regions["Iron Keep"].connect(regions["Belfry Sol"])
 
         regions["Path to Shaded Woods"].connect(regions["Shaded Woods"])
         regions["Shaded Woods"].connect(regions["Drangleic Castle"])
@@ -113,8 +115,10 @@ class DS2World(World):
     def create_region(self, name):
         return Region(name, self.player, self.multiworld)
 
-    def create_location(self, name, region, default_items, shop):
-        return DS2Location(self.player, name, self.location_name_to_id[name], region, default_items, shop)
+    def create_location(self, name, region, default_items, shop=False, skip=False):
+        location = DS2Location(self.player, name, self.location_name_to_id[name], region, default_items, shop)
+        if skip: location.progress_type = LocationProgressType.EXCLUDED
+        return location
 
     def create_items(self):
         pool : list[DS2Item] = []
@@ -193,6 +197,7 @@ class DS2World(World):
 
         self.set_shop_rules()
 
+        # EVENTS
         self.set_location_rule("Rotate the Majula Rotunda", lambda state: state.has("Rotunda Lockstone", self.player))
         self.set_location_rule("Unpetrify Rosabeth of Melfia", lambda state: state.has("Fragrant Branch of Yore", self.player))
         self.set_location_rule("Open Shrine of Winter", lambda state: 
@@ -200,38 +205,27 @@ class DS2World(World):
              state.has("Defeat the Lost Sinner", self.player) and
              state.has("Defeat the Old Iron King", self.player) and
              state.has("Defeat the Duke's Dear Freja", self.player)))
-        self.set_location_rule(self.multiworld.get_location("[IronKeep] Metal chest in lava at right side of the first big lava room", lambda state:
-            (state.has_group("fire_res_ring", player, 1) or
-             state.has_group("fire_res_pyro", player, 2) or
-             state.has_group("fire_res_darkpyro", player, 2)))
-        self.set_location_rule(self.multiworld.get_location("[IronKeep] Metal chest in lava in the room with changing platforms", lambda state: 
-            (state.has_group("fire_res_ring", player, 1) or
-             state.has_group("fire_res_pyro", player, 2) or
-             state.has_group("fire_res_darkpyro", player, 2)))
-        self.set_location_rule(self.multiworld.get_location("[IronKeep] On lava on the right of bridge by first bonfire", lambda state: 
-            (state.has_group("fire_res_ring", player, 1) or
-             state.has_group("fire_res_pyro", player, 2) or
-             state.has_group("fire_res_darkpyro", player, 2)))
-        self.set_location_rule(self.multiworld.get_location("[IronKeep] On lava next to the first bonfire", lambda state: 
-            (state.has_group("fire_res_ring", player, 1) or
-             state.has_group("fire_res_pyro", player, 2) or
-             state.has_group("fire_res_darkpyro", player, 2)))
-        self.set_location_rule(self.multiworld.get_location("[FOFG] First corpse in the lower fire area", self.player), lambda state: state.has("Iron Key"))
-        self.set_location_rule(self.multiworld.get_location("[FOFG] Second corpse in the lower fire area", self.player), lambda state: state.has("Iron Key"))
-        self.set_location_rule(self.multiworld.get_location("[Tseldora] Metal chest in Tseldora den", self.player), lambda state: state.has("Tseldora Den Key"))
-        self.set_location_rule(self.multiworld.get_location("[Tseldora] Wooden chest in Tseldora den", self.player), lambda state: state.has("Tseldora Den Key"))
-        self.set_location_rule(self.multiworld.get_location("[Tseldora] Metal chest behind locked door in pickaxe room", self.player), lambda state: state.has("Brightstone Key"))
+
+        # LOCATIONS
+        self.set_location_rule("[FOFG] First corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
+        self.set_location_rule("[FOFG] Second corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
+        self.set_location_rule("[Tseldora] Metal chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
+        self.set_location_rule("[Tseldora] Wooden chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
+        self.set_location_rule("[Tseldora] Metal chest behind locked door in pickaxe room", lambda state: state.has("Brightstone Key", self.player))
         
+        # CONNECTIONS
         self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
-        self.set_connection_rule("Majula", "Grave of Saints", state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
+        self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
         self.set_connection_rule("Path to Shaded Woods", "Shaded Woods", lambda state: state.has("Unpetrify Rosabeth of Melfia", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "Lost Bastille", lambda state: state.has("Soldier Key", self.player))
         self.set_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("King's Ring", self.player))
         self.set_connection_rule("Shaded Woods", "Drangleic Castle", lambda state: state.has("Open Shrine of Winter", self.player))
         self.set_connection_rule("Drangleic Castle", "King's Passage", lambda state: state.has("Key to King's Passage", self.player))
-        self.set_connection_rule("Forest of Fallen Giants", "Giant's Memory", lambda state: state.has("King's Ring", self.player) and state.has("Ashen Mist Heart", self.player) and state.has("Soldier Key"))
+        self.set_connection_rule("Forest of Fallen Giants", "Giant's Memory", lambda state: 
+                                    state.has("King's Ring", self.player) and 
+                                    state.has("Ashen Mist Heart", self.player) and 
+                                    state.has("Soldier Key", self.player))
         self.set_connection_rule("Drangleic Castle", "Throne of Want", lambda state: state.has("King's Ring", self.player))
-        self.set_connection_rule("Drangleic Castle", "Shrine of Amana", lambda state: state.has("Key to King's Passage", self.player))
         self.set_connection_rule("Iron Keep", "Belfry Sol", lambda state: state.has("Pharros' Lockstone", self.player))
         self.set_connection_rule("Lost Bastille", "Belfry Luna", lambda state: state.has("Pharros' Lockstone", self.player))
 
@@ -247,7 +241,6 @@ class DS2World(World):
 
     def set_location_rule(self, name, state):
         set_rule(self.multiworld.get_location(name, self.player), state)
-
 
     def set_shop_rules(self):
         self.set_location_rule("[Merchant Hag Melentia - Majula] Lifegem", lambda state: state.has("Defeat the Last Giant", self.player))
