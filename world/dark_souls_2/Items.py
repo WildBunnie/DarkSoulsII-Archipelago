@@ -39,13 +39,31 @@ repetable_categories: list[ItemCategory] = [
 progression_items: list[str] = [
     "Fragrant Branch of Yore",
     "King's Ring",
-    "Soldier Key",
-    "Key to King's Passage",
     "Rotunda Lockstone",
     "Silvercat Ring",
     "Ashen Mist Heart",
     "Giant's Kinship",
+    "Dull Ember",
+    "Flying Feline Boots",
+    "Pharros' Lockstone",
+    "Flame Quartz Ring",
+    "Flame Quartz Ring +1",
+    "Flame Quartz Ring +2",
+    "Flame Quartz Ring +3",
+    "Flash Sweat",
+    "Pyromancy Flame",
+    "Dark Pyromancy Flame",
+    "Soldier Key",
+    "Key to King's Passage",
+    "Bastille Key",
+    "Forgotten Key",
     "Lenigrast's Key",
+    "Antiquated Key",
+    "Fang Key",
+    "House Key",
+    "Tseldora Den Key",
+    "Iron Key",
+    "Brightstone Key",
     "Dull Ember"
 ]
 
@@ -1290,3 +1308,14 @@ item_list: list[ItemData] = [
     ItemData(64600000, "Loyce Soul", ItemCategory.CONSUMABLE),
     ItemData(64610000, "Soul of Lud, the King's Pet", ItemCategory.CONSUMABLE),
 ]
+
+group_table: Dict[str, Set[str]] = {
+    "fire_res_ring": {"Flame Quartz Ring",
+                      "Flame Quartz Ring +1",
+                      "Flame Quartz Ring +2",
+                      "Flame Quartz Ring +3"},
+       "great_soul": {"Old Iron King Soul",
+                      "Soul of the Rotten",
+                      "Soul of the Lost Sinner",
+                      "Soul of the Duke's Dear Freja"},
+}
