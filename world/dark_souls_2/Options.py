@@ -47,6 +47,6 @@ class DS2Options(PerGameCommonOptions):
     enable_ngp: EnableNGPOption
     infinite_lifegems: KeepInfiniteLifegems
     exclude_locations: DS2ExcludeLocations
-    oldironkingdlc: OldIronKingDLC
-    ivorykingdlc: IvoryKingDLC
-    sunkenkingdlc: SunkenKingDLC
+    old_iron_king_dlc: OldIronKingDLC
+    ivory_king_dlc: IvoryKingDLC
+    sunken_king_dlc: SunkenKingDLC
