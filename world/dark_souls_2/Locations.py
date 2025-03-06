@@ -1,7 +1,7 @@
 # all of the descriptions come from DS2S META
 # https://github.com/pseudostripy/DS2S-META/blob/master/DS2S%20META/Randomizer/CasualItemSet.cs
 
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Set
 from dataclasses import dataclass
 
 @dataclass
@@ -11,10 +11,10 @@ class LocationData:
     default_items: list[str]
     sotfs: Optional[bool] = False   # whether the location is only in sotfs
     vanilla: Optional[bool] = False # whether the location is only in vanilla
-    ngp: Optional[bool] = False
+    ngp: Optional[bool] = False  # whether the location is only in new game plus
     shop: Optional[bool] = False
     event: Optional[bool] = False
-    skip: Optional[bool] = False
+    skip: Optional[bool] = False # if true, dont place progression items in this location
 
 dlc_regions = ["Shulva", "Brume Tower", "Eleum Loyce"]
 
@@ -334,7 +334,7 @@ location_table = {
         LocationData(10146420, "[Tseldora] A corpse in the spiky mining field (2)", ['Titanite Shard', 'Titanite Chunk', 'Titanite Slab'], sotfs=True),
         LocationData(10146480, "[Tseldora] In urn next to Congregation foggate", ['Human Effigy'], sotfs=True),
         LocationData(10146490, "[Tseldora] In urn on right side when leaving Congregation fight", ['Cracked Red Eye Orb'], sotfs=True),
-        LocationData(10146500, "[Tseldora] Guide a pig from the campsite to lower tseldora and let it eat mushrooms", ['Pickaxe']),
+        LocationData(10146500, "[Tseldora] Guide a pig from the campsite to lower tseldora and let it eat mushrooms", ['Pickaxe'], skip=True),
         LocationData(10146510, "[Tseldora] In urn in the 2nd floor of a house just before the spiky mining field", ['Torch'], sotfs=True),
         LocationData(10146520, "[Tseldora] In urn in the pickaxe room", ['Poison Arrow'], sotfs=True),
         LocationData(78400200, "[Cromwell the Pardoner] White Priest Headpiece", ["White Priest Headpiece"], shop=True),
@@ -2189,3 +2189,12 @@ location_table = {
     #     LocationData(78500603, "[Blue Sentinel Targray, NG+] Cracked Blue Eye Orb", ["Cracked Blue Eye Orb"], shop=True),
     # ],
 }
+
+location_name_groups: Dict[str, Set[str]] = {}
+
+for region in location_table:
+    for location in location_table[region]:
+        if region not in location_name_groups:
+            location_name_groups[region] = {location.name}
+        else:
+            location_name_groups[region].add(location.name)

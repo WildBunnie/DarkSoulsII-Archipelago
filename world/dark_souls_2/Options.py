@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import PerGameCommonOptions, DeathLink, Toggle, Choice
+from Options import PerGameCommonOptions, DeathLink, Toggle, Choice, ExcludeLocations
 
 class NoWeaponRequirements(Toggle):
     """Remove the requirements to wield weapons"""
@@ -23,6 +23,10 @@ class GameVersion(Choice):
     option_sotfs = 0
     option_vanilla = 1
 
+class DS2ExcludeLocations(ExcludeLocations):
+    """Prevent these locations from having an important item."""
+    default = frozenset({"Chasm of the Abyss", "Dragon Memories"})
+
 @dataclass
 class DS2Options(PerGameCommonOptions):
     game_version: GameVersion
@@ -30,3 +34,4 @@ class DS2Options(PerGameCommonOptions):
     no_weapon_req: NoWeaponRequirements
     enable_dlcs: EnableDLCsOption
     enable_ngp: EnableNGPOption
+    exclude_locations: DS2ExcludeLocations
