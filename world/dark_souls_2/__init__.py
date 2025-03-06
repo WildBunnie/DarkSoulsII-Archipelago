@@ -5,7 +5,7 @@ from worlds.AutoWorld import World
 from worlds.generic.Rules import set_rule, add_item_rule
 from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType
 from .Items import item_list, progression_items, repetable_categories, group_table, ItemCategory
-from .Locations import location_table, dlc1_regions, dlc2_regions, dlc3_regions, location_name_groups
+from .Locations import location_table, location_name_groups
 from .Options import DS2Options
 from typing import Optional
 
@@ -52,9 +52,9 @@ class DS2World(World):
         regions["Menu"] = menu_region
     
         for region_name in location_table:
-            if region_name in dlc1_regions and not self.options.sunkenkingdlc: continue
-            if region_name in dlc2_regions and not self.options.oldironkingdlc: continue
-            if region_name in dlc3_regions and not self.options.ivorykingdlc: continue
+            if region_name == "Shulva" and not self.options.sunkenkingdlc: continue
+            if region_name == "Brume Tower" and not self.options.sunkenkingdlc: continue
+            if region_name == "Eleum Loyce" and not self.options.sunkenkingdlc: continue
             region = self.create_region(region_name)
             for location_data in location_table[region_name]:
                 if location_data.ngp and not self.options.enable_ngp: continue
