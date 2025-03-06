@@ -16,7 +16,9 @@ class LocationData:
     event: Optional[bool] = False
     skip: Optional[bool] = False # if true, dont place progression items in this location
 
-dlc_regions = ["Shulva", "Brume Tower", "Eleum Loyce"]
+dlc1_regions = ["Shulva"] # Sunken King DLC
+dlc2_regions = ["Brume Tower"] # Old Iron King DLC
+dlc3_regions = ["Eleum Loyce"] # Ivory King DLC
 
 location_table = {
     "Things Betwixt": [
