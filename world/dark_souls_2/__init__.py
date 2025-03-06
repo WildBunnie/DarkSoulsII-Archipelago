@@ -4,7 +4,7 @@ import random
 from worlds.AutoWorld import World
 from worlds.generic.Rules import set_rule, add_item_rule
 from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType
-from .Items import item_list, progression_items, repetable_categories, group_table
+from .Items import item_list, progression_items, repetable_categories, group_table, ItemCategory
 from .Locations import location_table, dlc_regions, location_name_groups
 from .Options import DS2Options
 from typing import Optional
@@ -23,10 +23,10 @@ class DS2Location(Location):
 
 class DS2Item(Item):
     game: str = "Dark Souls II"
-    repeatable: bool
+    category: ItemCategory
 
-    def __init__(self, name, classification, code, player, repeatable):
-        self.repeatable = repeatable
+    def __init__(self, name, classification, code, player, category):
+        self.category = category
         super(DS2Item, self).__init__(
             name, classification, code, player
         )
@@ -126,7 +126,7 @@ class DS2World(World):
 
         events = [location for region in location_table.keys() for location in location_table[region] if location.event == True]
         for event in events:
-            event_item = DS2Item(event.name, ItemClassification.progression, None, self.player, False)
+            event_item = DS2Item(event.name, ItemClassification.progression, None, self.player, None)
             self.multiworld.get_location(event.name, self.player).place_locked_item(event_item)
         
         # set the giant's kinship at the original location
@@ -176,8 +176,7 @@ class DS2World(World):
     def create_item(self, name: str, category=None) -> DS2Item:
         code = self.item_name_to_id[name]
         classification = ItemClassification.progression if name in progression_items else ItemClassification.filler
-        repeatable = True if category in repetable_categories and category != None else False
-        return DS2Item(name, classification, code, self.player, repeatable)
+        return DS2Item(name, classification, code, self.player, category)
 
     # given a list, returns the index of the first progression item
     # if no progression item is found inside the list, returns -1
@@ -194,7 +193,9 @@ class DS2World(World):
         # from other worlds inside the shop is a bit lackluster
         for location in self.multiworld.get_locations(self.player):
             if location.shop:
-                add_item_rule(location, lambda item: item.player == self.player)
+                add_item_rule(location, lambda item: 
+                              item.player == self.player and
+                              item.category not in [ItemCategory.AMMO, ItemCategory.CONSUMABLE])
 
         self.set_shop_rules()
 

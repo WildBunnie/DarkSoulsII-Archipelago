@@ -2194,6 +2194,8 @@ location_name_groups: Dict[str, Set[str]] = {}
 
 for region in location_table:
     for location in location_table[region]:
+        if location.event: continue
+        if location.code == 309700: continue # "[MemoryJeigh] Giant Lord drop"
         if region not in location_name_groups:
             location_name_groups[region] = {location.name}
         else:
