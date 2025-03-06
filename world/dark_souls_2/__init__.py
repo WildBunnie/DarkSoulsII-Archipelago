@@ -5,7 +5,7 @@ from worlds.AutoWorld import World
 from worlds.generic.Rules import set_rule, add_item_rule
 from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType
 from .Items import item_list, progression_items, repetable_categories, group_table, ItemCategory
-from .Locations import location_table, dlc_regions, location_name_groups
+from .Locations import location_table, location_name_groups
 from .Options import DS2Options
 from typing import Optional
 
@@ -52,7 +52,9 @@ class DS2World(World):
         regions["Menu"] = menu_region
     
         for region_name in location_table:
-            if region_name in dlc_regions and not self.options.enable_dlcs: continue
+            if region_name == "Shulva" and not self.options.sunken_king_dlc: continue
+            if region_name == "Brume Tower" and not self.options.old_iron_king_dlc: continue
+            if region_name == "Eleum Loyce" and not self.options.ivory_king_dlc: continue
             region = self.create_region(region_name)
             for location_data in location_table[region_name]:
                 if location_data.ngp and not self.options.enable_ngp: continue
@@ -110,10 +112,12 @@ class DS2World(World):
         
         regions["Aldia's Keep"].connect(regions["Dragon Aerie"])
 
-        if self.options.enable_dlcs:
-            regions["Shaded Woods"].connect(regions["Eleum Loyce"])
-            regions["Iron Keep"].connect(regions["Brume Tower"])
+        if self.options.sunken_king_dlc:
             regions["The Gutter"].connect(regions["Shulva"])
+        if self.options.old_iron_king_dlc:
+            regions["Iron Keep"].connect(regions["Brume Tower"])
+        if self.options.ivory_king_dlc:
+            regions["Shaded Woods"].connect(regions["Eleum Loyce"])
 
     def create_region(self, name):
         return Region(name, self.player, self.multiworld)

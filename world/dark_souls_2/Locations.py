@@ -16,8 +16,6 @@ class LocationData:
     event: Optional[bool] = False
     skip: Optional[bool] = False # if true, dont place progression items in this location
 
-dlc_regions = ["Shulva", "Brume Tower", "Eleum Loyce"]
-
 location_table = {
     "Things Betwixt": [
         LocationData(10025010, "[Betwixt] Wooden chest at the attic of Fire Keeper's cottage", ['Human Effigy']),
