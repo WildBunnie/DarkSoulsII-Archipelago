@@ -14,7 +14,7 @@ class EnableNGPOption(Toggle):
     display_name = "Enable NewGame+"
 
 class GameVersion(Choice):
-    """Choose the gave version you will be playing on
+    """Choose the game version you will be playing on
      
     - **sotfs:** You will be playing the scholar of the first sin version
     - **vanilla:** You will be playing the vanilla version
@@ -22,6 +22,10 @@ class GameVersion(Choice):
     display_name = "Game Version"
     option_sotfs = 0
     option_vanilla = 1
+
+class KeepInfiniteLifegems(Toggle):
+    """Keep Melentia's infinite supply of lifegems"""
+    display_name = "Keep Infinite Lifegems"
 
 class DS2ExcludeLocations(ExcludeLocations):
     """Prevent these locations from having an important item."""
@@ -34,4 +38,5 @@ class DS2Options(PerGameCommonOptions):
     no_weapon_req: NoWeaponRequirements
     enable_dlcs: EnableDLCsOption
     enable_ngp: EnableNGPOption
+    infinite_lifegems: KeepInfiniteLifegems
     exclude_locations: DS2ExcludeLocations

@@ -120,16 +120,8 @@ void overrideItemPrices() {
     uintptr_t itemPramPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, ParamOffsets::ItemParam);
     ParamRow* rowPtr = reinterpret_cast<ParamRow*>(itemPramPtr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x40
 
-    std::set<int64_t> itemIds;
-
-    // only override prices for items in the item pool
-    for (const auto& entry : GameHooks->locationRewards) {
-        itemIds.insert(entry.second.item_id);
-    }
-
     for (int i = 0; i < 10000; ++i) {
         if (rowPtr[i].paramId == 0) return; // return if we reach the end
-        if (!itemIds.contains(rowPtr[i].paramId)) continue;
         uintptr_t rewardPtr = itemPramPtr + rowPtr[i].rewardOffset;
 
         uint32_t price = 1;
@@ -157,11 +149,18 @@ void Hooks::overrideShopParams() {
 
     for (int i = 0; i < 10000; ++i) {      
         if (rowPtr[i].paramId == 0) return; // return if we reach the end
-        if (!locationRewards.contains(rowPtr[i].paramId)) continue; // skip if its not an archipelago location
 
         uintptr_t rewardPtr = shopParamPtr + rowPtr[i].rewardOffset;
-        locationReward archipelagoReward = locationRewards[rowPtr[i].paramId];
 
+        // we need to always set the price rate for situations where the item price is set to 1 but the location is excluded
+        // this happens, for example, with the infinite lifegems if the infinite lifegem option is set
+        float_t price_rate = shopPrices[rowPtr[i].paramId];
+        uintptr_t ratePtr = rewardPtr + 0x1C;
+        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)ratePtr, &price_rate, sizeof(float_t), NULL);
+
+        if (!locationRewards.contains(rowPtr[i].paramId)) continue; // skip if its not an archipelago location
+
+        locationReward archipelagoReward = locationRewards[rowPtr[i].paramId];
         if (archipelagoReward.isLocal) {
             WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &archipelagoReward.item_id, sizeof(uint32_t), NULL);
         }
@@ -178,10 +177,6 @@ void Hooks::overrideShopParams() {
         float_t disable_flag = -1.0f;
         uintptr_t disablePtr = rewardPtr + 0xC;
         WriteProcessMemory(GetCurrentProcess(), (LPVOID*)disablePtr, &disable_flag, sizeof(float_t), NULL);
-
-        float_t price_rate = shopPrices[rowPtr[i].paramId];
-        uintptr_t ratePtr = rewardPtr + 0x1C;
-        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)ratePtr, &price_rate, sizeof(float_t), NULL);
 
         uint8_t amount = 1;
         uintptr_t amountPtr = rewardPtr + 0x20;
