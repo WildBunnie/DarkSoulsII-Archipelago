@@ -53,8 +53,8 @@ class DS2World(World):
     
         for region_name in location_table:
             if region_name == "Shulva" and not self.options.sunkenkingdlc: continue
-            if region_name == "Brume Tower" and not self.options.sunkenkingdlc: continue
-            if region_name == "Eleum Loyce" and not self.options.sunkenkingdlc: continue
+            if region_name == "Brume Tower" and not self.options.oldironkingdlc: continue
+            if region_name == "Eleum Loyce" and not self.options.ivorykingdlc: continue
             region = self.create_region(region_name)
             for location_data in location_table[region_name]:
                 if location_data.ngp and not self.options.enable_ngp: continue
