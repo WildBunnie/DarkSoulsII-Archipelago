@@ -45,14 +45,19 @@ getItemLotId proc thisPtr:ptr, arg1:ptr, arg2:ptr, baseAddress:ptr
     test eax,eax
     jz done
 
-    push eax  ; Store eax on the stack
+    push ebp
+    mov ebp, esp
+    sub esp, 200h
 
-    lea ecx, [esp]
+    mov [ebp-200h], eax
+
+    lea ecx, [ebp-200h]
     lea eax, [edi + 2062B0h]
     call eax
     mov esi, eax
-
-    pop eax
+    
+    mov esp, ebp
+    pop ebp
 
     mov ecx, esi 
     lea eax, [edi + 25D1B0h]
@@ -87,7 +92,7 @@ is_enemy_drop:
 
 error:
     mov eax, -1
-    ret
+    jmp done
 
 done:
     ret

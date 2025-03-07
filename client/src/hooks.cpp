@@ -205,17 +205,15 @@ void Hooks::giveItems(std::vector<int> ids) {
         itemStruct.items[i] = item;
     }
 
-    UINT_PTR displayStruct = (UINT_PTR)VirtualAlloc(nullptr, 0x110, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    unsigned char displayStruct[0x200];
 
     if (giveNextItem) {
         originalAddItemsToInventory(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::AvailableItemBag), &itemStruct, ids.size(), 0);
     }
-    originalCreatePopupStructure(displayStruct, &itemStruct, ids.size(), 1);
+    originalCreatePopupStructure((UINT_PTR)displayStruct, &itemStruct, ids.size(), 1);
     if (showNextItem) {
-        originalShowItemPopup(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::ItemGiveWindow), displayStruct);
+        originalShowItemPopup(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::ItemGiveWindow), (UINT_PTR)displayStruct);
     }
-
-    VirtualFree((LPVOID)displayStruct, 0, MEM_RELEASE);
 }
 
 std::wstring removeSpecialCharacters(const std::wstring& input) {
@@ -440,8 +438,8 @@ bool Hooks::killPlayer() {
     int curHp;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &curHp, sizeof(int), NULL);
     if (curHp > 0) {
-    int zeroHp = 0;
-    WriteProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &zeroHp, sizeof(int), NULL);
+        int zeroHp = 0;
+        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &zeroHp, sizeof(int), NULL);
         return true;
     }
     return false;
