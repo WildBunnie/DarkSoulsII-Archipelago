@@ -430,14 +430,21 @@ bool Hooks::playerJustDied() {
     prevHp = curHp;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &curHp, sizeof(int), NULL);
     if (prevHp != 0 && curHp == 0) {
+        spdlog::debug("YOU DIED");
         return true;
     }
     return false;
 }
 
-void Hooks::killPlayer() {
+bool Hooks::killPlayer() {
+    int curHp;
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &curHp, sizeof(int), NULL);
+    if (curHp > 0) {
     int zeroHp = 0;
     WriteProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &zeroHp, sizeof(int), NULL);
+        return true;
+    }
+    return false;
 }
 
 bool Hooks::isPlayerInGame() {

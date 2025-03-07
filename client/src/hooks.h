@@ -29,7 +29,7 @@ public:
 
     bool playerJustDied();
     bool isPlayerInGame();
-    void killPlayer();
+    bool killPlayer();
 
     std::set<int64_t> locationsToCheck;
     std::list<int64_t> checkedLocations;

@@ -93,7 +93,6 @@ VOID ClientCore::Panic(std::string message)
 VOID ClientCore::HandleDeathLink()
 {
     if (GameHooks->isDeathLink && GameHooks->isPlayerInGame() && GameHooks->playerJustDied()) {
-        spdlog::debug("player just died");
         if (!Core->diedByDeathLink) {
             acplg->sendDeathLink();
         }

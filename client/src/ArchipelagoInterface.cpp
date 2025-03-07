@@ -159,8 +159,6 @@ BOOL CArchipelago::Initialise(std::string URI) {
 
 	ap->set_bounced_handler([](const json& cmd) {
 		if (GameHooks->isDeathLink) {
-			spdlog::debug("Received DeathLink");
-
 			auto tagsIt = cmd.find("tags");
 			auto dataIt = cmd.find("data");
 
@@ -173,8 +171,9 @@ BOOL CArchipelago::Initialise(std::string URI) {
 
 					if (!source.empty() && source != Core->pSlotName) {
 						spdlog::info("DeathLink source: {} caused by: {}", source, cause);
-						Core->diedByDeathLink = true;
-						GameHooks->killPlayer();
+						if (GameHooks->killPlayer()) {
+							Core->diedByDeathLink = true;
+						}
 					}
 				}
 			}
