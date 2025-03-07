@@ -83,7 +83,9 @@ class DS2World(World):
         regions["Grave of Saints"].connect(regions["The Gutter"])
         regions["The Gutter"].connect(regions["Chasm of the Abyss"])
 
-        regions["Forest of Fallen Giants"].connect(regions["Giant's Memory"])
+        regions["Forest of Fallen Giants"].connect(regions["Memory of Jeigh"])
+        regions["Forest of Fallen Giants"].connect(regions["Memory of Vammar"])
+        regions["Forest of Fallen Giants"].connect(regions["Memory of Orro"])
         regions["Forest of Fallen Giants"].connect(regions["Lost Bastille"])
 
         regions["Heide's Tower of Flame"].connect(regions["Unseen Path to Heide"])
@@ -215,14 +217,22 @@ class DS2World(World):
              state.has("Defeat the Duke's Dear Freja", self.player)))
 
         # LOCATIONS
+        ## PURSUER
+        self.set_location_rule("[FOFG] Just before pursuer arena", lambda state: state.has("Soldier Key", self.player))
+        if self.options.enable_ngp:
+            self.set_location_rule("[FOFG] Just before pursuer arena in NG+", lambda state: state.has("Soldier Key", self.player))
+        self.set_location_rule("Defeat the Pursuer (in the proper arena)", lambda state: state.has("Soldier Key", self.player))
+        ## UPPER FLOOR CARDINAL TOWER
         self.set_location_rule("[FOFG] Wooden chest in upper floor of cardinal tower", lambda state: state.has("Soldier Key", self.player))
         self.set_location_rule("[FOFG] Metal chest in upper floor of cardinal tower", lambda state: state.has("Soldier Key", self.player))
         self.set_location_rule("[FOFG] Drop onto tree branch from upper floor of Cardinal Tower", lambda state: state.has("Soldier Key", self.player))
         self.set_location_rule("[FOFG] Behind the wagon at Cardinal Tower upper floor", lambda state: state.has("Soldier Key", self.player))
         if self.options.game_version == "sotfs":
             self.set_location_rule("[FOFG] Behind a table at cardinal tower upper floor", lambda state: state.has("Soldier Key", self.player))
+        ## LOWER FIRE AREA
         self.set_location_rule("[FOFG] First corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
         self.set_location_rule("[FOFG] Second corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
+        ## TSELDORA DEN
         self.set_location_rule("[Tseldora] Metal chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
         self.set_location_rule("[Tseldora] Wooden chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
         self.set_location_rule("[Tseldora] Metal chest behind locked door in pickaxe room", lambda state: state.has("Brightstone Key", self.player))
@@ -235,7 +245,11 @@ class DS2World(World):
         self.set_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("King's Ring", self.player))
         self.set_connection_rule("Shaded Woods", "Drangleic Castle", lambda state: state.has("Open Shrine of Winter", self.player))
         self.set_connection_rule("Drangleic Castle", "King's Passage", lambda state: state.has("Key to King's Passage", self.player))
-        self.set_connection_rule("Forest of Fallen Giants", "Giant's Memory", lambda state: 
+        self.set_connection_rule("Forest of Fallen Giants", "Memory of Vammar", lambda state: state.has("Ashen Mist Heart", self.player))
+        self.set_connection_rule("Forest of Fallen Giants", "Memory of Orro", lambda state: 
+                                    state.has("Ashen Mist Heart", self.player) and
+                                    state.has("Defeat the Pursuer (in the proper arena)", self.player))
+        self.set_connection_rule("Forest of Fallen Giants", "Memory of Jeigh", lambda state: 
                                     state.has("King's Ring", self.player) and 
                                     state.has("Ashen Mist Heart", self.player) and 
                                     state.has("Soldier Key", self.player))
