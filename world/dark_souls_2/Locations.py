@@ -851,6 +851,7 @@ location_table = {
         LocationData(10256440, "[Gutter] Fourth corpse in top level; near Jeff jump", ['Smooth & Silky Stone'], sotfs=True),
         LocationData(10256450, "[Gutter] Fifth corpse in top level; near Jeff jump", ['Fragrant Branch of Yore'], sotfs=True),
         LocationData(10256500, "[Gulch] Dropped from rotten's arm", ["Pharros' Lockstone"]),
+        LocationData(60001000, "[Gulch] Drop from Gulch Giants", ['Forgotten Key', 'Soul of a Giant']),
     ],
     "Dragon Aerie": [
         LocationData(600000, "[DragonShrine] Ancient dragon drop", ['Ashen Mist Heart', 'Soul of a Giant', 'Petrified Dragon Bone']),
@@ -1780,7 +1781,6 @@ location_table = {
     #     LocationData(3021000, "Gesture: Praise the Sun. Gestures seemingly not tied to expected events though", ['"Praise the Sun" Gesture']),
     # ],
     # "Event": [
-    #     LocationData(60001000, "[Gulch] Drop from Gulch Giants", ['Forgotten Key', 'Soul of a Giant']),
     #     LocationData(60002000, "[FOFG] On the tree near solider's rest bonfire", ['Seed of a Tree of Giants']),
     #     LocationData(60003000, "[DragonShrine] Near the invader in dragon shrine", ['Petrified Egg']),
     #     LocationData(60004000, "[MemoryJeigh] Giant corpse at end of all memories", ['Soul of a Giant']),
