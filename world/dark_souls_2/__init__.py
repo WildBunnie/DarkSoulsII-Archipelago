@@ -236,7 +236,14 @@ class DS2World(World):
         self.set_location_rule("[Tseldora] Metal chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
         self.set_location_rule("[Tseldora] Wooden chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
         self.set_location_rule("[Tseldora] Metal chest behind locked door in pickaxe room", lambda state: state.has("Brightstone Key", self.player))
-        
+        ## FORGOTTEN KEY
+        self.set_location_rule("[Pit] First metal chest behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
+        self.set_location_rule("[Pit] Third metal chest behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
+        self.set_location_rule("[Pit] Second metal chest behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
+        if self.options.game_version == "sotfs": 
+            self.set_location_rule("[Pit] Corpse behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
+        self.set_location_rule("[Gutter] Urn behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
+
         # CONNECTIONS
         self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
         self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
