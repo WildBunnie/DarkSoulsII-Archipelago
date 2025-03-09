@@ -427,7 +427,7 @@ int prevHp, curHp = -1;
 bool Hooks::playerJustDied() {
     prevHp = curHp;
     ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &curHp, sizeof(int), NULL);
-    if (prevHp != 0 && curHp == 0) {
+    if (prevHp != curHp && prevHp > 0 && curHp <= 0) {
         spdlog::debug("YOU DIED");
         return true;
     }
