@@ -38,6 +38,14 @@ The mod works with a single `dinput8.dll` file.
 - make sure you have vcpkg, it should be installed together with visual studio, and then run `vcpkg integrate install`
 - set the correct platform (x86 for vanilla, x64 for scholar) and build
 
+## Frequently Asked Questions
+
+### **Do I need to play in offline mode? Is it safe to play online?**
+The mod forces the game to start in offline mode. We do not offer a version of the mod that works online. If you have a firewall rule to block Dark Souls II it will make the mod unable to communicate with archipelago (unless it's hosted locally) so you will have to deactivate that rule to play the mod.
+
+### **I get `Access is denied` when trying to connect to archipelago.**
+This happens if you have a rule in your firewall blocking Dark Souls II like mentioned [here](#do-i-need-to-play-in-offline-mode-is-it-safe-to-play-online).
+
 ## Credits
 
 https://github.com/SeanPesce/DLL_Wrapper_Generator \
