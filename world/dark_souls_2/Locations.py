@@ -850,7 +850,7 @@ location_table = {
         LocationData(10256430, "[Gutter] Third corpse in top level; near Jeff jump", ['Twinkling Titanite'], sotfs=True),
         LocationData(10256440, "[Gutter] Fourth corpse in top level; near Jeff jump", ['Smooth & Silky Stone'], sotfs=True),
         LocationData(10256450, "[Gutter] Fifth corpse in top level; near Jeff jump", ['Fragrant Branch of Yore'], sotfs=True),
-        LocationData(10256500, "[Gulch] Dropped from rotten's arm", ["Pharros' Lockstone"]),
+        LocationData(10256500, "[Gulch] Dropped from rotten's arm", ["Pharros' Lockstone"], skip=True),
         LocationData(60001000, "[Gulch] Drop from Gulch Giants", ['Forgotten Key', 'Soul of a Giant']),
     ],
     "Dragon Aerie": [
@@ -981,7 +981,7 @@ location_table = {
         LocationData(10326180, "[ShadedWoods] On collapsed stairs next to Creighton", ['Soul of a Brave Warrior', "Skeptic's Spice"]),
         LocationData(10326190, "[ShadedWoods] Corpse next to the big collapsing floor", ['Lifegem']),
         LocationData(10326191, "[ShadedWoods] Corpse next to the big collapsing floor in NG+", ['Divine Blessing'], ngp=True),
-        LocationData(10326200, "[ShadedWoods] On tree in Najka's arena", ['Flame Butterfly']),
+        LocationData(10326200, "[ShadedWoods] On tree in Najka's arena", ['Flame Butterfly'], skip=True),
         LocationData(10326210, "[ShadedWoods] On lower floor of the building leading to Manscorpion Tark", ['Soul of a Brave Warrior', "Pharros' Lockstone"]),
         LocationData(10326220, "[ShadedWoods] Behind the ruined gate", ['Repair', 'Large Soul of a Lost Undead'], vanilla=True),
         LocationData(10326220, "[ShadedWoods] Behind the ruined gate", ['Soul of a Hero'], sotfs=True),
