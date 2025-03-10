@@ -4,7 +4,7 @@ import random
 from worlds.AutoWorld import World
 from worlds.generic.Rules import set_rule, add_item_rule
 from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType
-from .Items import item_list, progression_items, repetable_categories, group_table, ItemCategory
+from .Items import item_list, progression_items, repetable_categories, group_table, ItemCategory, DLC
 from .Locations import location_table, location_name_groups
 from .Options import DS2Options
 from typing import Optional
@@ -171,8 +171,15 @@ class DS2World(World):
             items_in_pool.append(item_data.name)
             pool.append(item)
 
+        allowed_dlcs = [None]
+        if self.options.sunken_king_dlc: allowed_dlcs.append(DLC.SUNKEN_KING)
+        if self.options.old_iron_king_dlc: allowed_dlcs.append(DLC.OLD_IRON_KING)
+        if self.options.ivory_king_dlc: allowed_dlcs.append(DLC.IVORY_KING)
+        any_dlc = self.options.sunken_king_dlc or self.options.old_iron_king_dlc or self.options.ivory_king_dlc
+        if any_dlc: allowed_dlcs.append(DLC.ALL)
+
         # fill the rest of the pool with filler items
-        filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip and not item.sotfs]
+        filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip and not item.sotfs and item.dlc in allowed_dlcs]
         for _ in range(max_pool_size - len(pool)):
             item = self.create_item(random.choice(filler_items).name, item_data.category)
             pool.append(item)
