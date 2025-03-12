@@ -103,15 +103,15 @@ VOID ClientCore::HandleDeathLink()
 VOID ClientCore::HandleGiveItems()
 {
     if (Core->itemsToGive.size() > 0 && GameHooks->isPlayerInGame() && Core->saveLoaded) {
-
-        std::vector<int> items;
+        std::lock_guard<std::mutex> lock(Core->itemsMutex);
+        std::vector<int32_t> items;
 
         for (const auto& networkItem : Core->itemsToGive) {
             if (networkItem.index < Core->lastReceivedIndex) {
                 continue;
             }
 
-            items.push_back(networkItem.item);
+            items.push_back(static_cast<int32_t>(networkItem.item));
 
             if (items.size() == 8) {
                 GameHooks->giveItems(items);

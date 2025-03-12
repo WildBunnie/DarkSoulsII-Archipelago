@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ArchipelagoInterface.h"
+#include <mutex>
 
 enum GameVersion {
     SOTFS = 0,
@@ -30,7 +31,8 @@ public:
     std::string pPassword;
     std::string pSeed;
     std::string pSaveId;
-    std::list<APClient::NetworkItem> itemsToGive;
+    std::vector<APClient::NetworkItem> itemsToGive;
+    std::mutex itemsMutex;
     int lastReceivedIndex = 0;
     bool saveLoaded;
     bool diedByDeathLink = false;

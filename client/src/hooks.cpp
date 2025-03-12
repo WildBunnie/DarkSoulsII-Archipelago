@@ -10,12 +10,12 @@ extern Hooks* GameHooks;
 bool showItem = true;
 
 struct Item {
-    int idk;
-    int itemId;
-    int durability;
-    short amount;
-    char upgrade;
-    char infusion;
+    int32_t idk;
+    int32_t itemId;
+    int32_t durability;
+    int16_t amount;
+    int8_t upgrade;
+    int8_t infusion;
 };
 
 struct ItemStruct {
@@ -185,7 +185,7 @@ void Hooks::overrideShopParams() {
 }
 
 // TODO: receive the other item information like amount, upgrades and infusions
-void Hooks::giveItems(std::vector<int> ids) {
+void Hooks::giveItems(std::vector<int32_t> ids) {
 
     if (ids.size() > 8) {
         return;

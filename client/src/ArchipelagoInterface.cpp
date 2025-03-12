@@ -133,6 +133,7 @@ BOOL CArchipelago::Initialise(std::string URI) {
 			return;
 		}
 
+		std::lock_guard<std::mutex> lock(Core->itemsMutex);
 		for (auto const& i : receivedItems) {
 			Core->itemsToGive.push_back(i);
 		}

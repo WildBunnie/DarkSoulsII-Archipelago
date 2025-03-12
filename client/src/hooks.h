@@ -22,7 +22,7 @@ struct locationReward {
 class Hooks {
 public:
     bool initHooks();
-    void giveItems(std::vector<int> ids);
+    void giveItems(std::vector<int32_t> ids);
     void showLocationRewardMessage(int32_t locationId);
     void patchWeaponRequirements();
     void overrideShopParams();
