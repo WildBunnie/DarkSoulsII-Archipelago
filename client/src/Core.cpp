@@ -114,12 +114,12 @@ VOID ClientCore::HandleGiveItems()
             if (GameHooks->unpetrifyStatue(networkItem.item)) {
                 std::string item_name = acplg->getItemName(networkItem.item);
                 std::wstring message(item_name.begin(), item_name.end());
-                GameHooks->showMessage(message);
-                Core->lastReceivedIndex += 1;
-                continue;
+                GameHooks->messageToDisplay = message; // TODO: fix when getting multiple of these
+                items.push_back(GameHooks->unusedItemForPopup);
             }
-
-            items.push_back(static_cast<int32_t>(networkItem.item));
+            else {
+                items.push_back(static_cast<int32_t>(networkItem.item));
+            }
 
             if (items.size() == 8) {
                 GameHooks->giveItems(items);

@@ -38,6 +38,10 @@ public:
     std::map<int64_t, locationReward> locationRewards;
     bool isDeathLink;
 
+    int unusedItemForShop = 60375000;
+    int unusedItemForPopup = 65240000;
+    std::wstring messageToDisplay = L"archipelago message";
+
 #ifdef _M_IX86
     const char* addressToBlock = "frpg2-steam-ope.fromsoftware.jp";
 #elif defined(_M_X64)

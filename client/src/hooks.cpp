@@ -87,9 +87,6 @@ showItemPopup_t originalShowItemPopup = nullptr;
 getItemNameFromId_t originalGetItemNameFromId = nullptr;
 
 uintptr_t baseAddress;
-int unusedItemForShop = 60375000;
-int unusedItemForPopup = 65240000;
-std::wstring messageToDisplay = L"archipelago message";
 
 // this strategy with the booleans is not the best
 // but if we dont call the original the item wont be removed from the map
@@ -397,10 +394,10 @@ void __cdecl detourShowItemPopup(UINT_PTR thisPtr, UINT_PTR displayStruct) {
 
 const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
 
-    if (itemId == unusedItemForPopup) {
-        return messageToDisplay.c_str();
+    if (itemId == GameHooks->unusedItemForPopup) {
+        return GameHooks->messageToDisplay.c_str();
     }
-    if (itemId == unusedItemForShop) {
+    if (itemId == GameHooks->unusedItemForPopup) {
         return L"archipelago item";
     }
 
