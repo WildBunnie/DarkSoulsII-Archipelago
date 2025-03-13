@@ -1,5 +1,26 @@
 #pragma once
 #include <map>
+#include "offsets.h"
+
+std::map<int, WorldFlagOffset> statueOffsets = {
+    {1, {0x9D2, 5}},  // Unpetrify Statue in Things Betwixt
+    {2, {0x152, 7}},  // Unpetrify Rosabeth of Melfia
+    {3, {0xCED, 5}},  // Unpetrify Statue in Heide's Tower of Flame
+    {4, {0xA33, 0}},  // Unpetrify Statue in Lost Bastille
+    {5, {0x15E, 2}},  // Unpetrify Straid of Olaphis
+    {6, {0xAC9, 4}},  // Unpetrify Statue in Black Gulch
+    {7, {0xB13, 7}},  // Unpetrify Statue Before Body of Vengarl in Shaded Ruins
+    {8, {0xB12, 5}},  // Unpetrify Statue After Body of Vengarl in Shaded Ruins
+    {9, {0xB13, 5}},  // Unpetrify Statue Blocking the Chest in Shaded Ruins
+    {10, {0xB12, 3}}, // Unpetrify Statue Above Darkdiver Grandahl in Shaded Ruins
+    {11, {0xB12, 1}}, // Unpetrify Statue Near the Bridge in Shaded Ruins
+    {12, {0xB13, 6}}, // Unpetrify Statue Near the Golden Lion in Shaded Ruins
+    {13, {0xB78, 1}}, // Unpetrify Statue Blocking Milfanito Shrine in Shrine of Amana
+    {14, {0xCA7, 5}}, // Unpetrify Cyclops Statue in Aldia's Keep
+    {15, {0xCA7, 4}}, // Unpetrify Left-Hand Statue in Front of the Cage in Aldia's Keep
+    {16, {0xCA7, 3}}, // Unpetrify Right-Hand Statue in Front of the Cage in Aldia's Keep
+    {17, {0xCBD, 1}}  // Unpetrify Statue in Dragon Aerie
+};
 
 // these were calculated by multiplying
 // the base price of the item with the price rate

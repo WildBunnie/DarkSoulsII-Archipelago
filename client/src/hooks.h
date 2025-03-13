@@ -23,9 +23,11 @@ class Hooks {
 public:
     bool initHooks();
     void giveItems(std::vector<int32_t> ids);
+    void showMessage(std::wstring message);
     void showLocationRewardMessage(int32_t locationId);
     void patchWeaponRequirements();
     void overrideShopParams();
+    bool unpetrifyStatue(int statueId);
 
     bool playerJustDied();
     bool isPlayerInGame();

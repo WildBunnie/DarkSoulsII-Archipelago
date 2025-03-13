@@ -184,6 +184,21 @@ void Hooks::overrideShopParams() {
     }
 }
 
+bool Hooks::unpetrifyStatue(int statueId) {
+    if (!statueOffsets.contains(statueId)) {
+        return false;
+    }
+
+    WorldFlagOffset statueOffset = statueOffsets[statueId];
+    uintptr_t worldFlagsPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::WorldFlags);
+
+    uint8_t currentValue;
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(worldFlagsPtr+statueOffset.offset), &currentValue, sizeof(uint8_t), NULL);
+    currentValue |= (1 << statueOffset.bit_start);
+    WriteProcessMemory(GetCurrentProcess(), (LPVOID*)(worldFlagsPtr + statueOffset.offset), &currentValue, sizeof(uint8_t), NULL);
+    return true;
+}
+
 // TODO: receive the other item information like amount, upgrades and infusions
 void Hooks::giveItems(std::vector<int32_t> ids) {
 
@@ -250,8 +265,12 @@ void Hooks::showLocationRewardMessage(int32_t locationId) {
 
     messageToDisplay = player_name_wide + L"'s " + item_name_wide;
 
+    showMessage(messageToDisplay);
+}
+
+void Hooks::showMessage(std::wstring message) {
     // remove most special characters, since things like # crash the game
-    messageToDisplay = removeSpecialCharacters(messageToDisplay);
+    messageToDisplay = removeSpecialCharacters(message);
 
     showNextItem = true;
     giveNextItem = false;

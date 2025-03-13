@@ -111,6 +111,14 @@ VOID ClientCore::HandleGiveItems()
                 continue;
             }
 
+            if (GameHooks->unpetrifyStatue(networkItem.item)) {
+                std::string item_name = acplg->getItemName(networkItem.item);
+                std::wstring message(item_name.begin(), item_name.end());
+                GameHooks->showMessage(message);
+                Core->lastReceivedIndex += 1;
+                continue;
+            }
+
             items.push_back(static_cast<int32_t>(networkItem.item));
 
             if (items.size() == 8) {

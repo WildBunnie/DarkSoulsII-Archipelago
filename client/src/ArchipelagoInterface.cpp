@@ -237,3 +237,7 @@ VOID CArchipelago::sendDeathLink() {
 	};
 	ap->Bounce(data, {}, {}, { "DeathLink" });
 }
+
+std::string CArchipelago::getItemName(int64_t item_id) {
+	return ap->get_item_name(item_id, ap->get_game());
+}

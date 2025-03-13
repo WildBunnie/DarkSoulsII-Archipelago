@@ -1,4 +1,5 @@
 #include <vector>
+#include <minwindef.h>
 
 #pragma once
 
@@ -39,6 +40,7 @@ namespace PointerOffsets {
     std::vector<uintptr_t> HP = { 0xD0, 0x168 };
     std::vector<uintptr_t> AvailableItemBag = { 0xA8, 0x10, 0x10, 0x0 };
     std::vector<uintptr_t> ItemGiveWindow = { 0x22E0, 0x0 };
+    std::vector<uintptr_t> WorldFlags = { 0x70, 0x20, 0x18, 0x0 };
 #endif
 };
 
@@ -80,3 +82,8 @@ namespace ParamOffsets {
     std::vector<uintptr_t> ItemParam = { 0xA8, 0x20, 0xD8, 0x0 };
 #endif
 }
+
+struct WorldFlagOffset {
+    uint32_t offset;
+    uint8_t bit_start;
+};
