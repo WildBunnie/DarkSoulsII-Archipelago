@@ -126,13 +126,6 @@ BOOL CArchipelago::Initialise(std::string URI) {
 
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& receivedItems) {
 
-		if (!ap->is_data_package_valid()) {
-			// NOTE: this should not happen since we ask for data package before connecting
-			if (!ap_sync_queued) ap->Sync();
-			ap_sync_queued = true;
-			return;
-		}
-
 		std::lock_guard<std::mutex> lock(Core->itemsMutex);
 		for (auto const& i : receivedItems) {
 			Core->itemsToGive.push_back(i);

@@ -475,8 +475,8 @@ bool Hooks::killPlayer() {
 
 bool Hooks::isPlayerInGame() {
     int value;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::PlayerCtrl), &value, sizeof(int), NULL);
-    if (value != 0) {
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::GameState), &value, sizeof(int), NULL);
+    if (value == 30) {
         return true;
     }
     return false;
