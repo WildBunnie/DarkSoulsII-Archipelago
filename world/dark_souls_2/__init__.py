@@ -92,7 +92,8 @@ class DS2World(World):
         regions["Unseen Path to Heide"].connect(regions["No-man's Wharf"])
         regions["No-man's Wharf"].connect(regions["Lost Bastille"])
         regions["Lost Bastille"].connect(regions["Belfry Luna"])
-
+        regions["Lost Bastille"].connect(regions["Sinners' Rise"])
+        
         regions["Huntman's Copse"].connect(regions["Earthen Peak"])
         regions["Earthen Peak"].connect(regions["Iron Keep"])
         regions["Iron Keep"].connect(regions["Belfry Sol"])
@@ -171,9 +172,8 @@ class DS2World(World):
             # dont allow duplicates
             if item_data.category not in repetable_categories and item_data.name in items_in_pool: continue
 
-            if item_data.name == "Fragrant Branch of Yore":
+            if item_data.name == "Fragrant Branch of Yore" and len(statues) > 0:
                 item_data = statues.pop()
-                print(item_data)
 
             item = self.create_item(item_data.name, item_data.category)
             items_in_pool.append(item_data.name)
@@ -198,7 +198,7 @@ class DS2World(World):
 
     def create_item(self, name: str, category=None) -> DS2Item:
         code = self.item_name_to_id[name]
-        classification = ItemClassification.progression if name in progression_items else ItemClassification.filler
+        classification = ItemClassification.progression if name in progression_items or category==ItemCategory.STATUE else ItemClassification.filler
         return DS2Item(name, classification, code, self.player, category)
 
     # given a list, returns the index of the first progression item
@@ -257,7 +257,23 @@ class DS2World(World):
         if self.options.game_version == "sotfs": 
             self.set_location_rule("[Pit] Corpse behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
         self.set_location_rule("[Gutter] Urn behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
+        
+        self.set_location_rule("[ShadedWoods] Gift from Manscorpion Tark after defeating Najka", lambda state: state.has("Ring of Whispers", self.player))
 
+        #STATUES
+        if self.options.game_version == "sotfs":
+            self.set_location_rule("[Betwixt] In the basilisk pit", lambda state: state.has("Unpetrify Statue in Things Betwixt", self.player))
+            self.set_location_rule("[Heides] Metal chest behind petrified hollow after Dragonrider", lambda state: state.has("Unpetrify Statue in Heide's Tower of Flame", self.player))
+            self.set_location_rule("[Heides] On railing behind petrified hollow", lambda state: state.has("Unpetrify Statue in Heide's Tower of Flame", self.player))
+            self.set_location_rule("Defeat the Rotten", lambda state: state.has("Unpetrify Statue in Black Gulch", self.player))
+            self.set_location_rule("[ShadedWoods] Metal chest blocked by petrified statue", lambda state: state.has("Unpetrify Statue Blocking the Chest in Shaded Ruins", self.player))
+            self.set_location_rule("[ShadedWoods] Drop from Petrified Lion Warrior next to Golden Lion Warrior", lambda state: state.has("Unpetrify Warlock Mask Statue in Shaded Ruins", self.player))
+            self.set_location_rule("[AldiasKeep] Petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Left Cage Statue in Aldia's Keep", self.player))
+            self.set_location_rule("[AldiasKeep] Centre petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Right Cage Statue in Aldia's Keep", self.player))
+        self.set_location_rule("[ShadedWoods] Metal chest in room blocked by petrified statue", lambda state: state.has("Unpetrify Lion Mage Set Statue in Shaded Ruins", self.player))
+        self.set_location_rule("[ShadedWoods] Drop from the petrified lion warrior by the tree bridge", lambda state: state.has("Unpetrify Fang Key Statue in Shaded Ruins", self.player))
+        self.set_location_rule("[AldiasKeep] Drop from Petrified Ogre blocking stairway near Bone Dragon", lambda state: state.has("Unpetrify Cyclops Statue in Aldia's Keep", self.player))
+    
         # CONNECTIONS
         self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
         self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
@@ -277,6 +293,8 @@ class DS2World(World):
         self.set_connection_rule("Drangleic Castle", "Throne of Want", lambda state: state.has("King's Ring", self.player))
         self.set_connection_rule("Iron Keep", "Belfry Sol", lambda state: state.has("Pharros' Lockstone", self.player))
         self.set_connection_rule("Lost Bastille", "Belfry Luna", lambda state: state.has("Pharros' Lockstone", self.player))
+        if self.options.game_version == "sotfs":
+            self.set_connection_rule("Lost Bastille", "Sinners' Rise", lambda state: state.has("Unpetrify Statue in Lost Bastille", self.player)) # not sure about this
 
         set_rule(self.multiworld.get_location("Defeat Nashandra", self.player), lambda state: state.has("Giant's Kinship", self.player))
 

@@ -64,7 +64,7 @@ progression_items: list[str] = [
     "Iron Key",
     "Brightstone Key",
     "Dull Ember",
-    "Unpetrify Rosabeth of Melfia"
+    "Ring of Whispers"
 ]
 
 item_list: list[ItemData] = [
