@@ -231,6 +231,8 @@ class DS2World(World):
              state.has("Defeat the Duke's Dear Freja", self.player)))
 
         # LOCATIONS
+        ## MAJULA
+        self.set_location_rule("[Majula] Wooden chest in Lenigrast's workshop", lambda state: state.has("Lenigrast's Key", self.player))
         ## PURSUER
         self.set_location_rule("[FOFG] Just before pursuer arena", lambda state: state.has("Soldier Key", self.player))
         if self.options.enable_ngp:
@@ -297,7 +299,11 @@ class DS2World(World):
             self.set_connection_rule("Lost Bastille", "Sinners' Rise", lambda state: 
                                     state.has("Unpetrify Statue in Lost Bastille", self.player) or
                                     state.has("Antiquated Key", self.player))
-        
+        elif self.options.game_version == "vanilla":
+            self.set_connection_rule("Lost Bastille", "Sinners' Rise", lambda state: 
+                                    state.has("Pharros' Lockstone", self.player) and
+                                    state.has("Antiquated Key", self.player))
+            
         set_rule(self.multiworld.get_location("Defeat Nashandra", self.player), lambda state: state.has("Giant's Kinship", self.player))
 
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Defeat Nashandra", self.player)
