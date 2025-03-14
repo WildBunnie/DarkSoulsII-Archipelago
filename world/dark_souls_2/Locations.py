@@ -267,6 +267,7 @@ location_table = {
         LocationData(None, "Defeat the Duke's Dear Freja", None, event=True),
         LocationData(603000, "[Tseldora] Duke's Dear Freja drop", ["Soul of the Duke's Dear Freja"]),
         LocationData(603001, "[Tseldora] Duke's Dear Freja drop in NG+", ["Soul of the Duke's Dear Freja", 'Old Paledrake Soul'], ngp=True),
+        LocationData(1140300, "[Tseldora] Drop from Duke Tseldora after Freja", ['Brightstone Key', 'Fragrant Branch of Yore', 'Dark Quartz Ring+1']),
         LocationData(10145050, "Human Effigy (2)", ['Human Effigy']),
         LocationData(10145060, "[Tseldora] Spider-trapped wooden chest before Congregation", ['Heavy Bolt']),
         LocationData(10145061, "[Tseldora] Spider-trapped wooden chest before Congregation in NG+", ['Magic Bolt'], ngp=True),
@@ -346,6 +347,7 @@ location_table = {
     ],
     "Aldia's Keep": [
         LocationData(212000, "[AldiasKeep] Guardian Dragon drop", ['Guardian Dragon Soul']),
+        LocationData(1153100, "[AldiasKeep] Drop from Mimic trapped in final hanging cage in corridor with paintings", ['Fragrant Branch of Yore'], sotfs=True),
         LocationData(10155000, "[AldiasKeep] Metal chest in a side corridor next to the mirror room", ['Great Magic Barrier']),
         LocationData(10155010, "[AldiasKeep] Metal chest in a side corridor next to the giant basilisk", ['Bonfire Ascetic']),
         LocationData(10155020, "[AldiasKeep] Metal chest behind the breakable chained door", ['Malformed Shell']),
@@ -892,7 +894,6 @@ location_table = {
         LocationData(10276190, "[Aerie] In the cave under the first dragon nest (2)", ['Bonfire Ascetic'], sotfs=True),
     ],
     "Path to Shaded Woods": [
-        LocationData(None, "Unpetrify Rosabeth of Melfia", None, event=True),
         LocationData(10295000, "[ShadedWoods] Metal chest next to the Old Akelarre bonfire", ['Estus Flask Shard']),
         LocationData(10296000, "[Majula] In small room next to petrified Rosabeth", ["Lloyd's Talisman"]),
         LocationData(10296010, "[Majula] Corpse next to Benhart", ['Lifegem', 'Homeward Bone']),
@@ -943,6 +944,7 @@ location_table = {
         LocationData(None, "Open Shrine of Winter", None, event=True),
         LocationData(503000, "[ShadedWoods] Scorpioness Najka drop", ['Scorpioness Najka Soul']),
         LocationData(503001, "[ShadedWoods] Scorpioness Najka drop in NG+", ['Scorpioness Najka Soul', 'Southern Ritual Band+2'], ngp=True),
+        LocationData(1502000, "[ShadedWoods] Gift from Manscorpion Tark after defeating Najka", ['Fragrant Branch of Yore']),
         LocationData(10325000, "[ShadedWoods] Wooden chest on lower floor of the main Shaded Ruins bridge", ['Magic Bolt']),
         LocationData(10325001, "[ShadedWoods] Wooden chest On lower floor of the main Shaded Ruins bridge in NG+", ['Magic Bolt'], ngp=True),
         LocationData(10325010, "[ShadedWoods] Wooden chest on upper floor of the main Shaded Ruins bridge", ['Titanite Chunk', 'Petrified Dragon Bone']),
@@ -1227,6 +1229,7 @@ location_table = {
         LocationData(None, "Defeat Velstadt", None, event=True),
         LocationData(333000, "[Crypt] Velstadt drop", ['Soul of Velstadt']),
         LocationData(333001, "[Crypt] Velstadt drop in NG+", ['Soul of Velstadt', "Royal Soldier's Ring+2"], ngp=True),
+        LocationData(333000, "[Crypt] Drop from an Insolent Knight that spawns when you light up the Crypt", ['Fragrant Branch of Yore'], sotfs=True, skip=True),
         LocationData(20245000, "[Crypt] Metal chest near the torch that lights up the big statues", ['Soul Vessel']),
         LocationData(20245010, "[Crypt] Wooden chest on left side of the doorway leading to the great hall and Velstadt", ['Magic Stone', 'Darknight Stone']),
         LocationData(20245020, "[Crypt] Metal chest on balcony of the second graveyard room", ['Dried Fingers', 'Bonfire Ascetic', 'Twinkling Titanite']),
@@ -1657,7 +1660,6 @@ location_table = {
     # "NPC": [
     #     LocationData(1307000, "[ShadedWoods] Gift from Head of Vengarl after exhausting his dialogue", ["Vengarl's Helm"]),
     #     LocationData(1307100, "Vengarl's Helm. Maybe some kind of fail-safe?", ["Vengarl's Helm"]),
-    #     LocationData(1502000, "[ShadedWoods] Gift from Manscorpion Tark after defeating Najka", ['Fragrant Branch of Yore']),
     #     LocationData(1502010, "[ShadedWoods] Gift from manscorpion Tark after defeating Freja", ['Second Dragon Ring'], vanilla=True),
     #     LocationData(1502010, "[ShadedWoods] Gift from manscorpion Tark after defeating Freja", ['Black Scorpion Stinger', 'Second Dragon Ring'], sotfs=True),
     #     LocationData(1506000, "[Crypt] Gift from Agdayne after getting King's Ring", ['Darkdrift', "Agdayne's Black Robe", "Agdayne's Cuffs", "Agdayne's Kilt"]),

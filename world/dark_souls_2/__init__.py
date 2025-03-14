@@ -143,6 +143,10 @@ class DS2World(World):
 
         max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
 
+        statues = [item for item in item_list if item.category == ItemCategory.STATUE]
+        if self.options.game_version == "vanilla":
+            statues = [item for item in statues if not item.sotfs]
+
         # initial attempt at filling the item pool with the default items
         items_in_pool = [item.name for item in pool]
         for location in self.multiworld.get_unfilled_locations(self.player):
@@ -166,6 +170,10 @@ class DS2World(World):
             if item_data.skip: continue
             # dont allow duplicates
             if item_data.category not in repetable_categories and item_data.name in items_in_pool: continue
+
+            if item_data.name == "Fragrant Branch of Yore":
+                item_data = statues.pop()
+                print(item_data)
 
             item = self.create_item(item_data.name, item_data.category)
             items_in_pool.append(item_data.name)
@@ -210,13 +218,12 @@ class DS2World(World):
             if location.shop:
                 add_item_rule(location, lambda item: 
                               item.player == self.player and
-                              item.category not in [ItemCategory.AMMO, ItemCategory.CONSUMABLE])
+                              item.category not in [ItemCategory.AMMO, ItemCategory.CONSUMABLE, ItemCategory.STATUE])
 
         self.set_shop_rules()
 
         # EVENTS
         self.set_location_rule("Rotate the Majula Rotunda", lambda state: state.has("Rotunda Lockstone", self.player))
-        self.set_location_rule("Unpetrify Rosabeth of Melfia", lambda state: state.has("Fragrant Branch of Yore", self.player))
         self.set_location_rule("Open Shrine of Winter", lambda state: 
             (state.has("Defeat the Rotten", self.player) and
              state.has("Defeat the Lost Sinner", self.player) and
@@ -305,7 +312,7 @@ class DS2World(World):
                 elif "[Lonesome Gavlan - Doors of Pharros]" in location_table:
                     self.set_location_rule(location.name, lambda state: state.has("Speak with Lonesome Gavlan in Harvest Valley", self.player))
                 elif "Straid of Olaphis" in location.name:
-                    self.set_location_rule(location.name, lambda state: state.has("Fragrant Branch of Yore", self.player))
+                    self.set_location_rule(location.name, lambda state: state.has("Unpetrify Straid of Olaphis", self.player))
                 elif " - Shrine of Winter]" in location.name:
                     self.set_location_rule(location.name, lambda state: state.has("Open Shrine of Winter", self.player))
                 elif " - Skeleton Lords]" in location.name:
