@@ -294,8 +294,10 @@ class DS2World(World):
         self.set_connection_rule("Iron Keep", "Belfry Sol", lambda state: state.has("Pharros' Lockstone", self.player))
         self.set_connection_rule("Lost Bastille", "Belfry Luna", lambda state: state.has("Pharros' Lockstone", self.player))
         if self.options.game_version == "sotfs":
-            self.set_connection_rule("Lost Bastille", "Sinners' Rise", lambda state: state.has("Unpetrify Statue in Lost Bastille", self.player)) # not sure about this
-
+            self.set_connection_rule("Lost Bastille", "Sinners' Rise", lambda state: 
+                                    state.has("Unpetrify Statue in Lost Bastille", self.player) or
+                                    state.has("Antiquated Key", self.player))
+        
         set_rule(self.multiworld.get_location("Defeat Nashandra", self.player), lambda state: state.has("Giant's Kinship", self.player))
 
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Defeat Nashandra", self.player)
