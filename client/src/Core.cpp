@@ -114,8 +114,8 @@ VOID ClientCore::HandleGiveItems()
             if (GameHooks->unpetrifyStatue(networkItem.item)) {
                 std::string item_name = acplg->getItemName(networkItem.item);
                 std::wstring message(item_name.begin(), item_name.end());
-                GameHooks->messageToDisplay = message; // TODO: fix when getting multiple of these
-                items.push_back(GameHooks->unusedItemForPopup);
+                int unused_item_id = GameHooks->getUnusedItem(message, items.size()); // use items.size() as index
+                items.push_back((static_cast<int32_t>(unused_item_id)));
             }
             else {
                 items.push_back(static_cast<int32_t>(networkItem.item));

@@ -124,6 +124,15 @@ void overrideItemPrices() {
         uint32_t price = 1;
         uintptr_t pricePtr = rewardPtr + 0x30;
         WriteProcessMemory(GetCurrentProcess(), (LPVOID*)pricePtr, &price, sizeof(uint32_t), NULL);
+
+        // this sets the item type id of unused items to "Weapon Resion/Ooze" so that their icon is all the same
+        // this should definetly be changed to another function, im just lazy
+        auto it = std::find(unusedItemIds.begin(), unusedItemIds.end(), rowPtr[i].paramId);
+        if (it != unusedItemIds.end()) {
+            uint32_t item_type_id = 600;
+            uintptr_t itemTypePtr = rewardPtr + 0x40;
+            WriteProcessMemory(GetCurrentProcess(), (LPVOID*)itemTypePtr, &item_type_id, sizeof(uint32_t), NULL);
+        }
     }
 }
 
@@ -162,6 +171,9 @@ void Hooks::overrideShopParams() {
             WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &archipelagoReward.item_id, sizeof(uint32_t), NULL);
         }
         else {
+            // for now just use the last one
+            int size = sizeof(unusedItemIds) / sizeof(unusedItemIds[0]);
+            uint32_t unusedItemForShop = unusedItemIds[size - 1];
             WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &unusedItemForShop, sizeof(uint32_t), NULL);
         }
 
@@ -260,18 +272,21 @@ void Hooks::showLocationRewardMessage(int32_t locationId) {
     std::wstring player_name_wide(reward.player_name.begin(), reward.player_name.end());
     std::wstring item_name_wide(reward.item_name.begin(), reward.item_name.end());
 
-    messageToDisplay = player_name_wide + L"'s " + item_name_wide;
+    std::wstring message = player_name_wide + L"'s " + item_name_wide;
 
-    showMessage(messageToDisplay);
-}
-
-void Hooks::showMessage(std::wstring message) {
-    // remove most special characters, since things like # crash the game
-    messageToDisplay = removeSpecialCharacters(message);
+    int item_id = unusedItemIds[0];
+    unusedItemNames[item_id] = removeSpecialCharacters(message);
 
     showNextItem = true;
     giveNextItem = false;
-    giveItems({ unusedItemForPopup });
+    giveItems({ item_id });
+}
+
+// returns the id for an unused item that will have the given name
+int Hooks::getUnusedItem(std::wstring name, int index) {
+    int item_id = unusedItemIds[index];
+    unusedItemNames[item_id] = removeSpecialCharacters(name);
+    return item_id;
 }
 
 // ============================= HOOKS =============================
@@ -394,11 +409,8 @@ void __cdecl detourShowItemPopup(UINT_PTR thisPtr, UINT_PTR displayStruct) {
 
 const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
 
-    if (itemId == GameHooks->unusedItemForPopup) {
-        return GameHooks->messageToDisplay.c_str();
-    }
-    if (itemId == GameHooks->unusedItemForPopup) {
-        return L"archipelago item";
+    if (GameHooks->unusedItemNames.contains(itemId)) {
+        return GameHooks->unusedItemNames[itemId].c_str();
     }
 
     return originalGetItemNameFromId(arg1, itemId);

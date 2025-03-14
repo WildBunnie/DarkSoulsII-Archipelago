@@ -1,7 +1,18 @@
 #pragma once
 #include <map>
-#include "offsets.h"
 
+std::vector<int> unusedItemIds = {
+    3400000, 3401000, 21001100, 21001101, 21001102, 21001103, 21600000,
+    21610000, 21620000, 21630000, 21640000, 21650000, 21660000, 21670000,
+    21680000, 21690000, 21700000, 21710000, 26590000, 26750000, 26770000,
+    26800000, 26900000, 27521000, 60375000, 65240000, 65250000, 65260000,
+    65270000, 65280000, 65290000, 900008182, 900008183
+};
+
+struct WorldFlagOffset {
+    uint32_t offset;
+    uint8_t bit_start;
+};
 std::map<int, WorldFlagOffset> statueOffsets = {
     {1, {0x9D2, 5}},  // Unpetrify Statue in Things Betwixt
     {2, {0x152, 7}},  // Unpetrify Rosabeth of Melfia

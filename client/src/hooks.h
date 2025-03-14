@@ -11,7 +11,6 @@
 #include <minhook.h>
 #include <iostream>
 
-
 struct locationReward {
     int64_t item_id;
     std::string item_name;
@@ -23,11 +22,11 @@ class Hooks {
 public:
     bool initHooks();
     void giveItems(std::vector<int32_t> ids);
-    void showMessage(std::wstring message);
     void showLocationRewardMessage(int32_t locationId);
     void patchWeaponRequirements();
     void overrideShopParams();
     bool unpetrifyStatue(int statueId);
+    int getUnusedItem(std::wstring name, int id);
 
     bool playerJustDied();
     bool isPlayerInGame();
@@ -36,11 +35,8 @@ public:
     std::set<int64_t> locationsToCheck;
     std::list<int64_t> checkedLocations;
     std::map<int64_t, locationReward> locationRewards;
+    std::map<int, std::wstring> unusedItemNames;
     bool isDeathLink;
-
-    int unusedItemForShop = 60375000;
-    int unusedItemForPopup = 65240000;
-    std::wstring messageToDisplay = L"archipelago message";
 
 #ifdef _M_IX86
     const char* addressToBlock = "frpg2-steam-ope.fromsoftware.jp";

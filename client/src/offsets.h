@@ -82,8 +82,3 @@ namespace ParamOffsets {
     std::vector<uintptr_t> ItemParam = { 0xA8, 0x20, 0xD8, 0x0 };
 #endif
 }
-
-struct WorldFlagOffset {
-    uint32_t offset;
-    uint8_t bit_start;
-};
