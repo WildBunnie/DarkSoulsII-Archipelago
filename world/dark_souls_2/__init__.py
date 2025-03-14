@@ -333,7 +333,7 @@ class DS2World(World):
                     self.set_location_rule(location.name, lambda state: state.has("Unpetrify Rosabeth of Melfia", self.player))
                 elif "[Blacksmith Lenigrast]" in location.name:
                     self.set_location_rule(location.name, lambda state: state.has("Lenigrast's Key", self.player))
-                elif "[Steady Hand McDuff - Dull Ember]" in location.name:
+                elif "[Steady Hand McDuff]" in location.name:
                     self.set_location_rule(location.name, lambda state: state.has("Dull Ember", self.player))
                 elif "[Lonesome Gavlan - Doors of Pharros]" in location_table:
                     self.set_location_rule(location.name, lambda state: state.has("Speak with Lonesome Gavlan in Harvest Valley", self.player))
