@@ -87,9 +87,6 @@ showItemPopup_t originalShowItemPopup = nullptr;
 getItemNameFromId_t originalGetItemNameFromId = nullptr;
 
 uintptr_t baseAddress;
-int unusedItemForShop = 60375000;
-int unusedItemForPopup = 65240000;
-std::wstring messageToDisplay = L"archipelago message";
 
 // this strategy with the booleans is not the best
 // but if we dont call the original the item wont be removed from the map
@@ -127,6 +124,15 @@ void overrideItemPrices() {
         uint32_t price = 1;
         uintptr_t pricePtr = rewardPtr + 0x30;
         WriteProcessMemory(GetCurrentProcess(), (LPVOID*)pricePtr, &price, sizeof(uint32_t), NULL);
+
+        // this sets the item type id of unused items to "Weapon Resion/Ooze" so that their icon is all the same
+        // this should definetly be changed to another function, im just lazy
+        auto it = std::find(unusedItemIds.begin(), unusedItemIds.end(), rowPtr[i].paramId);
+        if (it != unusedItemIds.end()) {
+            uint32_t item_type_id = 600;
+            uintptr_t itemTypePtr = rewardPtr + 0x40;
+            WriteProcessMemory(GetCurrentProcess(), (LPVOID*)itemTypePtr, &item_type_id, sizeof(uint32_t), NULL);
+        }
     }
 }
 
@@ -165,6 +171,9 @@ void Hooks::overrideShopParams() {
             WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &archipelagoReward.item_id, sizeof(uint32_t), NULL);
         }
         else {
+            // for now just use the last one
+            int size = sizeof(unusedItemIds) / sizeof(unusedItemIds[0]);
+            uint32_t unusedItemForShop = unusedItemIds[size - 1];
             WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &unusedItemForShop, sizeof(uint32_t), NULL);
         }
 
@@ -182,6 +191,21 @@ void Hooks::overrideShopParams() {
         uintptr_t amountPtr = rewardPtr + 0x20;
         WriteProcessMemory(GetCurrentProcess(), (LPVOID*)amountPtr, &amount, sizeof(uint8_t), NULL);  
     }
+}
+
+bool Hooks::unpetrifyStatue(int statueId) {
+    if (!statueOffsets.contains(statueId)) {
+        return false;
+    }
+
+    WorldFlagOffset statueOffset = statueOffsets[statueId];
+    uintptr_t worldFlagsPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::WorldFlags);
+
+    uint8_t currentValue;
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(worldFlagsPtr+statueOffset.offset), &currentValue, sizeof(uint8_t), NULL);
+    currentValue |= (1 << statueOffset.bit_start);
+    WriteProcessMemory(GetCurrentProcess(), (LPVOID*)(worldFlagsPtr + statueOffset.offset), &currentValue, sizeof(uint8_t), NULL);
+    return true;
 }
 
 // TODO: receive the other item information like amount, upgrades and infusions
@@ -248,14 +272,21 @@ void Hooks::showLocationRewardMessage(int32_t locationId) {
     std::wstring player_name_wide(reward.player_name.begin(), reward.player_name.end());
     std::wstring item_name_wide(reward.item_name.begin(), reward.item_name.end());
 
-    messageToDisplay = player_name_wide + L"'s " + item_name_wide;
+    std::wstring message = player_name_wide + L"'s " + item_name_wide;
 
-    // remove most special characters, since things like # crash the game
-    messageToDisplay = removeSpecialCharacters(messageToDisplay);
+    int item_id = unusedItemIds[0];
+    unusedItemNames[item_id] = removeSpecialCharacters(message);
 
     showNextItem = true;
     giveNextItem = false;
-    giveItems({ unusedItemForPopup });
+    giveItems({ item_id });
+}
+
+// returns the id for an unused item that will have the given name
+int Hooks::getUnusedItem(std::wstring name, int index) {
+    int item_id = unusedItemIds[index];
+    unusedItemNames[item_id] = removeSpecialCharacters(name);
+    return item_id;
 }
 
 // ============================= HOOKS =============================
@@ -378,11 +409,8 @@ void __cdecl detourShowItemPopup(UINT_PTR thisPtr, UINT_PTR displayStruct) {
 
 const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
 
-    if (itemId == unusedItemForPopup) {
-        return messageToDisplay.c_str();
-    }
-    if (itemId == unusedItemForShop) {
-        return L"archipelago item";
+    if (GameHooks->unusedItemNames.contains(itemId)) {
+        return GameHooks->unusedItemNames[itemId].c_str();
     }
 
     return originalGetItemNameFromId(arg1, itemId);

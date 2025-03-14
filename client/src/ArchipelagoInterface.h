@@ -2,6 +2,7 @@
 
 #include "apclient.hpp"
 #include "Core.h"
+#include <string>
 
 using nlohmann::json;
 
@@ -13,6 +14,7 @@ public:
 	VOID update();
 	VOID gameFinished();
 	VOID sendDeathLink();
+	std::string getItemName(int64_t item_id);
 
 private:
 	VOID handleLocationChecks();

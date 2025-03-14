@@ -25,6 +25,7 @@ class ItemCategory(Enum):
     SHIELD = 10
     SPELL = 11
     STAFF_OR_CHIME = 12
+    STATUE = 13 
 
 @dataclass
 class ItemData:
@@ -62,10 +63,28 @@ progression_items: list[str] = [
     "Tseldora Den Key",
     "Iron Key",
     "Brightstone Key",
-    "Dull Ember"
+    "Dull Ember",
+    "Ring of Whispers"
 ]
 
 item_list: list[ItemData] = [
+    ItemData(1, "Unpetrify Statue in Things Betwixt", ItemCategory.STATUE, sotfs=True),
+    ItemData(2, "Unpetrify Rosabeth of Melfia", ItemCategory.STATUE),
+    ItemData(3, "Unpetrify Statue in Heide's Tower of Flame", ItemCategory.STATUE, sotfs=True),
+    ItemData(4, "Unpetrify Statue in Lost Bastille", ItemCategory.STATUE, sotfs=True),
+    ItemData(5, "Unpetrify Straid of Olaphis", ItemCategory.STATUE),
+    ItemData(6, "Unpetrify Statue in Black Gulch", ItemCategory.STATUE, sotfs=True),
+    ItemData(7, "Unpetrify Statue near Manscorpion Tark", ItemCategory.STATUE, sotfs=True),
+    ItemData(8, "Unpetrify Statue near Black Knight Halberd", ItemCategory.STATUE),
+    ItemData(9, "Unpetrify Statue Blocking the Chest in Shaded Ruins", ItemCategory.STATUE, sotfs=True),
+    ItemData(10, "Unpetrify Lion Mage Set Statue in Shaded Ruins", ItemCategory.STATUE),
+    ItemData(11, "Unpetrify Fang Key Statue in Shaded Ruins", ItemCategory.STATUE),
+    ItemData(12, "Unpetrify Warlock Mask Statue in Shaded Ruins", ItemCategory.STATUE, sotfs=True),
+    ItemData(13, "Unpetrify Milfanito Entrace Statue", ItemCategory.STATUE, sotfs=True),
+    ItemData(14, "Unpetrify Cyclops Statue in Aldia's Keep", ItemCategory.STATUE),
+    ItemData(15, "Unpetrify Left Cage Statue in Aldia's Keep", ItemCategory.STATUE, sotfs=True),
+    ItemData(16, "Unpetrify Right Cage Statue in Aldia's Keep", ItemCategory.STATUE, sotfs=True),
+    ItemData(17, "Unpetrify Statue in Dragon Aerie", ItemCategory.STATUE, sotfs=True),
     ItemData(1000000, "Dagger", ItemCategory.WEAPON),
     ItemData(1010000, "Bandit's Knife", ItemCategory.WEAPON),
     ItemData(1040000, "Mytha's Bent Blade", ItemCategory.WEAPON),
