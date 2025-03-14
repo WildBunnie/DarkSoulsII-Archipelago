@@ -13,24 +13,34 @@ struct WorldFlagOffset {
     uint32_t offset;
     uint8_t bit_start;
 };
+
 std::map<int, WorldFlagOffset> statueOffsets = {
+#ifdef _M_X64
     {1, {0x9D2, 5}},  // Unpetrify Statue in Things Betwixt
     {2, {0x152, 7}},  // Unpetrify Rosabeth of Melfia
     {3, {0xCED, 5}},  // Unpetrify Statue in Heide's Tower of Flame
     {4, {0xA33, 0}},  // Unpetrify Statue in Lost Bastille
     {5, {0x15E, 2}},  // Unpetrify Straid of Olaphis
     {6, {0xAC9, 4}},  // Unpetrify Statue in Black Gulch
-    {7, {0xB13, 7}},  // Unpetrify Statue Before Body of Vengarl in Shaded Ruins
-    {8, {0xB12, 5}},  // Unpetrify Statue After Body of Vengarl in Shaded Ruins
+    {7, {0xB13, 7}},  // Unpetrify Statue near Manscorpion Tark
+    {8, {0xB12, 5}},  // Unpetrify Statue near Black Knight Halberd
     {9, {0xB13, 5}},  // Unpetrify Statue Blocking the Chest in Shaded Ruins
-    {10, {0xB12, 3}}, // Unpetrify Statue Above Darkdiver Grandahl in Shaded Ruins
-    {11, {0xB12, 1}}, // Unpetrify Statue Near the Bridge in Shaded Ruins
-    {12, {0xB13, 6}}, // Unpetrify Statue Near the Golden Lion in Shaded Ruins
-    {13, {0xB78, 1}}, // Unpetrify Statue Blocking Milfanito Shrine in Shrine of Amana
+    {10, {0xB12, 3}}, // Unpetrify Lion Mage Set Statue in Shaded Ruins
+    {11, {0xB12, 1}}, // Unpetrify Fang Key Statue in Shaded Ruins
+    {12, {0xB13, 6}}, // Unpetrify Warlock Mask Statue in Shaded Ruins
+    {13, {0xB78, 1}}, // Unpetrify Milfanito Entrance Statue
     {14, {0xCA7, 5}}, // Unpetrify Cyclops Statue in Aldia's Keep
-    {15, {0xCA7, 4}}, // Unpetrify Left-Hand Statue in Front of the Cage in Aldia's Keep
-    {16, {0xCA7, 3}}, // Unpetrify Right-Hand Statue in Front of the Cage in Aldia's Keep
+    {15, {0xCA7, 4}}, // Unpetrify Left Cage Statue in Aldia's Keep
+    {16, {0xCA7, 3}}, // Unpetrify Right Cage Statue in Aldia's Keep
     {17, {0xCBD, 1}}  // Unpetrify Statue in Dragon Aerie
+#elif defined(_M_IX86)
+    {2, {0x14a, 7}},  // Unpetrify Rosabeth of Melfia
+    {5, {0x156, 2}},  // Unpetrify Straid of Olaphis
+    {8, {0xB0A, 5}},  // Unpetrify Statue near Black Knight Halberd
+    {10, {0xB0A, 3}}, // Unpetrify Lion Mage Set Statue in Shaded Ruins
+    {11, {0xB0A, 1}}, // Unpetrify Fang Key Statue in Shaded Ruins
+    {14, {0xC9F, 5}}  // Unpetrify Cyclops Statue in Aldia's Keep
+#endif
 };
 
 // these were calculated by multiplying

@@ -34,6 +34,7 @@ namespace PointerOffsets {
     std::vector<uintptr_t> HP = { 0x74, 0xFC }; 
     std::vector<uintptr_t> AvailableItemBag = { 0x60, 0x8, 0x8, 0x0 };
     std::vector<uintptr_t> ItemGiveWindow = { 0xCC4, 0x0 };
+    std::vector<uintptr_t> WorldFlags = { 0x44, 0x10, 0x28, 0x0, 0x0 };
 #elif defined(_M_X64)
     uintptr_t BaseA = 0x16148F0;
     std::vector<uintptr_t> PlayerCtrl = { 0xD0 };
