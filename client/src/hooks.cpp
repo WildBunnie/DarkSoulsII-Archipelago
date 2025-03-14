@@ -424,6 +424,10 @@ void Hooks::patchWeaponRequirements() {
     PatchMemory(baseAddress + PatchesOffsets::menuWeaponReqPatchOffset, Patches::menuWeaponReqPatch);
 }
 
+void Hooks::patchInfiniteTorch() {
+    PatchMemory(baseAddress + PatchesOffsets::infiniteTorchOffset, Patches::infiniteTorch);
+}
+
 bool Hooks::initHooks() {
 
     HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");

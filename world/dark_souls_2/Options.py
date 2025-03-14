@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import PerGameCommonOptions, DeathLink, Toggle, Choice, ExcludeLocations
+from Options import PerGameCommonOptions, DeathLink, Toggle, Choice, ExcludeLocations, StartInventory
 
 class NoWeaponRequirements(Toggle):
     """Remove the requirements to wield weapons"""
@@ -39,6 +39,10 @@ class DS2ExcludeLocations(ExcludeLocations):
     """Prevent these locations from having an important item."""
     default = frozenset({"Chasm of the Abyss", "Dragon Memories"})
 
+class DS2StartInventory(StartInventory):
+    """Start with these items."""
+    default = dict({"Torch":1})
+
 @dataclass
 class DS2Options(PerGameCommonOptions):
     game_version: GameVersion
@@ -47,6 +51,7 @@ class DS2Options(PerGameCommonOptions):
     enable_ngp: EnableNGPOption
     infinite_lifegems: KeepInfiniteLifegems
     exclude_locations: DS2ExcludeLocations
+    start_inventory: DS2StartInventory
     old_iron_king_dlc: OldIronKingDLC
     ivory_king_dlc: IvoryKingDLC
     sunken_king_dlc: SunkenKingDLC

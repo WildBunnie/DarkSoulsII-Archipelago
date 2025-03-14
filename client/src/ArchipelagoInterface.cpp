@@ -55,6 +55,8 @@ BOOL CArchipelago::Initialise(std::string URI) {
 			GameHooks->patchWeaponRequirements();
 		}
 
+		GameHooks->patchInfiniteTorch();
+
 		std::list<std::string> tags;
 		if (GameHooks->isDeathLink) {
 			tags.push_back("DeathLink");
@@ -121,7 +123,7 @@ BOOL CArchipelago::Initialise(std::string URI) {
 	});
 
 	ap->set_room_info_handler([]() {
-		ap->ConnectSlot(Core->pSlotName, Core->pPassword, 3, {}, APClientVersion);
+		ap->ConnectSlot(Core->pSlotName, Core->pPassword, 0b111, {}, APClientVersion);
 	});
 
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& receivedItems) {
