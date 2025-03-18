@@ -43,6 +43,7 @@ repetable_categories: list[ItemCategory] = [
 ]
 
 progression_items: list[str] = [
+    "Dragon Talon", "Heavy Iron Key", "Frozen Flower",
     "Fragrant Branch of Yore",
     "King's Ring",
     "Rotunda Lockstone",
@@ -1110,9 +1111,9 @@ item_list: list[ItemData] = [
     ItemData(51010000, "Simpleton's Spice", ItemCategory.CONSUMABLE),
     ItemData(51020000, "Skeptic's Spice", ItemCategory.CONSUMABLE),
     ItemData(51030000, "Aldia Key", ItemCategory.KEY_ITEM),
-    ItemData(52000000, "Dragon Talon", ItemCategory.KEY_ITEM, skip=True),
-    ItemData(52100000, "Heavy Iron Key", ItemCategory.KEY_ITEM, skip=True),
-    ItemData(52200000, "Frozen Flower", ItemCategory.KEY_ITEM, skip=True),
+    ItemData(52000000, "Dragon Talon", ItemCategory.KEY_ITEM, dlc=DLC.SUNKEN_KING, sotfs=True),
+    ItemData(52100000, "Heavy Iron Key", ItemCategory.KEY_ITEM, dlc=DLC.OLD_IRON_KING, sotfs=True),
+    ItemData(52200000, "Frozen Flower", ItemCategory.KEY_ITEM, dlc=DLC.IVORY_KING, sotfs=True),
     ItemData(52300000, "Eternal Sanctum Key", ItemCategory.KEY_ITEM, dlc=DLC.SUNKEN_KING),
     ItemData(52400000, "Tower Key", ItemCategory.KEY_ITEM, dlc=DLC.OLD_IRON_KING),
     ItemData(52500000, "Garrison Ward Key", ItemCategory.KEY_ITEM, dlc=DLC.IVORY_KING),

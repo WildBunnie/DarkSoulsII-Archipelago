@@ -277,6 +277,16 @@ class DS2World(World):
         self.set_location_rule("[AldiasKeep] Drop from Petrified Ogre blocking stairway near Bone Dragon", lambda state: state.has("Unpetrify Cyclops Statue in Aldia's Keep", self.player))
     
         # CONNECTIONS
+        if self.options.game_version == "sotfs":
+            if self.options.sunken_king_dlc:
+                self.set_connection_rule("The Gutter", "Shulva", lambda state: state.has("Dragon Talon", self.player))
+            if self.options.old_iron_king_dlc:
+                self.set_connection_rule("Iron Keep", "Brume Tower", lambda state: state.has("Heavy Iron Key", self.player))
+            if self.options.ivory_king_dlc:
+                self.set_connection_rule("Shaded Woods", "Eleum Loyce", lambda state: 
+                                            state.has("Frozen Flower", self.player) and 
+                                            state.has("Open Shrine of Winter", self.player))
+
         self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
         self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
         self.set_connection_rule("Path to Shaded Woods", "Shaded Woods", lambda state: state.has("Unpetrify Rosabeth of Melfia", self.player))
