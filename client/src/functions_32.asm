@@ -10,92 +10,99 @@ END_IF_NOT_X86
 .386
 .model flat, c
 .code
-
 ; thanks to pseudostripy for showing me how this is done
 ; and for creating a proof of concept version, making this possible
 
-; this function allows us to get the itemLotId of an item that is being picked up
+; this function allows us to get the itemlot id of an item that is being picked up
 ; since the itemGive function only receives the contents of the itemLot
-getItemLotId proc thisPtr:ptr, arg1:ptr, arg2:ptr, baseAddress:ptr
 
-    ; Load arguments into registers
-    mov esi, thisPtr     ; thisPtr
-    mov ecx, arg1        ; arg1
-    mov eax, arg2        ; arg2
-    mov edi, baseAddress ; baseAddress
+; this is basically just recreating what happens in the function at 'DarkSoulsII.exe+25D230'
+; which is the function responsible for calling the function that sets the map item as picked up
+; we do this because this function is called AFTER the item is already added to the inventory
+; so we "replicate" what it does so we can obtain the itemlot id before the item is added to inventory
+get_pickup_id proc param_1:ptr, base_address:ptr
+    
+    mov edi, param_1
+    mov ebx, base_address
 
-    shld eax, ecx, 16
-    mov ecx, eax
-    sar ecx, 16
-    sar eax, 31
-
-    mov eax, [esi+4]
-    imul ecx, ecx, 4
-    mov ecx, [eax+ecx]
-
-    lea edx, arg1
-    push edx
-
-    lea eax, [edi + 258890h]
+    lea eax, [ebx + 25D3D0h] 
     call eax
+    
+    sub esp, 8
+    lea esi, [esp]
+    push esi
+    push edi
+    mov ecx, eax
+    lea eax, [ebx + 25B870h]
+    call eax
+    
+    test al,al
+    jz done
 
-    mov eax, [eax+120h]
-
-    ; skip if it's an item we dropped
+    lea ecx, [esp]
+    lea eax, [ebx + 2062B0h]
+    call eax
+    mov esi, [esp]
+    add esp, 8
+    
     test eax,eax
     jz done
 
-    push ebp
-    mov ebp, esp
-    sub esp, 200h
+    and esi, 0Fh
+    dec esi
+    jnz enemy_drop
 
-    mov [ebp-200h], eax
-
-    lea ecx, [ebp-200h]
-    lea eax, [edi + 2062B0h]
+    push eax
+    lea eax, [ebx + 1C4BE0h]
     call eax
+    add esp, 4
     mov esi, eax
     
-    mov esp, ebp
-    pop ebp
+    test esi, esi
+    jz done
 
-    mov ecx, esi 
-    lea eax, [edi + 25D1B0h]
-    call eax
-    test eax, eax
-    jz is_chest
+    jmp map_item
 
-    mov eax, [eax+28h]
-    jmp done
+map_item:
 
-is_chest:
     mov ecx, esi
-    lea eax, [edi + 25D1F0h]
+    lea eax, [ebx + 25D1B0h]
     call eax
-    test eax, eax
-    jz is_enemy_drop
+    
+    test eax,eax
+    jz chest_item
 
-    mov eax, [eax+40h]
-    jmp done
+    mov eax, [eax + 28h]
+    ret
 
-is_enemy_drop:
-    push esi
-    lea eax, [edi + 25D170h]
+chest_item:
+
+    mov ecx, esi
+    lea eax, [ebx + 25D1F0h]
     call eax
+
     test eax, eax
-    jz error
+    jz done
 
-    mov eax, [eax+44h]
-    mov eax, [eax+80h]
+    mov eax, [eax + 40h]
+    ret
 
-    jmp done
+enemy_drop:
 
-error:
-    mov eax, -1
-    jmp done
+    push eax
+    lea eax, [ebx + 25D170h]
+    call eax
+    add esp, 4
+
+    test eax, eax
+    jz done
+
+    mov eax, [eax + 44h]
+    mov eax, [eax + 80h]
+    ret
 
 done:
     ret
 
-getItemLotId endp
+get_pickup_id endp
 end
