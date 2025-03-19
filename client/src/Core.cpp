@@ -1,6 +1,8 @@
 #include "Core.h"
 #include "hooks.h"
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 CArchipelago* acplg;
 ClientCore* Core;
@@ -11,15 +13,32 @@ ClientCore::ClientCore() {
     GameHooks = new Hooks();
 }
 
+void setup_logging() {
+    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+
+#ifdef NDEBUG
+    console_sink->set_level(spdlog::level::info);
+#else
+    console_sink->set_level(spdlog::level::debug);
+#endif
+
+    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("archipelago.log", false);
+    file_sink->set_level(spdlog::level::debug);
+
+    console_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
+    file_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
+
+    auto logger = std::make_shared<spdlog::logger>("DS2Archipelago", spdlog::sinks_init_list{ console_sink, file_sink });
+    spdlog::register_logger(logger);
+    spdlog::set_default_logger(logger);
+    spdlog::set_level(spdlog::level::debug);
+}
+
 VOID ClientCore::Start()
 {
     Core = new ClientCore();
 
-#ifdef NDEBUG
-    spdlog::set_level(spdlog::level::info);
-#else
-    spdlog::set_level(spdlog::level::debug);
-#endif
+    setup_logging();
 
     spdlog::info("Archipelago client\n"
         "Type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]' to connect to the room\n"
