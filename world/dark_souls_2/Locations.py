@@ -814,7 +814,7 @@ location_table = {
         LocationData(326000, "[Gulch] The Rotten drop", ['Soul of the Rotten']),
         LocationData(326001, "[Gulch] The Rotten drop in NG+", ['Soul of the Rotten', 'Old Dead One Soul'], ngp=True),
         LocationData(10255010, "[Gutter] Wooden chest on top of small structure in the end of the first long bridge", ['Black Firebomb']),
-        LocationData(10255020, "Twinkling Titanite & 3 Smooth and Silky Stones", ['Twinkling Titanite', 'Small Smooth & Silky Stone']),
+        LocationData(10255020, "[Gutter] Wooden chest on the middle floor of an wooden building near where Melinda the Butcher invades.", ['Twinkling Titanite', 'Small Smooth & Silky Stone'], vanilla=True),
         LocationData(10255030, "[Gutter] Wooden chest on ledge in multiple ladders area", ['Great Club']),
         LocationData(10255040, "[Gutter] Metal chest near where Melinda the Butcher invades", ['Ring of Soul Protection']),
         LocationData(10255050, "[Gulch] Wooden chest in the side tunnel after the worms", ['Divine Blessing']),
