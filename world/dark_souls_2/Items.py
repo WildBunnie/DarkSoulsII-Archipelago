@@ -1327,6 +1327,22 @@ item_list: list[ItemData] = [
     ItemData(64610000, "Soul of Lud, the King's Pet", ItemCategory.CONSUMABLE, dlc=DLC.IVORY_KING),
 ]
 
+category_names = {
+    ItemCategory.ARMOR: "Armor",
+    ItemCategory.CONSUMABLE: "Consumables",
+    ItemCategory.USABLE_ITEM: "Usable Items",
+    ItemCategory.UPGRADE_MATERIAL: "Upgrade Materials",
+    ItemCategory.GESTURE: "Gestures",
+    ItemCategory.KEY_ITEM: "Key Items",
+    ItemCategory.WEAPON: "Weapons",
+    ItemCategory.AMMO: "Ammo",
+    ItemCategory.RING: "Rings",
+    ItemCategory.SHIELD: "Shields",
+    ItemCategory.SPELL: "Spells",
+    ItemCategory.STAFF_OR_CHIME: "Staffs and Chimes",
+    ItemCategory.STATUE: "Statues",
+}
+
 group_table: Dict[str, Set[str]] = {
     "fire_res_rings": {
         "Flame Quartz Ring",
@@ -1335,3 +1351,10 @@ group_table: Dict[str, Set[str]] = {
         "Flame Quartz Ring +3"
     },
 }
+
+for item in item_list:
+    category_name = category_names[item.category]
+    if category_name not in group_table:
+        group_table[category_name] = {item.name}
+    else:
+        group_table[category_name].add(item.name)
