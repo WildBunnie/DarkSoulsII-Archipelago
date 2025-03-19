@@ -125,7 +125,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(SolutionDir)src\dllmain.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>$(SolutionDir)src\dinput8\dinput8.def</ModuleDefinitionFile>
       <AdditionalDependencies>libcrypto_*.lib;libssl_*.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>subprojects\openssl\include\openssl;subprojects\openssl\include\crypto;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -151,7 +151,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(SolutionDir)src\dllmain.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>$(SolutionDir)src\dinput8\dinput8.def</ModuleDefinitionFile>
       <AdditionalDependencies>libcrypto_*.lib;libssl_*.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>subprojects\openssl\include\openssl;subprojects\openssl\include\crypto;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
@@ -174,7 +174,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(SolutionDir)src\dllmain.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>$(SolutionDir)src\dinput8\dinput8.def</ModuleDefinitionFile>
       <AdditionalDependencies>libcrypto_*.lib;libssl_*.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>subprojects\openssl\include\openssl;subprojects\openssl\include\crypto;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -200,7 +200,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(SolutionDir)src\dllmain.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>$(SolutionDir)src\dinput8\dinput8.def</ModuleDefinitionFile>
       <AdditionalDependencies>libcrypto_*.lib;libssl_*.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>subprojects\openssl\include\openssl;subprojects\openssl\include\crypto;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -212,21 +212,23 @@
     <ClCompile Include="src\hooks.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\dinput8.asm">
+    <MASM Include="src\dinput8\dinput8_32.asm" />
+    <MASM Include="src\dinput8\dinput8_64.asm">
       <FileType>Document</FileType>
     </MASM>
-    <MASM Include="src\functions_64.asm" />
-    <None Include="src\dllmain.def" />
+    <MASM Include="src\assembly\functions_64.asm" />
+    <None Include="src\dinput8\dinput8.def" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ArchipelagoInterface.h" />
     <ClInclude Include="src\Core.h" />
+    <ClInclude Include="src\dinput8\dinput8.h" />
     <ClInclude Include="src\ds2.h" />
     <ClInclude Include="src\offsets.h" />
     <ClInclude Include="src\hooks.h" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\functions_32.asm" />
+    <MASM Include="src\assembly\functions_32.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

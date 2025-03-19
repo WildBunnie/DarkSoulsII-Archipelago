@@ -29,7 +29,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\dllmain.def">
+    <None Include="src\dinput8\dinput8.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
@@ -43,15 +43,27 @@
     <ClInclude Include="src\Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\FunctionOffsets.h">
+    <ClInclude Include="src\ds2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\offsets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dinput8\dinput8.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\functions.asm">
+    <MASM Include="src\dinput8\dinput8_64.asm">
       <Filter>Source Files</Filter>
     </MASM>
-    <MASM Include="src\dllmain.asm">
+    <MASM Include="src\functions_64.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\functions_32.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\dinput8\dinput8_32.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
