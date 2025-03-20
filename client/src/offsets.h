@@ -6,7 +6,7 @@
 namespace FunctionOffsets {
 #ifdef _M_IX86
     uintptr_t GiveItemsOnReward = 0x21D3C0;
-    uintptr_t GiveItemsOnPickup = 0x25bff0;
+    uintptr_t GiveItemsOnPickup = 0x25BD90;
     uintptr_t GiveShopItem = 0x22B340;
     //uintptr_t AddShopItemToInventory; // this is the same as AddItemsToInventory in vanilla
     uintptr_t AddItemsToInventory = 0x22AD20;
@@ -15,7 +15,7 @@ namespace FunctionOffsets {
     uintptr_t GetItemNameFromId = 0x4ff6e0;
 #elif defined(_M_X64)
     uintptr_t GiveItemsOnReward = 0x199CC0;
-    uintptr_t GiveItemsOnPickup = 0x1E4590; // this is not the same function as in vanilla
+    uintptr_t GiveItemsOnPickup = 0x1E4590;
     uintptr_t GiveShopItem = 0x1A76A0;
     uintptr_t AddShopItemToInventory = 0x1AA810;
     uintptr_t AddItemsToInventory = 0x1A7470;

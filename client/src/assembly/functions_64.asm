@@ -14,7 +14,7 @@ END_IF_NOT_X64
 
 ; this function allows us to get the itemLotId of an item that is being picked up
 ; since the itemGive function only receives the contents of the itemLot
-getItemLotId proc 
+get_pickup_id proc 
     
     push rcx
     push rdx
@@ -42,7 +42,6 @@ getItemLotId proc
     mov rax, [rax + 120h]
     mov [rbp-200h], rax
 
-    ; return if it's an item we dropped
     test rax,rax
     jz done
 
@@ -101,5 +100,5 @@ done:
 
     ret
 
-getItemLotId endp
+get_pickup_id endp
 end
