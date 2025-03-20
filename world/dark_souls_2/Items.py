@@ -64,7 +64,6 @@ progression_items: list[str] = [
     "Tseldora Den Key",
     "Iron Key",
     "Brightstone Key",
-    "Dull Ember",
     "Ring of Whispers"
 ]
 
