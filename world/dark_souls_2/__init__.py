@@ -172,7 +172,8 @@ class DS2World(World):
             # dont allow duplicates
             if item_data.category not in repetable_categories and item_data.name in items_in_pool: continue
 
-            if item_data.name == "Fragrant Branch of Yore" and len(statues) > 0:
+            if item_data.name == "Fragrant Branch of Yore":
+                if len(statues) == 0: continue
                 item_data = statues.pop()
 
             item = self.create_item(item_data.name, item_data.category)
