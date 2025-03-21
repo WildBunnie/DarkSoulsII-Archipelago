@@ -210,6 +210,7 @@
     <ClCompile Include="src\Core.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\hooks.cpp" />
+    <ClCompile Include="src\memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="src\dinput8\dinput8_32.asm" />
@@ -224,6 +225,7 @@
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\dinput8\dinput8.h" />
     <ClInclude Include="src\ds2.h" />
+    <ClInclude Include="src\memory.h" />
     <ClInclude Include="src\offsets.h" />
     <ClInclude Include="src\hooks.h" />
   </ItemGroup>
