@@ -428,12 +428,14 @@ const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
 }
 
 #ifdef _M_IX86
-void __fastcall detourShowItemPopup(UINT_PTR thisPtr, void* Unknown, UINT_PTR displayStruct) {
+int32_t __fastcall detour_remove_item_from_inventory(uintptr_t param_1, void* _edx, uintptr_t param_2, uintptr_t inventory_item_ptr, uint32_t amount) {
+    uint32_t item_id = read_int(inventory_item_ptr + 0xC);
+    uint32_t current_amount = read_int(inventory_item_ptr + 0x18);
 #elif defined(_M_X64)
 int32_t __cdecl detour_remove_item_from_inventory(uintptr_t param_1, uintptr_t param_2, uintptr_t inventory_item_ptr, uint32_t amount) {
-#endif
     uint32_t item_id = read_int(inventory_item_ptr + 0x18);
     uint32_t current_amount = read_int(inventory_item_ptr + 0x20);
+#endif
 
     if (amount <= current_amount && item_id == 60536000) {
         spdlog::debug("used a Pharros' Lockstone");
