@@ -148,50 +148,48 @@ class DS2World(World):
         if self.options.game_version == "vanilla":
             statues = [item for item in statues if not item.sotfs]
 
-        # initial attempt at filling the item pool with the default items
+        # fill pool with all the default items from each location
         items_in_pool = [item.name for item in pool]
         for location in self.multiworld.get_unfilled_locations(self.player):
-            
-            # check if location contains a progression item
-            index = self.get_progression_item(location.default_items)
+            for item_name in location.default_items:
 
-            # if the location contains a progression item
-            # we add that item to the pool, otherwise pick one randomly
-            if index != -1:
-                item_name = location.default_items[index]
-            else:
-                item_name = random.choice(location.default_items)
+                if item_name == "Fragrant Branch of Yore":
+                    if len(statues) == 0: continue
+                    item_data = statues.pop()
+                elif item_name == "Pharros' Lockstone":
+                    if "Master Lockstone" in items_in_pool: continue
+                    item_data = next((item for item in item_list if item.name == "Master Lockstone"), None)
+                else:
+                    item_data = next((item for item in item_list if item.name == item_name), None)
+                    assert item_data, f"location's default item not in item list '{item_name}'"
 
-            item_data = next((item for item in item_list if item.name == item_name), None)
-            assert item_data, "location's default item not in item list"
+                # skip unwanted items
+                if item_data.skip: continue
+                # dont allow duplicates
+                if item_data.category not in repetable_categories and item_data.name in items_in_pool: continue
+                # skip sotfs items if we are not in sotfs
+                if item_data.sotfs and not self.options.game_version == "sotfs": continue
 
-            # skip sotfs items if we are not in sotfs
-            if item_data.sotfs and not self.options.game_version == "sotfs": continue
-            # skip unwanted items
-            if item_data.skip: continue
-            # dont allow duplicates
-            if item_data.category not in repetable_categories and item_data.name in items_in_pool: continue
+                item = self.create_item(item_data.name, item_data.category)
+                items_in_pool.append(item_data.name)
+                pool.append(item)
 
-            if item_data.name == "Fragrant Branch of Yore":
-                if len(statues) == 0: continue
-                item_data = statues.pop()
+        diff = len(pool) - max_pool_size
 
-            item = self.create_item(item_data.name, item_data.category)
-            items_in_pool.append(item_data.name)
-            pool.append(item)
-
-        allowed_dlcs = [None]
-        if self.options.sunken_king_dlc: allowed_dlcs.append(DLC.SUNKEN_KING)
-        if self.options.old_iron_king_dlc: allowed_dlcs.append(DLC.OLD_IRON_KING)
-        if self.options.ivory_king_dlc: allowed_dlcs.append(DLC.IVORY_KING)
-        any_dlc = self.options.sunken_king_dlc or self.options.old_iron_king_dlc or self.options.ivory_king_dlc
-        if any_dlc: allowed_dlcs.append(DLC.ALL)
-
-        # fill the rest of the pool with filler items
-        filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip and not item.sotfs and item.dlc in allowed_dlcs]
-        for _ in range(max_pool_size - len(pool)):
-            item = self.create_item(random.choice(filler_items).name, item_data.category)
-            pool.append(item)
+        # remove filler items so pool is not overfilled
+        if diff > 0:
+            while diff != 0:
+                item = random.choice(pool)
+                if item.category in repetable_categories:
+                    pool.remove(item)
+                    diff -= 1
+        # fill pool with filler items
+        elif diff < 0:
+            filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip and not item.sotfs and self.is_dlc_allowed(item.dlc)]
+            for _ in range(abs(diff)):
+                item_data = random.choice(filler_items)
+                item = self.create_item(item_data.name, item_data.category)
+                pool.append(item)
 
         assert len(pool) == max_pool_size, "item pool is under-filled or over-filled"
 
@@ -202,13 +200,17 @@ class DS2World(World):
         classification = ItemClassification.progression if name in progression_items or category==ItemCategory.STATUE else ItemClassification.filler
         return DS2Item(name, classification, code, self.player, category)
 
-    # given a list, returns the index of the first progression item
-    # if no progression item is found inside the list, returns -1
-    def get_progression_item(self, list):
-        for index,item in enumerate(list):
-            if item in progression_items:
-                return index
-        return -1
+    def is_dlc_allowed(dlc, options):
+        dlc_conditions = {
+            DLC.SUNKEN_KING: options.sunken_king_dlc,
+            DLC.OLD_IRON_KING: options.old_iron_king_dlc,
+            DLC.IVORY_KING: options.ivory_king_dlc
+        }
+
+        if dlc == DLC.ALL:
+            return any(dlc_conditions.values())
+        
+        return dlc_conditions.get(dlc, False)
 
     def set_rules(self):
 
@@ -304,15 +306,15 @@ class DS2World(World):
                                     state.has("Ashen Mist Heart", self.player) and 
                                     state.has("Soldier Key", self.player))
         self.set_connection_rule("Drangleic Castle", "Throne of Want", lambda state: state.has("King's Ring", self.player))
-        self.set_connection_rule("Iron Keep", "Belfry Sol", lambda state: state.has("Pharros' Lockstone", self.player))
-        self.set_connection_rule("Lost Bastille", "Belfry Luna", lambda state: state.has("Pharros' Lockstone", self.player))
+        self.set_connection_rule("Iron Keep", "Belfry Sol", lambda state: state.has("Master Lockstone", self.player))
+        self.set_connection_rule("Lost Bastille", "Belfry Luna", lambda state: state.has("Master Lockstone", self.player))
         if self.options.game_version == "sotfs":
             self.set_connection_rule("Lost Bastille", "Sinners' Rise", lambda state: 
                                     state.has("Unpetrify Statue in Lost Bastille", self.player) or
                                     state.has("Antiquated Key", self.player))
         elif self.options.game_version == "vanilla":
             self.set_connection_rule("Lost Bastille", "Sinners' Rise", lambda state: 
-                                    state.has("Pharros' Lockstone", self.player) and
+                                    state.has("Master Lockstone", self.player) and
                                     state.has("Antiquated Key", self.player))
             
         set_rule(self.multiworld.get_location("Defeat Nashandra", self.player), lambda state: state.has("Giant's Kinship", self.player))

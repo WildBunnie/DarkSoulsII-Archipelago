@@ -53,6 +53,7 @@ progression_items: list[str] = [
     "Dull Ember",
     "Flying Feline Boots",
     "Pharros' Lockstone",
+    "Master Lockstone",
     "Soldier Key",
     "Key to King's Passage",
     "Bastille Key",
@@ -1183,8 +1184,8 @@ item_list: list[ItemData] = [
     ItemData(60527000, "Bonfire Ascetic", ItemCategory.CONSUMABLE),
     ItemData(60530000, "Alluring Skull", ItemCategory.CONSUMABLE),
     ItemData(60531000, "Lloyd's Talisman", ItemCategory.CONSUMABLE),
-    ItemData(60536000, "Pharros' Lockstone", ItemCategory.CONSUMABLE),
-    ItemData(60537000, "Fragrant Branch of Yore", ItemCategory.CONSUMABLE),
+    ItemData(60536000, "Master Lockstone", ItemCategory.KEY_ITEM),
+    ItemData(60537000, "Fragrant Branch of Yore", ItemCategory.CONSUMABLE, skip=True),
     ItemData(60538000, "Fire Seed", ItemCategory.UPGRADE_MATERIAL),
     ItemData(60540000, "Throwing Knife", ItemCategory.CONSUMABLE),
     ItemData(60550000, "Witching Urn", ItemCategory.CONSUMABLE),
@@ -1343,6 +1344,9 @@ category_names = {
 }
 
 group_table: Dict[str, Set[str]] = {
+    "Pharros' Lockstone": {
+        "Master Lockstone"
+    },
     "fire_res_rings": {
         "Flame Quartz Ring",
         "Flame Quartz Ring +1",
@@ -1351,7 +1355,10 @@ group_table: Dict[str, Set[str]] = {
     },
 }
 
+group_table["Fragrant Branch of Yore"] = [item.name for item in item_list if item.category == ItemCategory.STATUE]
+
 for item in item_list:
+    if item.skip: continue
     category_name = category_names[item.category]
     if category_name not in group_table:
         group_table[category_name] = {item.name}
