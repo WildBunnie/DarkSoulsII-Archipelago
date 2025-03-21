@@ -2,7 +2,7 @@
 #include "offsets.h"
 #include <spdlog/spdlog.h>
 #include "ds2.h"
-
+#include "memory.h"
 extern Hooks* GameHooks;
 
 // ============================= Utils =============================
@@ -72,6 +72,9 @@ typedef void(__thiscall* showItemPopup_t)(UINT_PTR thisPtr, UINT_PTR displayStru
 
 // this function given an itemId return a pointer to the item's name
 typedef const wchar_t* (__cdecl* getItemNameFromId_t)(INT32 arg1, INT32 itemId);
+
+typedef int32_t (__thiscall* remove_item_from_inventory)(uintptr_t, uintptr_t, uintptr_t , uint32_t);
+remove_item_from_inventory original_remove_item_from_inventory;
 
 getaddrinfo_t originalGetaddrinfo = nullptr;
 
@@ -411,7 +414,33 @@ const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
         return GameHooks->unusedItemNames[itemId].c_str();
     }
 
+    // rename "Pharros' Lockstone" to "Master Lockstone"
+    if (itemId == 60536000) {
+        if (arg1 == 8) {
+            return L"Master Lockstone";
+        }
+        else if (arg1 == 9) {
+            return L"Activates Pharros' contraptions (unlimited uses)";
+        }
+    }
+
     return originalGetItemNameFromId(arg1, itemId);
+}
+
+#ifdef _M_IX86
+void __fastcall detourShowItemPopup(UINT_PTR thisPtr, void* Unknown, UINT_PTR displayStruct) {
+#elif defined(_M_X64)
+int32_t __cdecl detour_remove_item_from_inventory(uintptr_t param_1, uintptr_t param_2, uintptr_t inventory_item_ptr, uint32_t amount) {
+#endif
+    uint32_t item_id = read_int(inventory_item_ptr + 0x18);
+    uint32_t current_amount = read_int(inventory_item_ptr + 0x20);
+
+    if (amount <= current_amount && item_id == 60536000) {
+        spdlog::debug("used a Pharros' Lockstone");
+        return 0;
+    }
+
+    return original_remove_item_from_inventory(param_1, param_2, inventory_item_ptr, amount);
 }
 
 void Hooks::patchWeaponRequirements() {
@@ -447,6 +476,8 @@ bool Hooks::initHooks() {
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
 
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetItemNameFromId), &detourGetItemNameFromId, (LPVOID*)&originalGetItemNameFromId);
+
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::RemoveItemFromInventory), &detour_remove_item_from_inventory, (LPVOID*)&original_remove_item_from_inventory);
 
     MH_EnableHook(MH_ALL_HOOKS);
 

@@ -27,6 +27,9 @@
     <ClCompile Include="src\Core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\dinput8\dinput8.def">
@@ -52,18 +55,21 @@
     <ClInclude Include="src\dinput8\dinput8.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="src\dinput8\dinput8_64.asm">
       <Filter>Source Files</Filter>
     </MASM>
-    <MASM Include="src\functions_64.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
-    <MASM Include="src\functions_32.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
     <MASM Include="src\dinput8\dinput8_32.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\assembly\functions_64.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="src\assembly\functions_32.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
