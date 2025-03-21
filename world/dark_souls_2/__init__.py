@@ -278,7 +278,28 @@ class DS2World(World):
         self.set_location_rule("[ShadedWoods] Metal chest in room blocked by petrified statue", lambda state: state.has("Unpetrify Lion Mage Set Statue in Shaded Ruins", self.player))
         self.set_location_rule("[ShadedWoods] Drop from the petrified lion warrior by the tree bridge", lambda state: state.has("Unpetrify Fang Key Statue in Shaded Ruins", self.player))
         self.set_location_rule("[AldiasKeep] Drop from Petrified Ogre blocking stairway near Bone Dragon", lambda state: state.has("Unpetrify Cyclops Statue in Aldia's Keep", self.player))
-    
+        
+        # lockstones
+        self.set_location_rule("[FOFG] First metal chest behind Pharros' contraption under the ballista-trap", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[FOFG] Second metal chest behind Pharros' contraption under the ballista-trap", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[Bastille] Wooden chest behind Pharros' contraption in Pharros/elevator room", lambda state: state.has("Master Lockstone", self.player))
+        if self.options.game_version == "vanilla":
+            self.set_location_rule("[Bastille] Metal chest next to elevator in Pharros/elevator room", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[EarthernPeak] Metal chest behind Pharros contraption in the lowest level next to Lucatiel", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[DragonShrine] Metal chest behind the Pharros contraption under the staircase", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[Pharros] Wooden chest in room after using top Pharros contraption and dropping down near the toxic rats", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[Pharros] Trapped wooden chest behind (floor) Pharros contraption in the upper level", lambda state: state.has("Master Lockstone", self.player))
+        if self.options.enable_ngp:
+            self.set_location_rule("[Pharros] Trapped wooden chest behind (floor) Pharros contraption in the upper level in NG+", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[Pharros] Metal chest behind three-part pharros door in the lower level", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[MemoryOrro] Trapped wooden chest behind a Pharros' contraption on the second floor", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[MemoryOrro] Metal chest behind a Pharros contraption and an illusory wall on the second floor", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[MemoryOrro] Metal chest behind a Pharros contraption and an illusory wall on the second floor (2)", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[Amana] Metal chest behind a pharros contraption near the crumbled ruins bonfire", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[Crypt] Metal chest behind a illusory wall and a Pharros contraption from the third graveyard room", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[GraveOfSaints] 1st floor on other side of the drawbridges", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[GraveOfSaints] 2nd floor on other side of the drawbridges", lambda state: state.has("Master Lockstone", self.player))
+
         # CONNECTIONS
         if self.options.game_version == "sotfs":
             if self.options.sunken_king_dlc:
