@@ -327,7 +327,7 @@ void detourGiveItemsOnPickupLogic(int32_t itemLotId){
     spdlog::debug("picked up: {}", itemLotId);
 
     // 0 means its an item we dropped
-    if (itemLotId != 0 && GameHooks->locationsToCheck.contains(itemLotId)) {
+    if (itemLotId != 0 && !shopPrices.contains(itemLotId) && GameHooks->locationsToCheck.contains(itemLotId)) {
         GameHooks->checkedLocations.push_back(itemLotId);
         GameHooks->locationsToCheck.erase(itemLotId);
         GameHooks->showLocationRewardMessage(itemLotId);
