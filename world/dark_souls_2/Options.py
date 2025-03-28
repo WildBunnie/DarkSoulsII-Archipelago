@@ -37,7 +37,7 @@ class KeepInfiniteLifegems(Toggle):
 
 class DS2ExcludeLocations(ExcludeLocations):
     """Prevent these locations from having an important item."""
-    default = frozenset({"Chasm of the Abyss", "Dragon Memories"})
+    default = frozenset({"Dark Chasm of Old"})
 
 class DS2StartInventory(StartInventory):
     """Start with these items."""

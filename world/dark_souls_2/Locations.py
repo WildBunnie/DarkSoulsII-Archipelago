@@ -268,7 +268,7 @@ location_table = {
         LocationData(603000, "[Tseldora] Duke's Dear Freja drop", ["Soul of the Duke's Dear Freja"]),
         LocationData(603001, "[Tseldora] Duke's Dear Freja drop in NG+", ["Soul of the Duke's Dear Freja", 'Old Paledrake Soul'], ngp=True),
         LocationData(1140300, "[Tseldora] Drop from Duke Tseldora after Freja", ['Brightstone Key', 'Fragrant Branch of Yore', 'Dark Quartz Ring+1'], skip=True),
-        LocationData(10145050, "Human Effigy (2)", ['Human Effigy']),
+        LocationData(10145050, "[Tseldora] Wooden chest inside the small house in falconer camp", ['Human Effigy'], vanilla=True),
         LocationData(10145060, "[Tseldora] Spider-trapped wooden chest before Congregation", ['Heavy Bolt']),
         LocationData(10145061, "[Tseldora] Spider-trapped wooden chest before Congregation in NG+", ['Magic Bolt'], ngp=True),
         LocationData(10145070, "[Tseldora] Wooden chest in Tseldora den", ['Rusted Coin']),
@@ -1149,8 +1149,8 @@ location_table = {
         LocationData(20215011, "[Drangleic] Wooden chest in acid pool in NG+", ['Titanite Slab', 'Corrosive Urn'], ngp=True),
         LocationData(20215020, "[Drangleic] Wooden chest right after the multi-door sentinel room", ['Dark Arrow']),
         LocationData(20215021, "[Drangleic] Wooden chest right after the multi-door sentinel room in ng+", ['Dark Arrow'], ngp=True),
-        LocationData(20215040, "10 fire grearrows: likely leftover from the drangleic wooden trapped chest in chariot room in vanilla ds2", ['Fire Greatarrow']),
-        LocationData(20215041, "20/20 Fire/Destructive Grearrows: (see above) in NG+", ['Fire Greatarrow', 'Destructive Greatarrow'], ngp=True),
+        LocationData(20215040, "[Drangleic] Trapped wooden chest in room with Chariot", ['Fire Greatarrow'], vanilla=True),
+        LocationData(20215041, "[Drangleic] Trapped wooden chest in room with Chariot in NG+", ['Fire Greatarrow', 'Destructive Greatarrow'], ngp=True, vanilla=True),
         LocationData(20215050, "[Drangleic] Metal chest in alcove of one of the doors in the multi-door Sentinel room", ["Royal Soldier's Ring+1"]),
         LocationData(20215060, "[Drangleic] Metal chest in the embedded room", ['Soul Vessel', 'Fire Seed']),
         LocationData(20215070, "[Drangleic] Metal chest in the desert sorceress room", ['Estus Flask Shard']),
@@ -1270,14 +1270,8 @@ location_table = {
         LocationData(50600602, "[Grave Warden Agdayne] Dark Arrow", ["Dark Arrow"], shop=True),
         LocationData(50600603, "[Grave Warden Agdayne] Dark Bolt", ["Dark Bolt"], shop=True),
     ],
-    "Dragon Memories": [
-        LocationData(20265000, "Lifegem (2)", ['Lifegem']),
-        LocationData(20266000, "Soul of a Lost Undead", ['Soul of a Lost Undead']),
-    ],
-    "Chasm of the Abyss": [
+    "Dark Chasm of Old": [
         LocationData(506100, "[Drangleic] Darklurker drop", ['Darklurker Soul']),
-        LocationData(40035000, "Lifegem (3)", ['Lifegem']),
-        LocationData(40036000, "Soul of a Lost Undead (2)", ['Soul of a Lost Undead']),
     ],
     "Shulva": [
         LocationData(681000, "[DLC1] Sinh", ['Soul of Sinh, the Slumbering Dragon']),
@@ -1467,7 +1461,6 @@ location_table = {
         LocationData(50368060, "[DLC2] Inside ash statue at the bottom of the tower where Maldron invades", ['Palestone']),
         LocationData(50368070, "[DLC2] In ash statue in area one level down from the Foyer bonfire near vanilla Tower Key", ['Large Soul of a Nameless Soldier']),
         LocationData(50368080, "[DLC2] Inside ash statue on the right side of the Fume Knight arena", ['Titanite Chunk']),
-        LocationData(50368090, "Large Soul of a Brave Warrior", ['Large Soul of a Brave Warrior']),
     ],
     "Eleum Loyce": [
         LocationData(679000, "[DLC3] Aava", ["Soul of Aava, the King's Pet"]),

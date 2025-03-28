@@ -81,7 +81,7 @@ class DS2World(World):
         regions["Majula"].connect(regions["Grave of Saints"])
 
         regions["Grave of Saints"].connect(regions["The Gutter"])
-        regions["The Gutter"].connect(regions["Chasm of the Abyss"])
+        regions["The Gutter"].connect(regions["Dark Chasm of Old"])
 
         regions["Forest of Fallen Giants"].connect(regions["Memory of Jeigh"])
         regions["Forest of Fallen Giants"].connect(regions["Memory of Vammar"])
@@ -102,13 +102,12 @@ class DS2World(World):
         regions["Shaded Woods"].connect(regions["Drangleic Castle"])
         regions["Shaded Woods"].connect(regions["Doors of Pharros"])
         regions["Shaded Woods"].connect(regions["Aldia's Keep"])
-        regions["Shaded Woods"].connect(regions["Chasm of the Abyss"])
+        regions["Shaded Woods"].connect(regions["Dark Chasm of Old"])
 
         regions["Doors of Pharros"].connect(regions["Brightstone Cove"])
-        regions["Brightstone Cove"].connect(regions["Dragon Memories"])
 
         regions["Drangleic Castle"].connect(regions["Throne of Want"])
-        regions["Drangleic Castle"].connect(regions["Chasm of the Abyss"])
+        regions["Drangleic Castle"].connect(regions["Dark Chasm of Old"])
         regions["Drangleic Castle"].connect(regions["King's Passage"])
         regions["King's Passage"].connect(regions["Shrine of Amana"])
         regions["Shrine of Amana"].connect(regions["Undead Crypt"])
@@ -273,8 +272,8 @@ class DS2World(World):
             self.set_location_rule("Defeat the Rotten", lambda state: state.has("Unpetrify Statue in Black Gulch", self.player))
             self.set_location_rule("[ShadedWoods] Metal chest blocked by petrified statue", lambda state: state.has("Unpetrify Statue Blocking the Chest in Shaded Ruins", self.player))
             self.set_location_rule("[ShadedWoods] Drop from Petrified Lion Warrior next to Golden Lion Warrior", lambda state: state.has("Unpetrify Warlock Mask Statue in Shaded Ruins", self.player))
-            self.set_location_rule("[AldiasKeep] Petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Left Cage Statue in Aldia's Keep", self.player))
-            self.set_location_rule("[AldiasKeep] Centre petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Right Cage Statue in Aldia's Keep", self.player))
+            self.set_location_rule("[AldiasKeep] Drop from Petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Left Cage Statue in Aldia's Keep", self.player))
+            self.set_location_rule("[AldiasKeep] Drop from Centre petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Right Cage Statue in Aldia's Keep", self.player))
         self.set_location_rule("[ShadedWoods] Metal chest in room blocked by petrified statue", lambda state: state.has("Unpetrify Lion Mage Set Statue in Shaded Ruins", self.player))
         self.set_location_rule("[ShadedWoods] Drop from the petrified lion warrior by the tree bridge", lambda state: state.has("Unpetrify Fang Key Statue in Shaded Ruins", self.player))
         self.set_location_rule("[AldiasKeep] Drop from Petrified Ogre blocking stairway near Bone Dragon", lambda state: state.has("Unpetrify Cyclops Statue in Aldia's Keep", self.player))
