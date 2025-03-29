@@ -89,8 +89,8 @@ showItemPopup_t originalShowItemPopup = nullptr;
 
 getItemNameFromId_t originalGetItemNameFromId = nullptr;
 
-typedef uintptr_t(__thiscall* get_item_name)(uintptr_t, uintptr_t);
-get_item_name original_get_item_name;
+typedef uintptr_t(__thiscall* get_hovering_item_name)(uintptr_t, uintptr_t);
+get_hovering_item_name original_get_hovering_item_name;
 
 uintptr_t baseAddress;
 
@@ -434,10 +434,10 @@ const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
 }
 
 #ifdef _M_IX86
-uintptr_t __fastcall detour_get_item_name(uintptr_t param_1, void* _edx, uintptr_t param_2) {
+uintptr_t __fastcall detour_get_hovering_item_name(uintptr_t param_1, void* _edx, uintptr_t param_2) {
     int i = 0x8;
 #elif defined(_M_X64)
-uintptr_t __cdecl detour_get_item_name(uintptr_t param_1, uintptr_t param_2) {
+uintptr_t __cdecl detour_get_hovering_item_name(uintptr_t param_1, uintptr_t param_2) {
     int i = 0x10;
 #endif
     uintptr_t ptr;
@@ -456,7 +456,7 @@ uintptr_t __cdecl detour_get_item_name(uintptr_t param_1, uintptr_t param_2) {
         int item_id = unusedItemIds[24];
         GameHooks->unusedItemNames[item_id] = removeSpecialCharacters(message);
     }
-    return original_get_item_name(param_1, param_2);
+    return original_get_hovering_item_name(param_1, param_2);
 }
 
 #ifdef _M_IX86
@@ -518,7 +518,7 @@ bool Hooks::initHooks() {
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
 
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetItemNameFromId), &detourGetItemNameFromId, (LPVOID*)&originalGetItemNameFromId);
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetItemName), &detour_get_item_name, (LPVOID*)&original_get_item_name);
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetHoveringItemName), &detour_get_hovering_item_name, (LPVOID*)&original_get_hovering_item_name);
 
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::RemoveItemFromInventory), &detour_remove_item_from_inventory, (LPVOID*)&original_remove_item_from_inventory);
 
