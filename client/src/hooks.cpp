@@ -89,6 +89,9 @@ showItemPopup_t originalShowItemPopup = nullptr;
 
 getItemNameFromId_t originalGetItemNameFromId = nullptr;
 
+typedef uintptr_t(__thiscall* get_item_name)(uintptr_t, uintptr_t);
+get_item_name original_get_item_name;
+
 uintptr_t baseAddress;
 
 // this strategy with the booleans is not the best
@@ -175,8 +178,7 @@ void Hooks::overrideShopParams() {
         }
         else {
             // for now just use the last one
-            int size = sizeof(unusedItemIds) / sizeof(unusedItemIds[0]);
-            uint32_t unusedItemForShop = unusedItemIds[size - 1];
+            uint32_t unusedItemForShop = unusedItemIds[24];
             WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &unusedItemForShop, sizeof(uint32_t), NULL);
         }
 
@@ -363,7 +365,6 @@ char __cdecl detourGiveShopItem(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3)
     if (GameHooks->locationsToCheck.contains(shopLineupId)) {
         GameHooks->checkedLocations.push_back(shopLineupId);
         GameHooks->locationsToCheck.erase(shopLineupId);
-        GameHooks->showLocationRewardMessage(shopLineupId);
         giveNextItem = false;
         showNextItem = false;
     }
@@ -411,7 +412,12 @@ void __cdecl detourShowItemPopup(UINT_PTR thisPtr, UINT_PTR displayStruct) {
 const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
 
     if (GameHooks->unusedItemNames.contains(itemId)) {
-        return GameHooks->unusedItemNames[itemId].c_str();
+        if (arg1 == 8) {
+            return GameHooks->unusedItemNames[itemId].c_str();
+        }
+        else if (arg1 == 9) {
+            return L"Archipelago Item";
+        }
     }
 
     // rename "Pharros' Lockstone" to "Master Lockstone"
@@ -425,6 +431,32 @@ const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
     }
 
     return originalGetItemNameFromId(arg1, itemId);
+}
+
+#ifdef _M_IX86
+uintptr_t __fastcall detour_get_item_name(uintptr_t param_1, void* _edx, uintptr_t param_2) {
+    int i = 0x8;
+#elif defined(_M_X64)
+uintptr_t __cdecl detour_get_item_name(uintptr_t param_1, uintptr_t param_2) {
+    int i = 0x10;
+#endif
+    uintptr_t ptr;
+    uint32_t itemlot;
+    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(param_1 + i), &ptr, sizeof(uintptr_t), NULL);
+    if (ptr != 0) {
+        ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(ptr + i), &itemlot, sizeof(uint32_t), NULL);
+
+        locationReward reward = GameHooks->locationRewards[itemlot];
+
+        std::wstring player_name_wide(reward.player_name.begin(), reward.player_name.end());
+        std::wstring item_name_wide(reward.item_name.begin(), reward.item_name.end());
+
+        std::wstring message = player_name_wide + L"'s " + item_name_wide;
+
+        int item_id = unusedItemIds[24];
+        GameHooks->unusedItemNames[item_id] = removeSpecialCharacters(message);
+    }
+    return original_get_item_name(param_1, param_2);
 }
 
 #ifdef _M_IX86
@@ -486,6 +518,7 @@ bool Hooks::initHooks() {
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
 
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetItemNameFromId), &detourGetItemNameFromId, (LPVOID*)&originalGetItemNameFromId);
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetItemName), &detour_get_item_name, (LPVOID*)&original_get_item_name);
 
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::RemoveItemFromInventory), &detour_remove_item_from_inventory, (LPVOID*)&original_remove_item_from_inventory);
 

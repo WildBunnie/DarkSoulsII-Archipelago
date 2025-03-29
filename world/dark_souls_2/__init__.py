@@ -213,13 +213,10 @@ class DS2World(World):
 
     def set_rules(self):
 
-        # make it so shops only have local, non repeatable items
-        # this is because the implementation for showing items
-        # from other worlds inside the shop is a bit lackluster
         for location in self.multiworld.get_locations(self.player):
             if location.shop:
                 add_item_rule(location, lambda item: 
-                              item.player == self.player and
+                              item.player != self.player or
                               item.category not in [ItemCategory.AMMO, ItemCategory.CONSUMABLE, ItemCategory.STATUE])
 
         self.set_shop_rules()
@@ -251,8 +248,9 @@ class DS2World(World):
         self.set_location_rule("[FOFG] First corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
         self.set_location_rule("[FOFG] Second corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
         ## TSELDORA DEN
-        self.set_location_rule("[Tseldora] Metal chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
-        self.set_location_rule("[Tseldora] Wooden chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
+        # tseldora den key is not in pool rn
+        # self.set_location_rule("[Tseldora] Metal chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
+        # self.set_location_rule("[Tseldora] Wooden chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
         self.set_location_rule("[Tseldora] Metal chest behind locked door in pickaxe room", lambda state: state.has("Brightstone Key", self.player))
         ## FORGOTTEN KEY
         self.set_location_rule("[Pit] First metal chest behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))

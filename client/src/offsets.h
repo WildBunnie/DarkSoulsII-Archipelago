@@ -13,6 +13,7 @@ namespace FunctionOffsets {
     uintptr_t CreatePopUpStruct = 0x11F430;
     uintptr_t ShowItemPopup = 0x4FA9B0;
     uintptr_t GetItemNameFromId = 0x4ff6e0;
+    uintptr_t GetItemName = 0x105A40;
     uintptr_t RemoveItemFromInventory = 0x233ED0;
 #elif defined(_M_X64)
     uintptr_t GiveItemsOnReward = 0x199CC0;
@@ -23,6 +24,7 @@ namespace FunctionOffsets {
     uintptr_t CreatePopUpStruct = 0x5D950;
     uintptr_t ShowItemPopup = 0x501080;
     uintptr_t GetItemNameFromId = 0x503620;
+    uintptr_t GetItemName = 0x38170;
     uintptr_t RemoveItemFromInventory = 0x1AF1E0;
 #endif
 };
