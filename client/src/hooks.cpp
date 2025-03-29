@@ -457,10 +457,18 @@ void Hooks::patchInfiniteTorch() {
     PatchMemory(baseAddress + PatchesOffsets::infiniteTorchOffset, Patches::infiniteTorch);
 }
 
+void patch_unbreakable_chests() {
+    PatchMemory(baseAddress + PatchesOffsets::UnbreakableChests, Patches::UnbreakableChests);
+}
+
 bool Hooks::initHooks() {
 
     HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
     baseAddress = (uintptr_t)hModule;
+
+    // putting it here for now instead of after connecting to ap
+    // just to make sure people NEVER lose checks cause of this
+    patch_unbreakable_chests();
 
     MH_Initialize();
 

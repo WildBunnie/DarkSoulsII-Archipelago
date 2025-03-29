@@ -57,6 +57,7 @@ namespace Patches {
         0xC7, 0x46, 0x76, 0x01, 0x00, 0x00, 0x00, 0x90
     };
     std::vector<BYTE> infiniteTorch = { 0x90, 0x90, 0x90, 0x90 };
+    std::vector<BYTE> UnbreakableChests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE6 };
 #elif defined(_M_X64)
     std::vector<BYTE> noWeaponReqPatch = { 0xC3, 0x90, 0x90, 0x90, 0x90 };
     std::vector<BYTE> menuWeaponReqPatch = {
@@ -65,6 +66,7 @@ namespace Patches {
         0x90, 0x90, 0x66, 0x89, 0x4B, 0x74, 0x90, 0x90, 0x90, 0x90
     };
     std::vector<BYTE> infiniteTorch = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+    std::vector<BYTE> UnbreakableChests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE3 };
 #endif
 };
 
@@ -73,10 +75,12 @@ namespace PatchesOffsets {
     uintptr_t noWeaponReqPatchOffset = 0x372ff0;
     uintptr_t menuWeaponReqPatchOffset = 0x14E50A2;
     uintptr_t infiniteTorchOffset = 0x23950E;
+    uintptr_t UnbreakableChests = 0x24EDFC;
 #elif defined(_M_X64)
     uintptr_t noWeaponReqPatchOffset = 0x34A980;
     uintptr_t menuWeaponReqPatchOffset = 0x201EC0;
     uintptr_t infiniteTorchOffset = 0x1BBD1C;
+    uintptr_t UnbreakableChests = 0x1D3C29;
 #endif
 };
 
