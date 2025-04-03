@@ -75,7 +75,7 @@ class DS2World(World):
         regions["Things Betwixt"].connect(regions["Majula"])
 
         regions["Majula"].connect(regions["Forest of Fallen Giants"])
-        regions["Majula"].connect(regions["Path to Shaded Woods"])
+        regions["Majula"].connect(regions["Shaded Woods"])
         regions["Majula"].connect(regions["Heide's Tower of Flame"])
         regions["Majula"].connect(regions["Huntman's Copse"])
         regions["Majula"].connect(regions["Grave of Saints"])
@@ -86,19 +86,25 @@ class DS2World(World):
         regions["Forest of Fallen Giants"].connect(regions["Memory of Jeigh"])
         regions["Forest of Fallen Giants"].connect(regions["Memory of Vammar"])
         regions["Forest of Fallen Giants"].connect(regions["Memory of Orro"])
-        regions["Forest of Fallen Giants"].connect(regions["Lost Bastille"])
+        regions["Forest of Fallen Giants"].connect(regions["Lost Bastille - FOFG"])
 
-        regions["Heide's Tower of Flame"].connect(regions["Unseen Path to Heide"])
-        regions["Unseen Path to Heide"].connect(regions["No-man's Wharf"])
-        regions["No-man's Wharf"].connect(regions["Lost Bastille"])
-        regions["Lost Bastille"].connect(regions["Belfry Luna"])
-        regions["Lost Bastille"].connect(regions["Sinners' Rise"])
+        regions["Heide's Tower of Flame"].connect(regions["No-man's Wharf"])
+        regions["No-man's Wharf"].connect(regions["Lost Bastille - Wharf"])
+        
+        regions["Lost Bastille - FOFG"].connect(regions["Early Lost Bastille"])
+        regions["Lost Bastille - Wharf"].connect(regions["Early Lost Bastille"])
+        regions["Lost Bastille - Wharf"].connect(regions["Lost Bastille - After Key"])
+        regions["Early Lost Bastille"].connect(regions["Lost Bastille - After Statue"])
+        regions["Lost Bastille - After Statue"].connect(regions["Belfry Luna"])
+        regions["Lost Bastille - After Statue"].connect(regions["Lost Bastille - After Key"])
+        regions["Lost Bastille - After Statue"].connect(regions["Late Lost Bastille"])
+        regions["Lost Bastille - After Key"].connect(regions["Late Lost Bastille"])
+        regions["Late Lost Bastille"].connect(regions["Sinners' Rise"])
         
         regions["Huntman's Copse"].connect(regions["Earthen Peak"])
         regions["Earthen Peak"].connect(regions["Iron Keep"])
         regions["Iron Keep"].connect(regions["Belfry Sol"])
 
-        regions["Path to Shaded Woods"].connect(regions["Shaded Woods"])
         regions["Shaded Woods"].connect(regions["Drangleic Castle"])
         regions["Shaded Woods"].connect(regions["Doors of Pharros"])
         regions["Shaded Woods"].connect(regions["Aldia's Keep"])
@@ -310,8 +316,8 @@ class DS2World(World):
 
         self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
         self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
-        self.set_connection_rule("Path to Shaded Woods", "Shaded Woods", lambda state: state.has("Unpetrify Rosabeth of Melfia", self.player))
-        self.set_connection_rule("Forest of Fallen Giants", "Lost Bastille", lambda state: state.has("Soldier Key", self.player))
+        self.set_connection_rule("Majula", "Shaded Woods", lambda state: state.has("Unpetrify Rosabeth of Melfia", self.player))
+        self.set_connection_rule("Forest of Fallen Giants", "Lost Bastille - FOFG", lambda state: state.has("Soldier Key", self.player))
         self.set_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("King's Ring", self.player))
         self.set_connection_rule("Shaded Woods", "Drangleic Castle", lambda state: state.has("Open Shrine of Winter", self.player))
         self.set_connection_rule("Drangleic Castle", "King's Passage", lambda state: state.has("Key to King's Passage", self.player))
@@ -325,15 +331,14 @@ class DS2World(World):
                                     state.has("Soldier Key", self.player))
         self.set_connection_rule("Drangleic Castle", "Throne of Want", lambda state: state.has("King's Ring", self.player))
         self.set_connection_rule("Iron Keep", "Belfry Sol", lambda state: state.has("Master Lockstone", self.player))
-        self.set_connection_rule("Lost Bastille", "Belfry Luna", lambda state: state.has("Master Lockstone", self.player))
-        if self.options.game_version == "sotfs":
-            self.set_connection_rule("Lost Bastille", "Sinners' Rise", lambda state: 
-                                    state.has("Unpetrify Statue in Lost Bastille", self.player) or
-                                    state.has("Antiquated Key", self.player))
+
+        # LOST BASTILLE
+        self.set_connection_rule("Lost Bastille - Wharf", "Lost Bastille - After Key", lambda state: state.has("Antiquated Key", self.player))
+        self.set_connection_rule("Lost Bastille - After Statue", "Belfry Luna", lambda state: state.has("Master Lockstone", self.player))
+        if self.options.game_version == "sotfs": 
+            self.set_connection_rule("Early Lost Bastille", "Lost Bastille - After Statue", lambda state: state.has("Unpetrify Statue in Lost Bastille", self.player))
         elif self.options.game_version == "vanilla":
-            self.set_connection_rule("Lost Bastille", "Sinners' Rise", lambda state: 
-                                    state.has("Master Lockstone", self.player) and
-                                    state.has("Antiquated Key", self.player))
+            self.set_connection_rule("Lost Bastille - After Key", "Late Lost Bastille", lambda state: state.has("Master Lockstone", self.player))
             
         set_rule(self.multiworld.get_location("Defeat Nashandra", self.player), lambda state: state.has("Giant's Kinship", self.player))
 
