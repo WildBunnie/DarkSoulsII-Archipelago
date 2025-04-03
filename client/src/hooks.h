@@ -24,6 +24,7 @@ public:
     void giveItems(std::vector<int32_t> ids);
     void showLocationRewardMessage(int32_t locationId);
     void patchWeaponRequirements();
+    void patchSpellRequirements();
     void patchInfiniteTorch();
     void overrideShopParams();
     bool unpetrifyStatue(int statueId);

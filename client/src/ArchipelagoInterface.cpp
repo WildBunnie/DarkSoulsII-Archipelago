@@ -54,6 +54,9 @@ BOOL CArchipelago::Initialise(std::string URI) {
 		if (data.contains("no_weapon_req") && data.at("no_weapon_req") == 1) {
 			GameHooks->patchWeaponRequirements();
 		}
+		if (data.contains("no_spell_req") && data.at("no_spell_req") == 1) {
+			GameHooks->patchSpellRequirements();
+		}
 
 		GameHooks->patchInfiniteTorch();
 

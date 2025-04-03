@@ -5,6 +5,10 @@ class NoWeaponRequirements(Toggle):
     """Remove the requirements to wield weapons"""
     display_name = "No Weapon Requirements"
 
+class NoSpellRequirements(Toggle):
+    """Remove the requirements to cast spells"""
+    display_name = "No Spell Requirements"
+
 class OldIronKingDLC(Toggle):
     """Enable Crown of the Old Iron King DLC, randomizing items and locations within Brume Tower."""
     display_name = "Enable Crown of the Old Iron King DLC"
@@ -48,6 +52,7 @@ class DS2Options(PerGameCommonOptions):
     game_version: GameVersion
     death_link: DeathLink
     no_weapon_req: NoWeaponRequirements
+    no_spell_req: NoSpellRequirements
     enable_ngp: EnableNGPOption
     infinite_lifegems: KeepInfiniteLifegems
     exclude_locations: DS2ExcludeLocations

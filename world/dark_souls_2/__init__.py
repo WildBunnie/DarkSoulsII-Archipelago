@@ -391,4 +391,4 @@ class DS2World(World):
                     self.set_location_rule(location.name, lambda state: state.has("Defeat the Smelter Demon", self.player))
                     
     def fill_slot_data(self) -> dict:
-        return self.options.as_dict("death_link","game_version","no_weapon_req")
+        return self.options.as_dict("death_link","game_version","no_weapon_req","no_spell_req")

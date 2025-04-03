@@ -488,6 +488,13 @@ void Hooks::patchWeaponRequirements() {
     PatchMemory(baseAddress + PatchesOffsets::noPowerStanceDexReq, Patches::noPowerStanceReq);
 }
 
+void Hooks::patchSpellRequirements() {
+    PatchMemory(baseAddress + PatchesOffsets::noSpellCastIntReq, Patches::noSpellCastReq);
+    PatchMemory(baseAddress + PatchesOffsets::noSpellCastFthReq, Patches::noSpellCastReq);
+    PatchMemory(baseAddress + PatchesOffsets::noSpellMenuIntReq, Patches::noSpellMenuIntReq);
+    PatchMemory(baseAddress + PatchesOffsets::noSpellMenuFthReq, Patches::noSpellMenuFthReq);
+}
+
 void Hooks::patchInfiniteTorch() {
     PatchMemory(baseAddress + PatchesOffsets::infiniteTorchOffset, Patches::infiniteTorch);
 }

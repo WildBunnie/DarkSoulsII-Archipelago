@@ -59,6 +59,9 @@ namespace Patches {
         0xC7, 0x46, 0x76, 0x01, 0x00, 0x00, 0x00, 0x90
     };
     std::vector<BYTE> noPowerStanceReq = { 0x66, 0x0F, 0xEF, 0xC9 };
+    std::vector<BYTE> noSpellCastReq = { 0xEB };
+    std::vector<BYTE> noSpellMenuIntReq = { 0x66, 0xBE, 0x00, 0x00 };
+    std::vector<BYTE> noSpellMenuFthReq = { 0x66, 0xBA, 0x00, 0x00 };
     std::vector<BYTE> infiniteTorch = { 0x90, 0x90, 0x90, 0x90 };
     std::vector<BYTE> UnbreakableChests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE6 };
 #elif defined(_M_X64)
@@ -69,6 +72,9 @@ namespace Patches {
         0x90, 0x90, 0x66, 0x89, 0x4B, 0x74, 0x90, 0x90, 0x90, 0x90
     };
     std::vector<BYTE> noPowerStanceReq = { 0x66, 0x0F, 0xEF, 0xC0, 0x90, 0x90, 0x90, 0x90 };
+    std::vector<BYTE> noSpellCastReq = { 0xEB };
+    std::vector<BYTE> noSpellMenuIntReq = { 0x31, 0xC9, 0x90, 0x90 };
+    std::vector<BYTE> noSpellMenuFthReq = { 0x31, 0xC9, 0x90, 0x90 };
     std::vector<BYTE> infiniteTorch = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
     std::vector<BYTE> UnbreakableChests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE3 };
 #endif
@@ -80,6 +86,10 @@ namespace PatchesOffsets {
     uintptr_t menuWeaponReqPatchOffset = 0x14E50A2;
     uintptr_t noPowerStanceStrReq = 0x378398;
     uintptr_t noPowerStanceDexReq = 0x3783D7;
+    uintptr_t noSpellCastIntReq = 0x3C02CF;
+    uintptr_t noSpellCastFthReq = 0x3C02E7;
+    uintptr_t noSpellMenuIntReq = 0x236E72;
+    uintptr_t noSpellMenuFthReq = 0x236E7A;
     uintptr_t infiniteTorchOffset = 0x23950E;
     uintptr_t UnbreakableChests = 0x24EDFC;
 #elif defined(_M_X64)
@@ -87,6 +97,10 @@ namespace PatchesOffsets {
     uintptr_t menuWeaponReqPatchOffset = 0x201EC0;
     uintptr_t noPowerStanceStrReq = 0x35025C;
     uintptr_t noPowerStanceDexReq = 0x35028B;
+    uintptr_t noSpellCastIntReq = 0x397915;
+    uintptr_t noSpellCastFthReq = 0x39792C;
+    uintptr_t noSpellMenuIntReq = 0x1B8E7C;
+    uintptr_t noSpellMenuFthReq = 0x1B8E87;
     uintptr_t infiniteTorchOffset = 0x1BBD1C;
     uintptr_t UnbreakableChests = 0x1D3C29;
 #endif
