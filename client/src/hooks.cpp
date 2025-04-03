@@ -483,6 +483,9 @@ void Hooks::patchWeaponRequirements() {
     // makes it so it doesnt load the values for the requirements to show in the menu
     // this is mostly to not show the "unable to use this item efficiently" message
     PatchMemory(baseAddress + PatchesOffsets::menuWeaponReqPatchOffset, Patches::menuWeaponReqPatch);
+    // instead of multiplying the value of the requirements with 1.5x, we set the register to 0
+    PatchMemory(baseAddress + PatchesOffsets::noPowerStanceStrReq, Patches::noPowerStanceReq);
+    PatchMemory(baseAddress + PatchesOffsets::noPowerStanceDexReq, Patches::noPowerStanceReq);
 }
 
 void Hooks::patchInfiniteTorch() {
