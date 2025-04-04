@@ -8,6 +8,7 @@ namespace FunctionOffsets {
     uintptr_t GiveItemsOnReward = 0x21D3C0;
     uintptr_t GiveItemsOnPickup = 0x25BD90;
     uintptr_t GiveShopItem = 0x22B340;
+    uintptr_t ItemsFitInInventory = 0x22BB60;
     //uintptr_t AddShopItemToInventory; // this is the same as AddItemsToInventory in vanilla
     uintptr_t AddItemsToInventory = 0x22AD20;
     uintptr_t CreatePopUpStruct = 0x11F430;
@@ -19,6 +20,7 @@ namespace FunctionOffsets {
     uintptr_t GiveItemsOnReward = 0x199CC0;
     uintptr_t GiveItemsOnPickup = 0x1E4590;
     uintptr_t GiveShopItem = 0x1A76A0;
+    uintptr_t ItemsFitInInventory = 0x1ABA90;
     uintptr_t AddShopItemToInventory = 0x1AA810;
     uintptr_t AddItemsToInventory = 0x1A7470;
     uintptr_t CreatePopUpStruct = 0x5D950;

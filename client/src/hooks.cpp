@@ -61,6 +61,10 @@ typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, UINT_PTR idk1);
 // this function is called when the player buys an item
 typedef char(__thiscall* giveShopItem_t)(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3);
 
+typedef char(__thiscall* items_fit_in_inventory)(uintptr_t, uintptr_t, int32_t);
+items_fit_in_inventory original_items_fit_in_inventory;
+
+
 // this function adds the item to the players inventory
 typedef void(__thiscall* addShopItemToInventory_t)(UINT_PTR, UINT_PTR, UINT_PTR);
 // this function adds the item to the players inventory
@@ -384,6 +388,19 @@ void __cdecl detourAddShopItemToInventory(UINT_PTR thisPtr, UINT_PTR param_2, UI
 #endif
 
 #ifdef _M_IX86
+char __fastcall detour_items_fit_in_inventory(uintptr_t param_1, void* _edx, uintptr_t param_2, int32_t param_3) {
+#elif defined(_M_X64)
+char detour_items_fit_in_inventory(uintptr_t param_1, uintptr_t param_2, int32_t param_3) {
+#endif
+    // makes sure the pickup is removed from the ground
+    if (!giveNextItem) {
+        return 1;
+    }
+
+    return original_items_fit_in_inventory(param_1, param_2, param_3);
+}
+
+#ifdef _M_IX86
 char __fastcall detourAddItemsToInventory(UINT_PTR thisPtr, void* Unknown, ItemStruct* itemsList, INT amountToGive, INT param_3) {
 #elif defined(_M_X64)
 char __cdecl detourAddItemsToInventory(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3) {
@@ -520,6 +537,7 @@ bool Hooks::initHooks() {
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnPickup), &detourGiveItemsOnPickup, (LPVOID*)&originalGiveItemsOnPickup);
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveShopItem), &detourGiveShopItem, (LPVOID*)&originalGiveShopItem);
 
+    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ItemsFitInInventory), &detour_items_fit_in_inventory, (LPVOID*)&original_items_fit_in_inventory);
 #ifdef _M_X64
     MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddShopItemToInventory), &detourAddShopItemToInventory, (LPVOID*)&originalAddShopItemToInventory);
 #endif
