@@ -40,11 +40,7 @@ struct ParamRow {
 #endif
 
 // function that allows us to get the itemLotId on giveItemsOnPickup
-#ifdef _M_IX86
 extern "C" int __cdecl get_pickup_id(uintptr_t param_1, uintptr_t baseAddress);
-#elif defined(_M_X64)
-extern "C" int get_pickup_id(UINT_PTR thisPtr, UINT_PTR arg1, UINT_PTR baseAddress);
-#endif
 
 // hooking this function to always start the game offline
 // by blocking the game's dns lookup
@@ -53,11 +49,7 @@ typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const
 // fuction is called when player receives a reward (boss, covenant, npc or event)
 typedef void(__thiscall* giveItemsOnReward_t)(UINT_PTR thisPtr, UINT_PTR pItemLot, INT idk1, INT idk2, INT idk3);
 // fuction is called when player picks up an item
-#ifdef _M_IX86
-typedef char(__thiscall* giveItemsOnPickup_t)(uintptr_t this_ptr, uintptr_t param_1);
-#elif defined(_M_X64)
-typedef void(__thiscall* giveItemsOnPickup_t)(UINT_PTR thisPtr, UINT_PTR idk1);
-#endif
+typedef void(__thiscall* giveItemsOnPickup_t)(uintptr_t this_ptr, uintptr_t param_1);
 // this function is called when the player buys an item
 typedef char(__thiscall* giveShopItem_t)(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3);
 
@@ -329,7 +321,12 @@ void __cdecl detourGiveItemsOnReward(UINT_PTR thisPtr, UINT_PTR pItemLot, INT id
     return originalGiveItemsOnReward(thisPtr, pItemLot, idk1, idk2, idk3);
 }
 
-void detourGiveItemsOnPickupLogic(int32_t itemLotId){
+#ifdef _M_IX86
+void __fastcall detourGiveItemsOnPickup(uintptr_t this_ptr, void* Unknown, uintptr_t param_1) {
+#elif defined(_M_X64)
+void __cdecl detourGiveItemsOnPickup(uintptr_t this_ptr, uintptr_t param_1) {
+#endif
+    int32_t itemLotId = get_pickup_id(param_1, baseAddress);
     spdlog::debug("picked up: {}", itemLotId);
 
     // 0 means its an item we dropped
@@ -340,21 +337,9 @@ void detourGiveItemsOnPickupLogic(int32_t itemLotId){
         giveNextItem = false;
         showNextItem = false;
     }
-}
 
-#ifdef _M_IX86
-char __fastcall detourGiveItemsOnPickup(uintptr_t this_ptr, void* Unknown, uintptr_t param_1) {
-    int32_t itemLotId = get_pickup_id(param_1, baseAddress);
-    detourGiveItemsOnPickupLogic(itemLotId);
     return originalGiveItemsOnPickup(this_ptr, param_1);
 }
-#elif defined(_M_X64)
-void __cdecl detourGiveItemsOnPickup(UINT_PTR thisPtr, UINT_PTR idk1) {
-    int32_t itemLotId = get_pickup_id(thisPtr, idk1, baseAddress);
-    detourGiveItemsOnPickupLogic(itemLotId);
-    return originalGiveItemsOnPickup(thisPtr, idk1);
-}
-#endif
 
 #ifdef _M_IX86
 char __fastcall detourGiveShopItem(UINT_PTR thisPtr, void* Unknown, UINT_PTR param_2, INT param_3) {
