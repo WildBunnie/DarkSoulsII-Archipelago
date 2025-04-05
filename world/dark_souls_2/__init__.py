@@ -243,6 +243,22 @@ class DS2World(World):
         if self.options.enable_ngp:
             self.set_location_rule("[FOFG] Just before pursuer arena in NG+", lambda state: state.has("Soldier Key", self.player))
         self.set_location_rule("Defeat the Pursuer (in the proper arena)", lambda state: state.has("Soldier Key", self.player))
+        ## Soldier's Rest
+        self.set_location_rule("[FOFG] In the beginning of the dark skeleton tunnel", lambda state: state.has("Soldier Key", self.player))
+        self.set_location_rule("[FOFG] At the end of the dark skeleton tunnel", lambda state: state.has("Soldier Key", self.player))
+        self.set_location_rule("[FOFG] In the small stone house near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
+        self.set_location_rule("[FOFG] Wooden chest near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
+        self.set_location_rule("[FOFG] First corpse at rooftop near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
+        self.set_location_rule("[FOFG] Wooden chest near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
+        self.set_location_rule("[FOFG] Next to portcullis near Soldier's rest bonfire", lambda state: state.has("Soldier Key", self.player))
+        if self.options.game_version == "sotfs":
+            self.set_location_rule("[FOFG] Second corpse at rooftop near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
+            self.set_location_rule("[FOFG] Third corpse at rooftop near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
+            self.set_location_rule("[FOFG] Fourth corpse at rooftop near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
+        ## Before Kings Door
+        self.set_location_rule("[FOFG] Wooden chest in a side corridor on the way to the king's door", lambda state: state.has("Soldier Key", self.player))
+        if self.options.game_version == "sotfs":
+            self.set_location_rule("[FOFG] Wooden chest next to king's door", lambda state: state.has("Soldier Key", self.player))
         ## UPPER FLOOR CARDINAL TOWER
         self.set_location_rule("[FOFG] Wooden chest in upper floor of cardinal tower", lambda state: state.has("Soldier Key", self.player))
         self.set_location_rule("[FOFG] Metal chest in upper floor of cardinal tower", lambda state: state.has("Soldier Key", self.player))
