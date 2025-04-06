@@ -505,6 +505,12 @@ void patch_unbreakable_chests() {
     PatchMemory(baseAddress + PatchesOffsets::UnbreakableChests, Patches::UnbreakableChests);
 }
 
+void patch_disappearing_checks() {
+    // for some reason if the item doesnt fit in your inventory
+    // the chest will be empty, so we just make sure it always spawns
+    PatchMemory(baseAddress + PatchesOffsets::DissapearingChestItems, Patches::DissapearingChestItems);
+}
+
 bool Hooks::initHooks() {
 
     HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
@@ -513,6 +519,7 @@ bool Hooks::initHooks() {
     // putting it here for now instead of after connecting to ap
     // just to make sure people NEVER lose checks cause of this
     patch_unbreakable_chests();
+    patch_disappearing_checks();
 
     MH_Initialize();
 
