@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 #include "ds2.h"
 #include "memory.h"
+#include <cwctype>
 extern Hooks* GameHooks;
 
 // ============================= Utils =============================
@@ -232,13 +233,9 @@ void Hooks::giveItems(std::vector<int32_t> ids) {
 
     unsigned char displayStruct[0x200];
 
-    if (giveNextItem) {
-        originalAddItemsToInventory(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::AvailableItemBag), &itemStruct, ids.size(), 0);
-    }
+    originalAddItemsToInventory(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::AvailableItemBag), &itemStruct, ids.size(), 0);
     originalCreatePopupStructure((UINT_PTR)displayStruct, &itemStruct, ids.size(), 1);
-    if (showNextItem) {
-        originalShowItemPopup(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::ItemGiveWindow), (UINT_PTR)displayStruct);
-    }
+    originalShowItemPopup(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::ItemGiveWindow), (UINT_PTR)displayStruct);
 }
 
 std::wstring removeSpecialCharacters(const std::wstring& input) {
@@ -249,7 +246,7 @@ std::wstring removeSpecialCharacters(const std::wstring& input) {
     std::wstring output;
     for (wchar_t ch : input) {
         // Keep the character if it's alphanumeric or in the allowed special characters list
-        if (std::isalnum(ch) || allowedChars.find(ch) != allowedChars.end()) {
+        if (std::iswalnum(ch) || allowedChars.find(ch) != allowedChars.end()) {
             output += ch;
         }
     }
@@ -278,8 +275,6 @@ void Hooks::showLocationRewardMessage(int32_t locationId) {
     int item_id = unusedItemIds[0];
     unusedItemNames[item_id] = removeSpecialCharacters(message);
 
-    showNextItem = true;
-    giveNextItem = false;
     giveItems({ item_id });
 }
 
@@ -450,13 +445,15 @@ uintptr_t __cdecl detour_get_hovering_item_name(uintptr_t param_1, uintptr_t par
 
         locationReward reward = GameHooks->locationRewards[itemlot];
 
-        std::wstring player_name_wide(reward.player_name.begin(), reward.player_name.end());
-        std::wstring item_name_wide(reward.item_name.begin(), reward.item_name.end());
+        if (!reward.isLocal) {
+            std::wstring player_name_wide(reward.player_name.begin(), reward.player_name.end());
+            std::wstring item_name_wide(reward.item_name.begin(), reward.item_name.end());
 
-        std::wstring message = player_name_wide + L"'s " + item_name_wide;
+            std::wstring message = player_name_wide + L"'s " + item_name_wide;
 
-        int item_id = unusedItemIds[24];
-        GameHooks->unusedItemNames[item_id] = removeSpecialCharacters(message);
+            int item_id = unusedItemIds[24];
+            GameHooks->unusedItemNames[item_id] = removeSpecialCharacters(message);
+        }
     }
     return original_get_hovering_item_name(param_1, param_2);
 }
