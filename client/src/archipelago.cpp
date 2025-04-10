@@ -350,3 +350,8 @@ std::string get_local_item_name(int32_t item_id)
 {
 	return ap->get_item_name(item_id, ap->get_player_game(ap->get_player_number()));
 }
+
+void handle_finished_game()
+{
+    if (ap) ap->StatusUpdate(APClient::ClientStatus::GOAL);
+}

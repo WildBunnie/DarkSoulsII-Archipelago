@@ -96,6 +96,10 @@ void handle_check_locations()
     std::list<int64_t> matched_locations;
 
     for (int32_t location : locations_to_check) {
+        if (location == 627000) {
+            handle_finished_game();
+        }
+
         if (missing_locations.contains(static_cast<int64_t>(location))) {
             matched_locations.push_back(static_cast<int64_t>(location));
         }

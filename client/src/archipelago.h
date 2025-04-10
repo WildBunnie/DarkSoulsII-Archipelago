@@ -24,3 +24,4 @@ bool is_save_loaded();
 int get_last_received_index();
 void set_last_received_index(int value);
 std::string get_local_item_name(int32_t item_id);
+void handle_finished_game();
