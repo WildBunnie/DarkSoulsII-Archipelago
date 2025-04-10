@@ -60,7 +60,6 @@ class DS2World(World):
                 if location_data.ngp and not self.options.enable_ngp: continue
                 if location_data.sotfs and not self.options.game_version == "sotfs": continue
                 if location_data.vanilla and not self.options.game_version == "vanilla": continue
-                if location_data.code == 75400601 and self.options.infinite_lifegems: continue
 
                 if location_data.code == None: # event
                     location = DS2Location(self.player, location_data.name, None, region, None, False)
@@ -370,8 +369,6 @@ class DS2World(World):
         set_rule(self.multiworld.get_location(name, self.player), state)
 
     def set_shop_rules(self):
-        if not self.options.infinite_lifegems:
-            self.set_location_rule("[Merchant Hag Melentia - Majula] Lifegem", lambda state: state.has("Defeat the Last Giant", self.player))
         self.set_location_rule("[Sweet Shalquoir - Royal Rat Authority, Royal Rat Vanguard] Flying Feline Boots", lambda state: 
                                state.has("Defeat the Royal Rat Authority", self.player) and state.has("Defeat the Royal Rat Vanguard", self.player))
         
@@ -407,4 +404,4 @@ class DS2World(World):
                     self.set_location_rule(location.name, lambda state: state.has("Defeat the Smelter Demon", self.player))
                     
     def fill_slot_data(self) -> dict:
-        return self.options.as_dict("death_link","game_version","no_weapon_req","no_spell_req")
+        return self.options.as_dict("death_link","game_version","no_weapon_req","no_spell_req","infinite_lifegems")

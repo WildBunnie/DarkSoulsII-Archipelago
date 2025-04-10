@@ -35,6 +35,7 @@ bool death_link = false;
 bool save_loaded = false;
 bool _died_by_deathlink = false;
 int last_received_index = 0;
+std::set<int32_t> locations_to_ignore;
 std::list<APClient::NetworkItem> items_to_give;
 
 enum ItemsHandling {
@@ -99,6 +100,11 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		}
 		if (data.contains("no_spell_req") && data.at("no_spell_req") == 1) {
 			patch_spell_requirements(base_address);
+		}
+
+		locations_to_ignore.insert(1700000); // estus flask from emerald herald
+		if (data.contains("infinite_lifegems") && data.at("infinite_lifegems") == 1) {
+			locations_to_ignore.insert(75400601);
 		}
 
 		// we store an uuid we create in the server's data storage
@@ -167,7 +173,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 				reward_names[item.location] = player_name + "' " + item_name;
 			}
 		}
-		override_item_params(location_rewards);
+		override_item_params(location_rewards, ap->get_seed(), locations_to_ignore);
 		init_hooks(reward_names, custom_items);
 	});
 
