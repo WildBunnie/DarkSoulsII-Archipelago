@@ -9,6 +9,7 @@
 #include "minhook.h"
 
 #include <map>
+#include <cwctype>
 
 getaddrinfo_t original_getaddrinfo;
 
@@ -30,7 +31,7 @@ std::wstring remove_special_characters(const std::wstring& input)
     std::wstring output;
     for (wchar_t ch : input) {
         // Keep the character if it's alphanumeric or in the allowed special characters list
-        if (std::isalnum(ch) || allowedChars.find(ch) != allowedChars.end()) {
+        if (std::iswalnum(ch) || allowedChars.find(ch) != allowedChars.end()) {
             output += ch;
         }
     }
@@ -103,11 +104,10 @@ void __cdecl detour_give_items_on_pickup(uintptr_t param_1, uintptr_t param_2)
 
 #ifdef _M_IX86
 char __fastcall detour_give_shop_item(uintptr_t param_1, void* _edx, uintptr_t param_2, int32_t param_3)
-{
 #elif defined(_M_X64)
 char __cdecl detour_give_shop_item(uintptr_t param_1, uintptr_t param_2, int32_t param_3)
-{
 #endif
+{
     uint32_t offset = sizeof(uintptr_t) == 4 ? 0x8 : 0x10; // 0x8 in x32 and 0x10 in x64
     int32_t shop_lineup_id = read_value<int32_t>(param_2 + offset);
     spdlog::debug("just bought: {}", shop_lineup_id);
