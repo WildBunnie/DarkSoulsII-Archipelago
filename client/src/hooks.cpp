@@ -85,9 +85,9 @@ void __cdecl detour_give_items_on_reward(uintptr_t param_1, uintptr_t param_2, i
 }
 
 #ifdef _M_IX86
-void __fastcall detour_give_items_on_pickup(uintptr_t param_1, void* _edx, uintptr_t param_2)
+char __fastcall detour_give_items_on_pickup(uintptr_t param_1, void* _edx, uintptr_t param_2)
 #elif defined(_M_X64)
-void __cdecl detour_give_items_on_pickup(uintptr_t param_1, uintptr_t param_2)
+char __cdecl detour_give_items_on_pickup(uintptr_t param_1, uintptr_t param_2)
 #endif
 {
     int32_t itemlot_id = get_pickup_id(param_2, get_base_address());

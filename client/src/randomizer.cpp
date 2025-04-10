@@ -106,14 +106,6 @@ void override_item_prices()
 
 void override_shoplineup_param(std::map<int32_t, int32_t> rewards, std::string seed_str, std::set<int32_t> ignore)
 {
-#ifdef _M_IX86
-    // for some reason in vanilla when you go through the start menu
-    // they always override the params with the defaults
-    // this patch makes the game not override the ShopLineupParam (and maybe others?)
-    // this doesnt happen in sotfs
-    patch_memory(get_base_address() + 0x316A9F, {0x90, 0x90, 0x90, 0x90, 0x90});
-#endif
-
     // set all items base prices to 1 so that we can
     // set the values properly in the shop params
     override_item_prices();
@@ -225,6 +217,14 @@ void override_item_params(std::map<int32_t, int32_t> rewards, std::string seed, 
 
     spdlog::info("Randomizing items...");
     auto start_time = high_resolution_clock::now();
+
+#ifdef _M_IX86
+    // for some reason in vanilla when you go through the start menu
+    // they always override the params with the defaults
+    // this patch makes the game not override params
+    // this doesnt happen in sotfs
+    patch_memory(get_base_address() + 0x316A9F, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+#endif
 
     override_itemlot_param(rewards, seed, ignore, ParamOffsets::ItemLotParam2_Other);
     override_itemlot_param(rewards, seed, ignore, ParamOffsets::ItemLotParam2_Chr);

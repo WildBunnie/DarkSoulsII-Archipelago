@@ -22,6 +22,10 @@ END_IF_NOT_X86
 ; so we "replicate" what it does so we can obtain the itemlot id before the item is added to inventory
 get_pickup_id proc param_1:ptr, base_address:ptr
     
+    push ebx
+    push esi
+    push edi
+
     mov edi, param_1
     mov ebx, base_address
 
@@ -73,7 +77,7 @@ map_item:
     jz chest_item
 
     mov eax, [eax + 28h]
-    ret
+    jmp done
 
 chest_item:
 
@@ -85,7 +89,7 @@ chest_item:
     jz done
 
     mov eax, [eax + 40h]
-    ret
+    jmp done
 
 enemy_drop:
 
@@ -99,9 +103,12 @@ enemy_drop:
 
     mov eax, [eax + 44h]
     mov eax, [eax + 80h]
-    ret
+    jmp done
 
 done:
+    pop edi
+    pop esi
+    pop ebx
     ret
 
 get_pickup_id endp

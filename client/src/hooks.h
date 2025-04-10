@@ -19,7 +19,7 @@ extern "C" int __cdecl get_pickup_id(uintptr_t param_1, uintptr_t baseAddress);
 typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const ADDRINFOA* pHints, PADDRINFOA* ppResult);
 
 typedef void (__thiscall *give_items_on_reward_t) (uintptr_t, uintptr_t, int32_t, int32_t, int32_t);
-typedef void (__thiscall *give_items_on_pickup_t) (uintptr_t, uintptr_t);
+typedef char (__thiscall *give_items_on_pickup_t) (uintptr_t, uintptr_t);
 typedef char (__thiscall *give_shop_item_t)       (uintptr_t, uintptr_t, int32_t);
 
 typedef int  (__thiscall *remove_item_from_inventory_t) (uintptr_t, uintptr_t, uintptr_t, int32_t);
