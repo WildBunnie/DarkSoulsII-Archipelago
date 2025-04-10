@@ -28,62 +28,55 @@ struct ParamRow {
 };
 #endif
 
-void override_itemlot_param_other(std::map<int32_t, int32_t> rewards, std::set<int32_t> ignore)
+void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed_str, std::set<int32_t> ignore, std::vector<uintptr_t> param_offsets)
 {
-    uintptr_t param_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, ParamOffsets::ItemLotParam2_Other);
+    uintptr_t param_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, param_offsets);
     int first_row_offset = 0x44 - sizeof(uintptr_t); // 0x3C for x64 and 0x40 for x40
     ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + first_row_offset);
+
+    std::vector<int32_t> offsets;
+
     for (int i = 0; i < 10000; ++i) {
         int param_id = row_ptr[i].param_id;
 
-        if (i > 0 && param_id == 0) return; // return if we reach the end
+        if (i > 0 && param_id == 0) break; // return if we reach the end
         if (ignore.contains(param_id)) continue;
-        if (!rewards.contains(param_id)) continue;
-        if (is_shop_location(param_id)) continue; // shitty fix
+        if (rewards.contains(param_id) && !is_shop_location(param_id)) continue;
+
+        offsets.push_back(row_ptr[i].reward_offset);
+    }
+
+    std::hash<std::string> hasher;
+    size_t seed = hasher(seed_str);
+
+    std::default_random_engine rng(static_cast<unsigned int>(seed));
+    std::ranges::shuffle(offsets, rng);
+
+    for (int i = 0; i < 10000; ++i) {
+        int param_id = row_ptr[i].param_id;
+
+        if (i > 0 && param_id == 0) break; // return if we reach the end
+        if (ignore.contains(param_id)) continue;
 
         uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
-
-        for (int j = 0; j < 8; j++) {
-            uintptr_t item_ptr = reward_ptr + 0x2C + (j * sizeof(int32_t));
-            uintptr_t amount_ptr = reward_ptr + 0x4 + j;
-            if (j == 0) {
-                write_value<int32_t>(item_ptr, rewards[param_id]);
-                write_value<int32_t>(amount_ptr, 1);
-            }
-            else {
-                write_value<int32_t>(item_ptr, 10);
-                write_value<int32_t>(amount_ptr, 0);
+        if (rewards.contains(param_id) && !is_shop_location(param_id)) {
+            for (int j = 0; j < 10; j++) {
+                uintptr_t item_ptr = reward_ptr + 0x2C + (j * sizeof(int32_t));
+                uintptr_t amount_ptr = reward_ptr + 0x4 + j;
+                if (j == 0) {
+                    write_value<int32_t>(item_ptr, rewards[param_id]);
+                    write_value<int32_t>(amount_ptr, 1);
+                }
+                else if(read_value<int32_t>(item_ptr) == 10) {
+                    write_value<int32_t>(item_ptr, 10);
+                    write_value<int32_t>(amount_ptr, 0);
+                }
             }
         }
-    }
-}
-
-void override_itemlot_param_chr(std::map<int32_t, int32_t> rewards, std::set<int32_t> ignore)
-{
-    uintptr_t param_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, ParamOffsets::ItemLotParam2_Chr);
-    int first_row_offset = 0x44 - sizeof(uintptr_t); // 0x3C for x64 and 0x40 for x40
-    ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + first_row_offset);
-    for (int i = 0; i < 10000; ++i) {
-        int param_id = row_ptr[i].param_id;
-
-        if (i > 0 && param_id == 0) return; // return if we reach the end
-        if (ignore.contains(param_id)) continue;
-        if (!rewards.contains(param_id)) continue;
-        if (is_shop_location(param_id)) continue; // shitty fix
-
-        uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
-
-        for (int j = 0; j < 8; j++) {
-            uintptr_t item_ptr = reward_ptr + 0x2C + (j * sizeof(int32_t));
-            uintptr_t amount_ptr = reward_ptr + 0x4 + j;
-            if (j == 0) {
-                write_value<int32_t>(item_ptr, rewards[param_id]);
-                write_value<int32_t>(amount_ptr, 1);
-            }
-            else {
-                write_value<int32_t>(item_ptr, 10);
-                write_value<int32_t>(amount_ptr, 0);
-            }
+        else {
+            int32_t offset = offsets.back();
+            offsets.pop_back();
+            row_ptr[i].reward_offset = offset;
         }
     }
 }
@@ -233,8 +226,8 @@ void override_item_params(std::map<int32_t, int32_t> rewards, std::string seed, 
     spdlog::info("Randomizing items...");
     auto start_time = high_resolution_clock::now();
 
-    override_itemlot_param_other(rewards, ignore);
-    override_itemlot_param_chr(rewards, ignore);
+    override_itemlot_param(rewards, seed, ignore, ParamOffsets::ItemLotParam2_Other);
+    override_itemlot_param(rewards, seed, ignore, ParamOffsets::ItemLotParam2_Chr);
     override_shoplineup_param(rewards, seed, ignore);
 
     auto end_time = high_resolution_clock::now();
