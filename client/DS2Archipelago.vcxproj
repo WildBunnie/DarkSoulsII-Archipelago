@@ -208,7 +208,14 @@
   <ItemGroup>
     <ClCompile Include="src\archipelago.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\ds2.cpp" />
+    <ClCompile Include="src\game_functions.cpp" />
+    <ClCompile Include="src\hooks.cpp" />
     <ClCompile Include="src\memory.cpp" />
+    <ClCompile Include="src\offsets.cpp" />
+    <ClCompile Include="src\patches.cpp" />
+    <ClCompile Include="src\patches.h" />
+    <ClCompile Include="src\randomizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="src\dinput8\dinput8_32.asm" />
@@ -222,8 +229,11 @@
     <ClInclude Include="src\archipelago.h" />
     <ClInclude Include="src\dinput8\dinput8.h" />
     <ClInclude Include="src\ds2.h" />
+    <ClInclude Include="src\game_functions.h" />
+    <ClInclude Include="src\hooks.h" />
     <ClInclude Include="src\memory.h" />
     <ClInclude Include="src\offsets.h" />
+    <ClInclude Include="src\randomizer.h" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="src\assembly\functions_32.asm" />

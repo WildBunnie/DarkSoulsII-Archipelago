@@ -2,6 +2,9 @@
 
 #include "dinput8/dinput8.h"
 #include "archipelago.h"
+#include "hooks.h"
+#include "game_functions.h"
+#include "offsets.h"
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
@@ -10,11 +13,12 @@
 #include <windows.h>
 #include <string>
 #include <iostream>
+#include <filesystem>
 
 void setup_logging()
 {
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("archipelago.log", false);
+    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("archipelago/archipelago.log", false);
 
     console_sink->set_level(spdlog::level::debug);
     file_sink->set_level(spdlog::level::debug);
@@ -45,15 +49,23 @@ void handle_input()
                 "/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}] : Connect to the specified server.");
         }
         else if (line.find("/connect ") == 0) {
+
+            // temporary fix to the fact that overwriting the item lots 
+            // wont change the items already rendered in the zone the player is
+            if (is_player_ingame()) {
+                spdlog::warn("Must be in the menu to connect to archipelago.");
+                continue;
+            }
+
             std::string param = line.substr(9);
-            int space_index = param.find(" ");
+            size_t space_index = param.find(" ");
 
             if (space_index == std::string::npos) {
                 spdlog::info("Missing parameter : Make sure to type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]");
                 continue;
             }
 
-            int password_index = param.find("password:");
+            size_t password_index = param.find("password:");
             std::string address = param.substr(0, space_index);
             std::string slot_name = param.substr(space_index + 1, password_index - space_index - 2);
             std::string password = "";
@@ -74,6 +86,83 @@ void handle_input()
     }
 }
 
+void handle_check_locations()
+{
+    std::set<int64_t> missing_locations = get_missing_locations();
+    if (missing_locations.empty()) return;
+    std::set<int32_t> locations_to_check = get_locations_to_check();
+    if (locations_to_check.empty()) return;
+
+    std::list<int64_t> matched_locations;
+
+    for (int32_t location : locations_to_check) {
+        if (missing_locations.contains(static_cast<int64_t>(location))) {
+            matched_locations.push_back(static_cast<int64_t>(location));
+        }
+    }
+
+    clear_locations_to_check();
+
+    if (matched_locations.empty()) return;
+    check_locations(matched_locations);
+}
+
+void handle_give_items()
+{
+    std::list<int64_t> items_to_give = get_items_to_give();
+    if (items_to_give.empty()) return;
+    if (!is_player_ingame()) return;
+
+    ItemStruct item_struct;
+    int index = 0;
+
+    for (const auto& item_id : items_to_give) {
+
+        Item item;
+        item.idk = 0;
+        item.durability = -1;
+        item.amount = 1;
+        item.upgrade = 0;
+        item.infusion = 0;
+
+        // item_id < 1000000 means custom item
+        if (item_id < 1000000) {
+            if (is_statue(item_id)) unpetrify_statue(item_id);
+
+            item.item_id = unused_item_ids[index];
+            std::string item_name = get_local_item_name(item_id);
+            std::wstring item_name_wide(item_name.begin(), item_name.end());
+            set_item_name(item.item_id, item_name_wide);
+        }
+        else {
+            item.item_id = static_cast<int32_t>(item_id);
+        }
+
+        item_struct.items[index] = item;
+
+        index++;
+
+        if (index == 8) {
+            give_items(item_struct, 8);
+            index = 0;
+        }
+    }
+
+    if (index > 0) {
+        give_items(item_struct, index);
+    }
+
+    confirm_items_given(items_to_give.size());
+    write_save_file();
+}
+
+void handle_death_link()
+{
+    if (is_death_link() && is_player_ingame() && player_just_died() && !died_by_deathlink()) {
+        send_death_link();
+    }
+}
+
 void run()
 {
     AllocConsole();
@@ -85,13 +174,21 @@ void run()
         "Type '/help' for more information\n"
         "-----------------------------------------------------");
 
+    std::filesystem::create_directory("archipelago"); // make sure the archipelago folder exists
+
     setup_logging();
     CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)handle_input, NULL, NULL, NULL);
+
+    force_offline();
 
     while (true) {
         apclient_poll();
 
-        if (!is_apclient_connected) continue;
+        if (!is_apclient_connected() || !is_save_loaded) continue;
+
+        handle_check_locations();
+        handle_give_items();
+        handle_death_link();
 
         Sleep(1000 / 60);
     }
