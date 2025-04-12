@@ -283,6 +283,8 @@ class DS2World(World):
         self.set_location_rule("[Gutter] Urn behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
         ## BASTILLE KEY
         self.set_location_rule("[Bastille] In a cell next to Straid's cell", lambda state: state.has("Bastille Key", self.player))
+        self.set_location_rule("[SinnersRise] In locked cell left side upper level", lambda state: state.has("Bastille Key", self.player))
+        self.set_location_rule("[SinnersRise] In right side oil-sconce room just before the Sinner", lambda state: state.has("Bastille Key", self.player))
         if self.options.enable_ngp:
             self.set_location_rule("[Bastille] In a cell next to Straid's cell in NG+", lambda state: state.has("Bastille Key", self.player))
     
