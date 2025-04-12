@@ -281,7 +281,11 @@ class DS2World(World):
         if self.options.game_version == "sotfs": 
             self.set_location_rule("[Pit] Corpse behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
         self.set_location_rule("[Gutter] Urn behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
-        
+        ## BASTILLE KEY
+        self.set_location_rule("[Bastille] In a cell next to Straid's cell", lambda state: state.has("Bastille Key", self.player))
+        if self.options.enable_ngp:
+            self.set_location_rule("[Bastille] In a cell next to Straid's cell in NG+", lambda state: state.has("Bastille Key", self.player))
+    
         self.set_location_rule("[ShadedWoods] Gift from Manscorpion Tark after defeating Najka", lambda state: state.has("Ring of Whispers", self.player))
 
         #STATUES
