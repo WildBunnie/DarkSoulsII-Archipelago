@@ -290,6 +290,7 @@ class DS2World(World):
             self.set_location_rule("[Heides] Metal chest behind petrified hollow after Dragonrider", lambda state: state.has("Unpetrify Statue in Heide's Tower of Flame", self.player))
             self.set_location_rule("[Heides] On railing behind petrified hollow", lambda state: state.has("Unpetrify Statue in Heide's Tower of Flame", self.player))
             self.set_location_rule("Defeat the Rotten", lambda state: state.has("Unpetrify Statue in Black Gulch", self.player))
+            self.set_location_rule("[Gulch] Urn next to the second bonfire", lambda state: state.has("Unpetrify Statue in Black Gulch", self.player))
             self.set_location_rule("[ShadedWoods] Metal chest blocked by petrified statue", lambda state: state.has("Unpetrify Statue Blocking the Chest in Shaded Ruins", self.player))
             self.set_location_rule("[ShadedWoods] Drop from Petrified Lion Warrior next to Golden Lion Warrior", lambda state: state.has("Unpetrify Warlock Mask Statue in Shaded Ruins", self.player))
             self.set_location_rule("[AldiasKeep] Drop from Petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Left Cage Statue in Aldia's Keep", self.player))
@@ -297,7 +298,7 @@ class DS2World(World):
         self.set_location_rule("[ShadedWoods] Metal chest in room blocked by petrified statue", lambda state: state.has("Unpetrify Lion Mage Set Statue in Shaded Ruins", self.player))
         self.set_location_rule("[ShadedWoods] Drop from the petrified lion warrior by the tree bridge", lambda state: state.has("Unpetrify Fang Key Statue in Shaded Ruins", self.player))
         self.set_location_rule("[AldiasKeep] Drop from Petrified Ogre blocking stairway near Bone Dragon", lambda state: state.has("Unpetrify Cyclops Statue in Aldia's Keep", self.player))
-        
+
         # lockstones
         self.set_location_rule("[FOFG] First metal chest behind Pharros' contraption under the ballista-trap", lambda state: state.has("Master Lockstone", self.player))
         self.set_location_rule("[FOFG] Second metal chest behind Pharros' contraption under the ballista-trap", lambda state: state.has("Master Lockstone", self.player))
