@@ -95,7 +95,7 @@ char __cdecl detour_give_items_on_pickup(uintptr_t param_1, uintptr_t param_2)
 
     // janky way to fix the problem that some pickups
     // have the same id as some of the shop items
-    if (!is_shop_location(itemlot_id)) {
+    if (!shop_prices.contains(itemlot_id)) {
         handle_location_checked(itemlot_id);
     }
 

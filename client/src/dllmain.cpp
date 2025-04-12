@@ -148,6 +148,7 @@ void handle_give_items()
 
         if (index == 8) {
             give_items(item_struct, 8);
+            Sleep(500);
             index = 0;
         }
     }

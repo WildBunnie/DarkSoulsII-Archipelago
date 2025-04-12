@@ -41,7 +41,7 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
 
         if (i > 0 && param_id == 0) break; // return if we reach the end
         if (ignore.contains(param_id)) continue;
-        if (rewards.contains(param_id) && !is_shop_location(param_id)) continue;
+        if (rewards.contains(param_id) && !shop_prices.contains(param_id)) continue;
 
         offsets.push_back(row_ptr[i].reward_offset);
     }
@@ -59,7 +59,7 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
         if (ignore.contains(param_id)) continue;
 
         uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
-        if (rewards.contains(param_id) && !is_shop_location(param_id)) {
+        if (rewards.contains(param_id) && !shop_prices.contains(param_id)) {
             for (int j = 0; j < 10; j++) {
                 uintptr_t item_ptr = reward_ptr + 0x2C + (j * sizeof(int32_t));
                 uintptr_t amount_ptr = reward_ptr + 0x4 + j;
@@ -171,7 +171,7 @@ void override_shoplineup_param(std::map<int32_t, int32_t> rewards, std::string s
         // we need to set the price rate no matter what
         // because we set the default price of all the items to 1
         uintptr_t price_rate_ptr = reward_ptr + 0x1C;
-        write_value<float_t>(price_rate_ptr, get_shop_price(param_id));
+        write_value<float_t>(price_rate_ptr, shop_prices.at(param_id));
 
         // make it so the items never dissapear from the shop
         // to prevent the player from losing checks

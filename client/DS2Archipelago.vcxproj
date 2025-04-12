@@ -208,11 +208,9 @@
   <ItemGroup>
     <ClCompile Include="src\archipelago.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\ds2.cpp" />
     <ClCompile Include="src\game_functions.cpp" />
     <ClCompile Include="src\hooks.cpp" />
     <ClCompile Include="src\memory.cpp" />
-    <ClCompile Include="src\offsets.cpp" />
     <ClCompile Include="src\patches.cpp" />
     <ClCompile Include="src\patches.h" />
     <ClCompile Include="src\randomizer.cpp" />
