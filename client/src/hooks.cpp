@@ -45,7 +45,7 @@ void handle_location_checked(int32_t location_id)
     if (_reward_names.contains(location_id)) {
         std::string item_name = _reward_names[location_id];
         std::wstring item_name_wide(item_name.begin(), item_name.end());
-        item_names[60375000] = remove_special_characters(item_name_wide);
+        item_names[the_item_id] = remove_special_characters(item_name_wide);
     }
     // if its a custom item, do whatever we need to do
     if (_custom_items.contains(location_id)) {
@@ -152,7 +152,7 @@ uintptr_t __cdecl detour_get_hovering_item_info(uintptr_t param_1, uintptr_t par
         if (_reward_names.contains(itemlot_id)) {
             std::string item_name = _reward_names[itemlot_id];
             std::wstring item_name_wide(item_name.begin(), item_name.end());
-            item_names[60375000] = remove_special_characters(item_name_wide);
+            item_names[the_item_id] = remove_special_characters(item_name_wide);
         }
     }
     return original_get_hovering_item_info(param_1, param_2);

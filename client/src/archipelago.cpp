@@ -5,6 +5,7 @@
 #include "randomizer.h"
 #include "hooks.h"
 #include "game_functions.h"
+#include "ds2.h"
 
 #include "spdlog/spdlog.h"
 
@@ -164,7 +165,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 			if (item.player == ap->get_player_number()) {
 				// if the id is less than 1000000 it's a custom item
 				if (item.item < 1000000) {
-					location_rewards[item.location] = 60375000;
+					location_rewards[item.location] = the_item_id;
 					custom_items[item.location] = item.item;
 
 					std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));
@@ -175,7 +176,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 				}
 			}
 			else {
-				location_rewards[item.location] = 60375000;
+				location_rewards[item.location] = the_item_id;
 
 				std::string player_name = ap->get_player_alias(item.player);
 				std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));

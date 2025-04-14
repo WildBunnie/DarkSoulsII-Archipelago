@@ -1,6 +1,18 @@
 #pragma once
 #include <map>
 
+// used as the placeholder for other world/custom items
+// when overriding the game's loot tables
+const int32_t the_item_id = 60375000;
+
+const std::vector<int> unused_item_ids = {
+   3400000, 3401000, 21001100, 21001101, 21001102, 21001103, 21600000,
+   21610000, 21620000, 21630000, 21640000, 21650000, 21660000, 21670000,
+   21680000, 21690000, 21700000, 21710000, 26590000, 26750000, 26770000,
+   26800000, 26900000, 27521000, 60375000, 65240000, 65250000, 65260000,
+   65270000, 65280000, 65290000, 900008182, 900008183
+};
+
 const std::map<int32_t, float_t> shop_prices = {
     {30700000, 4300.0f},
     {30700001, 5000.0f},

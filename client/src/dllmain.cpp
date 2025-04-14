@@ -5,6 +5,7 @@
 #include "hooks.h"
 #include "game_functions.h"
 #include "offsets.h"
+#include "ds2.h"
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
