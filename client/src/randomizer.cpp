@@ -34,7 +34,10 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
     int first_row_offset = 0x44 - sizeof(uintptr_t); // 0x3C for x64 and 0x40 for x40
     ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + first_row_offset);
 
-    std::vector<int32_t> offsets;
+    std::vector<int32_t> guaranteed_items_offsets;
+    std::vector<int32_t> random_items_offsets;
+    std::set<int32_t> guaranteed_items_params;
+    std::set<int32_t> random_items_params;
 
     for (int i = 0; i < 10000; ++i) {
         int param_id = row_ptr[i].param_id;
@@ -43,14 +46,28 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
         if (ignore.contains(param_id)) continue;
         if (rewards.contains(param_id) && !shop_prices.contains(param_id)) continue;
 
-        offsets.push_back(row_ptr[i].reward_offset);
+        uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
+
+        // chance for the first item to drop
+        uintptr_t chance_ptr = reward_ptr + 0x54; 
+        float_t chance = read_value<float_t>(chance_ptr);
+
+        if (chance == 100.0) {
+            guaranteed_items_offsets.push_back(row_ptr[i].reward_offset);
+            guaranteed_items_params.insert(param_id);
+        }
+        else {
+            random_items_offsets.push_back(row_ptr[i].reward_offset);
+            random_items_params.insert(param_id);
+        }
     }
 
     std::hash<std::string> hasher;
     size_t seed = hasher(seed_str);
 
     std::default_random_engine rng(static_cast<unsigned int>(seed));
-    std::ranges::shuffle(offsets, rng);
+    std::ranges::shuffle(guaranteed_items_offsets, rng);
+    std::ranges::shuffle(random_items_offsets, rng);
 
     for (int i = 0; i < 10000; ++i) {
         int param_id = row_ptr[i].param_id;
@@ -60,22 +77,26 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
 
         uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
         if (rewards.contains(param_id) && !shop_prices.contains(param_id)) {
-            for (int j = 0; j < 10; j++) {
-                uintptr_t item_ptr = reward_ptr + 0x2C + (j * sizeof(int32_t));
-                uintptr_t amount_ptr = reward_ptr + 0x4 + j;
-                if (j == 0) {
-                    write_value<int32_t>(item_ptr, rewards[param_id]);
-                    write_value<int32_t>(amount_ptr, 1);
-                }
-                else if(read_value<int32_t>(item_ptr) == 10) {
-                    write_value<int32_t>(item_ptr, 10);
-                    write_value<int32_t>(amount_ptr, 0);
-                }
-            }
+            uintptr_t item_ptr = reward_ptr + 0x2C;
+            write_value<int32_t>(item_ptr, rewards[param_id]);
+
+            uintptr_t amount_ptr = reward_ptr + 0x4;
+            write_value<int8_t>(amount_ptr, 1);
+
+            // zero out the amounts of the other items
+            void* ptr = reinterpret_cast<void*>(amount_ptr + 1);
+            std::memset(ptr, 0, 9 * sizeof(int8_t));
         }
         else {
-            int32_t offset = offsets.back();
-            offsets.pop_back();
+            uintptr_t offset = row_ptr[i].reward_offset;
+            if (guaranteed_items_params.contains(param_id)) {
+                offset = guaranteed_items_offsets.back();
+                guaranteed_items_offsets.pop_back();
+            }
+            else if (random_items_params.contains(param_id)) {
+                offset = random_items_offsets.back();
+                random_items_offsets.pop_back();
+            }
             row_ptr[i].reward_offset = offset;
         }
     }
@@ -126,7 +147,7 @@ void override_shoplineup_param(std::map<int32_t, int32_t> rewards, std::string s
     for (int i = 0; i < 10000; ++i) {
         int param_id = row_ptr[i].param_id;
 
-        if (i > 0 && param_id == 0) break;         // return if we reach the end
+        if (i > 0 && param_id == 0) break; // return if we reach the end
         if (ignore.contains(param_id)) continue;
         if (rewards.contains(param_id)) continue; // we deal with predefined items in the next for loop
         if (param_id >= 76801000 && param_id <= 76801306) continue; // skip straid trades
@@ -170,8 +191,10 @@ void override_shoplineup_param(std::map<int32_t, int32_t> rewards, std::string s
 
         // we need to set the price rate no matter what
         // because we set the default price of all the items to 1
-        uintptr_t price_rate_ptr = reward_ptr + 0x1C;
-        write_value<float_t>(price_rate_ptr, shop_prices.at(param_id));
+        if (shop_prices.contains(param_id)) {
+            uintptr_t price_rate_ptr = reward_ptr + 0x1C;
+            write_value<float_t>(price_rate_ptr, shop_prices.at(param_id));
+        }
 
         // make it so the items never dissapear from the shop
         // to prevent the player from losing checks

@@ -16,6 +16,7 @@
 #include "boost/uuid/uuid_io.hpp"
 
 #include <map>
+#include <queue>
 #include <string>
 
 #if defined(_M_X64)
@@ -34,9 +35,9 @@ bool fatal_error = false;
 bool death_link = false;
 bool save_loaded = false;
 bool _died_by_deathlink = false;
-int last_received_index = 0;
+int last_received_index = -1;
 std::set<int32_t> locations_to_ignore;
-std::list<APClient::NetworkItem> items_to_give;
+std::queue<APClient::NetworkItem> items_to_give;
 
 enum ItemsHandling {
 	NO_ITEMS = 0b000,
@@ -54,7 +55,10 @@ void reset_apclient()
 	save_loaded = false;
 	_died_by_deathlink = false;
 	last_received_index = 0;
-	items_to_give.clear();
+	locations_to_ignore.clear();
+	while (!items_to_give.empty()) {
+		items_to_give.pop();
+	}
 }
 
 void setup_apclient(std::string URI, std::string slot_name, std::string password)
@@ -145,6 +149,11 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 			}
 		}
 		save_loaded = true;
+		
+		// forces the server to send us all the items
+		// it's a shitty solution to the fact that
+		// we get items before the save is loaded
+		ap->Sync();
 	});
 
 	ap->set_location_info_handler([](const std::list<APClient::NetworkItem>& items) {
@@ -177,9 +186,13 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		init_hooks(reward_names, custom_items);
 	});
 
-	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& receivedItems) {
-		for (const auto& network_item : receivedItems) {
-			items_to_give.push_back(network_item);
+	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& received_items) {
+		if (!save_loaded) {
+			return;
+		}
+		for (const auto& item : received_items) {
+			if (item.index <= last_received_index) continue;
+			items_to_give.push(item);
 		}
 	});
 
@@ -220,7 +233,12 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 
 bool is_apclient_connected() 
 {
-	return ap && ap->get_state() == APClient::State::SLOT_CONNECTED;
+	return ap && ap->get_state() == APClient::State::SLOT_CONNECTED && save_loaded;
+}
+
+bool is_death_link()
+{
+	return death_link;
 }
 
 void apclient_poll()
@@ -235,35 +253,38 @@ void apclient_say(std::string message)
 	}
 }
 
-std::set<int64_t> get_missing_locations()
+int64_t get_next_item()
 {
-	return ap->get_missing_locations();
-}
-
-void check_locations(std::list<int64_t> locations)
-{
-	ap->LocationChecks(locations);
-}
-
-std::list<int64_t> get_items_to_give()
-{
-	std::list<int64_t> result;
-	for (const auto& network_item : items_to_give) {
-		if (network_item.index < last_received_index) continue;
-		result.push_back(network_item.item);
+	if (!items_to_give.empty()) {
+		int64_t item = items_to_give.front().item;
+		items_to_give.pop();
+		return item;
 	}
-	return result;
+	return -1;
 }
 
 void confirm_items_given(int amount)
 {
 	last_received_index += amount;
-	items_to_give.clear();
+	write_save_file();
 }
 
-bool is_death_link()
+void check_locations(std::list<int32_t> locations)
 {
-	return death_link;
+	std::list<int64_t> checks;
+	std::set<int64_t> missing_locations = ap->get_missing_locations();
+
+	for (auto& location : locations)
+	{
+		if (missing_locations.contains(location))
+		{
+			checks.push_back(static_cast<int64_t>(location));
+		}
+	}
+	
+	if (!checks.empty()) {
+		ap->LocationChecks(checks);
+	}
 }
 
 void send_death_link()
@@ -289,16 +310,24 @@ bool died_by_deathlink()
 	return false;
 }
 
+std::string get_local_item_name(int32_t item_id)
+{
+	return ap->get_item_name(item_id, ap->get_player_game(ap->get_player_number()));
+}
+
+void announce_goal_reached()
+{
+    if (ap) ap->StatusUpdate(APClient::ClientStatus::GOAL);
+}
+
 void write_save_file()
 {
 	try {
-		std::filesystem::create_directory("archipelago");
-
 		json j = {
-			{"lastReceivedIndex", last_received_index}
+			{"last_received_index", last_received_index}
 		};
 
-		std::ofstream file("archipelago/" + std::string(room_id_value) + "_" + std::string(ap->get_slot()) + ".json");
+		std::ofstream file("archipelago/save_data/" + std::string(room_id_value) + "_" + std::string(ap->get_slot()) + ".json");
 
 		file << j.dump(4);
 
@@ -314,14 +343,14 @@ void write_save_file()
 void read_save_file()
 {
 	try {
-		std::ifstream file("archipelago/" + std::string(room_id_value) + "_" + std::string(ap->get_slot()) + ".json");
+		std::ifstream file("archipelago/save_data/" + std::string(room_id_value) + "_" + std::string(ap->get_slot()) + ".json");
 
 		json j;
 		file >> j;
 
-		if (j.contains("lastReceivedIndex")) {
-			last_received_index = j["lastReceivedIndex"];
-			spdlog::debug("Successfully read lastReceivedIndex: {}", last_received_index);
+		if (j.contains("last_received_index")) {
+			last_received_index = j["last_received_index"];
+			spdlog::debug("Successfully read last_received_index: {}", last_received_index);
 		}
 
 		file.close();
@@ -329,29 +358,4 @@ void read_save_file()
 	catch (const std::exception& e) {
 		spdlog::debug("Error reading save file");
 	}
-}
-
-bool is_save_loaded()
-{
-	return save_loaded;
-}
-
-int get_last_received_index()
-{
-	return last_received_index;
-}
-
-void set_last_received_index(int value)
-{
-	last_received_index = value;
-}
-
-std::string get_local_item_name(int32_t item_id)
-{
-	return ap->get_item_name(item_id, ap->get_player_game(ap->get_player_number()));
-}
-
-void handle_finished_game()
-{
-    if (ap) ap->StatusUpdate(APClient::ClientStatus::GOAL);
 }

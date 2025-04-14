@@ -20,7 +20,7 @@ HOOKS
 std::map<int, std::wstring> item_names;
 std::map<int32_t, std::string> _reward_names;
 std::map<int32_t, int32_t> _custom_items;
-std::set<int32_t> locations_to_check;
+std::list<int32_t> locations_to_check;
 
 std::wstring remove_special_characters(const std::wstring& input)
 {
@@ -54,7 +54,7 @@ void handle_location_checked(int32_t location_id)
             unpetrify_statue(item_id);
         }
     }
-    locations_to_check.insert(location_id);
+    locations_to_check.push_back(location_id);
 }
 
 INT __stdcall detour_getaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHints, PADDRINFOA* ppResult)
@@ -208,7 +208,7 @@ void force_offline()
     MH_EnableHook(target);
 }
 
-std::set<int32_t> get_locations_to_check()
+std::list<int32_t> get_locations_to_check()
 {
     return locations_to_check;
 }

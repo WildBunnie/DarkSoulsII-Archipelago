@@ -5,23 +5,17 @@
 #include <list>
 
 void setup_apclient(std::string URI, std::string slot_name, std::string password);
-
 bool is_apclient_connected();
-
+bool is_death_link();
 void apclient_poll();
 void apclient_say(std::string message);
 
-std::set<int64_t> get_missing_locations();
-void check_locations(std::list<int64_t> locations);
-std::list<int64_t> get_items_to_give();
+int64_t get_next_item();
 void confirm_items_given(int amount);
-bool is_death_link();
+void check_locations(std::list<int32_t> locations);
 void send_death_link();
 bool died_by_deathlink();
+std::string get_local_item_name(int32_t item_id);
+void announce_goal_reached();
 void write_save_file();
 void read_save_file();
-bool is_save_loaded();
-int get_last_received_index();
-void set_last_received_index(int value);
-std::string get_local_item_name(int32_t item_id);
-void handle_finished_game();

@@ -88,39 +88,31 @@ void handle_input()
 
 void handle_check_locations()
 {
-    std::set<int64_t> missing_locations = get_missing_locations();
-    if (missing_locations.empty()) return;
-    std::set<int32_t> locations_to_check = get_locations_to_check();
+    std::list<int32_t> locations_to_check = get_locations_to_check();
     if (locations_to_check.empty()) return;
 
-    std::list<int64_t> matched_locations;
-
     for (int32_t location : locations_to_check) {
+        // check if we get reward from nashandra
         if (location == 627000) {
-            handle_finished_game();
-        }
-
-        if (missing_locations.contains(static_cast<int64_t>(location))) {
-            matched_locations.push_back(static_cast<int64_t>(location));
+            announce_goal_reached();
         }
     }
 
+    check_locations(locations_to_check);
     clear_locations_to_check();
-
-    if (matched_locations.empty()) return;
-    check_locations(matched_locations);
 }
 
 void handle_give_items()
 {
-    std::list<int64_t> items_to_give = get_items_to_give();
-    if (items_to_give.empty()) return;
     if (!is_player_ingame()) return;
 
     ItemStruct item_struct;
-    int index = 0;
+    int num_items = 0;
 
-    for (const auto& item_id : items_to_give) {
+    for (int i = 0; i < 8; i++) {
+
+        int64_t item_id = get_next_item();
+        if (item_id == -1) break;
 
         Item item;
         item.idk = 0;
@@ -133,7 +125,7 @@ void handle_give_items()
         if (item_id < 1000000) {
             if (is_statue(item_id)) unpetrify_statue(item_id);
 
-            item.item_id = unused_item_ids[index];
+            item.item_id = unused_item_ids[i];
             std::string item_name = get_local_item_name(item_id);
             std::wstring item_name_wide(item_name.begin(), item_name.end());
             set_item_name(item.item_id, item_name_wide);
@@ -142,23 +134,14 @@ void handle_give_items()
             item.item_id = static_cast<int32_t>(item_id);
         }
 
-        item_struct.items[index] = item;
-
-        index++;
-
-        if (index == 8) {
-            give_items(item_struct, 8);
-            Sleep(500);
-            index = 0;
-        }
+        item_struct.items[i] = item;
+        num_items++;
     }
 
-    if (index > 0) {
-        give_items(item_struct, index);
+    if (num_items > 0) {
+        give_items(item_struct, num_items);
+        confirm_items_given(num_items);
     }
-
-    confirm_items_given(items_to_give.size());
-    write_save_file();
 }
 
 void handle_death_link()
@@ -179,7 +162,9 @@ void run()
         "Type '/help' for more information\n"
         "-----------------------------------------------------");
 
-    std::filesystem::create_directory("archipelago"); // make sure the archipelago folder exists
+    // make sure the archipelago folder exists
+    std::filesystem::create_directory("archipelago");
+    std::filesystem::create_directory("archipelago/save_data");
 
     setup_logging();
     CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)handle_input, NULL, NULL, NULL);
@@ -189,13 +174,13 @@ void run()
     while (true) {
         apclient_poll();
 
-        if (!is_apclient_connected() || !is_save_loaded) continue;
+        if (!is_apclient_connected()) continue;
 
         handle_check_locations();
         handle_give_items();
         handle_death_link();
 
-        Sleep(1000 / 60);
+        Sleep(1000 / 2);
     }
 }
 

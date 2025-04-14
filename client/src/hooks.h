@@ -6,11 +6,12 @@
 #include <WS2tcpip.h>
 #include <cstdint>
 #include <map>
+#include <list>
 #include <string>
 
 void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, int32_t> custom_items);
 void force_offline();
-std::set<int32_t> get_locations_to_check();
+std::list<int32_t> get_locations_to_check();
 void clear_locations_to_check();
 void set_item_name(int32_t item_id, std::wstring item_name);
 
