@@ -17,6 +17,7 @@ getaddrinfo_t original_getaddrinfo;
 HOOKS
 #undef HOOK
 
+bool hooks_enabled = false;
 std::map<int, std::wstring> item_names;
 std::map<int32_t, std::string> _reward_names;
 std::map<int32_t, int32_t> _custom_items;
@@ -185,6 +186,8 @@ void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, i
     _reward_names = reward_names;
     _custom_items = custom_items;
 
+    if (hooks_enabled) return;
+
     MH_Initialize();
 
     #define HOOK(name) \
@@ -195,7 +198,9 @@ void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, i
         spdlog::error("error enabling hook {}", #name); \
     } 
     HOOKS
-    #undef HOOK
+#undef HOOK
+
+    hooks_enabled = true;
 }
 
 void force_offline()
