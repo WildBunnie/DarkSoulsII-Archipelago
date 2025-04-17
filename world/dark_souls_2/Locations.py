@@ -1060,7 +1060,7 @@ location_table = {
         LocationData(20105010, "[MemoryVammar] Metal chest in the corner of the main battlefield area", ['Petrified Something'], sotfs=True),
         LocationData(20106000, "[MemoryVammar] Behind a corner in the first corridor after Drummond", ['Fire Seed']),
         LocationData(20106010, "[MemoryVammar] On the second floor of the ruined house", ['Large Soul of a Nameless Soldier']),
-        LocationData(20106011, "[MemoryVammar] On the second floor of the ruined house (2)", ['Large Soul of a Brave Warrior']),
+        LocationData(20106011, "[MemoryVammar] On the second floor of the ruined house in NG+", ['Large Soul of a Brave Warrior'], ngp=True),
         LocationData(20106020, "[MemoryVammar] In the corner of the roof", ['Soul of a Great Hero', 'Bonfire Ascetic']),
         LocationData(20106030, "[MemoryVammar] In the far right corner of the main battlefield area", ['Giant Warrior Club']),
         LocationData(20106040, "[MemoryVammar] At the top of the final stairs in Memory of Vammar", ['Old Radiant Lifegem']),
