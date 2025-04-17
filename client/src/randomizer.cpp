@@ -47,6 +47,14 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
         if (rewards.contains(param_id) && !shop_prices.contains(param_id)) continue;
 
         uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
+        
+        uintptr_t item_ptr = reward_ptr + 0x2C;
+        int32_t item_id = read_value<int32_t>(item_ptr);
+
+        if (item_id == 60510000 || item_id == 0) {
+            ignore.insert(param_id);
+            continue;
+        }
 
         // chance for the first item to drop
         uintptr_t chance_ptr = reward_ptr + 0x54; 

@@ -185,7 +185,7 @@ void run()
     setup_logging();
     force_offline();
 
-    const int tps = 0; // ticks per second
+    const int tps = 60; // ticks per second
     int loop_counter = 0;
     while (true) {
         handle_input();
