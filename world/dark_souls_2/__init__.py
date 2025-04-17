@@ -237,6 +237,10 @@ class DS2World(World):
         # LOCATIONS
         ## MAJULA
         self.set_location_rule("[Majula] Wooden chest in Lenigrast's workshop", lambda state: state.has("Lenigrast's Key", self.player))
+        self.set_location_rule("[Majula] Library room in Cale's house", lambda state: state.has("House Key", self.player))
+        self.set_location_rule("[Majula] Corpse in Cale's house basement", lambda state: state.has("House Key", self.player))
+        self.set_location_rule("[Majula] Metal chest in Cale's house basement", lambda state: state.has("House Key", self.player))
+        self.set_location_rule("[Majula] Wooden chest on the attic of Majula mansion", lambda state: state.has("House Key", self.player))
         ## PURSUER
         self.set_location_rule("[FOFG] Just before pursuer arena", lambda state: state.has("Soldier Key", self.player))
         if self.options.enable_ngp:
