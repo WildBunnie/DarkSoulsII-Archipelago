@@ -31,7 +31,7 @@ struct ParamRow {
 void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed_str, std::set<int32_t> ignore, std::vector<uintptr_t> param_offsets)
 {
     uintptr_t param_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, param_offsets);
-    int first_row_offset = 0x44 - sizeof(uintptr_t); // 0x3C for x64 and 0x40 for x40
+    int first_row_offset = 0x44 - sizeof(uintptr_t); // 0x3C for x64 and 0x40 for x86
     ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + first_row_offset);
 
     std::vector<int32_t> guaranteed_items_offsets;
@@ -63,6 +63,11 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
         if (chance == 100.0) {
             guaranteed_items_offsets.push_back(row_ptr[i].reward_offset);
             guaranteed_items_params.insert(param_id);
+        }
+        // ignore stupid itemlots that have the first item with 
+        // 0% chance and the second item with 100% chance
+        else if (chance == 0.0) {
+            ignore.insert(param_id);
         }
         else {
             random_items_offsets.push_back(row_ptr[i].reward_offset);
@@ -113,7 +118,7 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
 void override_item_prices()
 {
     uintptr_t param_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, ParamOffsets::ItemParam);
-    ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x40
+    ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x86
 
     for (int i = 0; i < 10000; ++i) {
         int param_id = row_ptr[i].param_id;
@@ -140,7 +145,7 @@ void override_shoplineup_param(std::map<int32_t, int32_t> rewards, std::string s
     override_item_prices();
 
     uintptr_t param_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, ParamOffsets::ShopLineupParam);
-    ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x40
+    ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x86
 
     typedef struct {
         int32_t id;
