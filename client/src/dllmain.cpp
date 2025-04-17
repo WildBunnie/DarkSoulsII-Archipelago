@@ -15,6 +15,7 @@
 #include <string>
 #include <iostream>
 #include <filesystem>
+#include <conio.h>
 
 void setup_logging()
 {
@@ -39,50 +40,64 @@ void setup_logging()
 
 void handle_input()
 {
-    while (true) {
-        std::string line;
-        std::getline(std::cin, line);
+    static std::string line;
 
-        if (line == "/help") {
-            spdlog::info("List of available commands : \n"
-                "/help : Prints this help message.\n"
-                "!help : Prints the help message related to Archipelago.\n"
-                "/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}] : Connect to the specified server.");
+    while (_kbhit()) {
+        char ch = _getch();
+        if (ch == '\r') { // enter key
+            std::cout << std::endl;
+
+            if (line == "/help") {
+                spdlog::info("List of available commands : \n"
+                    "/help : Prints this help message.\n"
+                    "!help : Prints the help message related to Archipelago.\n"
+                    "/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}] : Connect to the specified server.");
+            }
+            else if (line.find("/connect ") == 0) {
+
+                if (is_player_ingame()) {
+                    spdlog::warn("Must be in the menu to connect to archipelago.");
+                    line.clear();
+                    return;
+                }
+
+                std::string param = line.substr(9);
+                size_t space_index = param.find(" ");
+                if (space_index == std::string::npos) {
+                    spdlog::info("Missing parameter : Make sure to type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]");
+                    line.clear();
+                    return;
+                }
+
+                size_t password_index = param.find("password:");
+                std::string address = param.substr(0, space_index);
+                std::string slot_name = param.substr(space_index + 1, password_index == std::string::npos ? std::string::npos : password_index - space_index - 2);
+                std::string password = "";
+
+                if (password_index != std::string::npos) {
+                    password = param.substr(password_index + 9);
+                }
+
+                setup_apclient(address, slot_name, password);
+            }
+            else if (line.find("!") == 0) {
+                apclient_say(line);
+            }
+            else {
+                spdlog::info("Sorry did not understand that.");
+            }
+
+            line.clear();
         }
-        else if (line.find("/connect ") == 0) {
-
-            // temporary fix to the fact that overwriting the item lots 
-            // wont change the items already rendered in the zone the player is
-            if (is_player_ingame()) {
-                spdlog::warn("Must be in the menu to connect to archipelago.");
-                continue;
+        else if (ch == '\b') { // backspace
+            if (!line.empty()) {
+                line.pop_back();
+                std::cout << "\b \b";
             }
-
-            std::string param = line.substr(9);
-            size_t space_index = param.find(" ");
-
-            if (space_index == std::string::npos) {
-                spdlog::info("Missing parameter : Make sure to type '/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}]");
-                continue;
-            }
-
-            size_t password_index = param.find("password:");
-            std::string address = param.substr(0, space_index);
-            std::string slot_name = param.substr(space_index + 1, password_index - space_index - 2);
-            std::string password = "";
-            spdlog::info("{} - {}", address, slot_name, "\n");
-
-            if (password_index != std::string::npos) {
-                password = param.substr(password_index + 9);
-            }
-
-            setup_apclient(address, slot_name, password);
-        }
-        else if (line.find("!") == 0) {
-            apclient_say(line);
         }
         else {
-            spdlog::info("Sorry did not understand that.");
+            line.push_back(ch);
+            std::cout << ch;
         }
     }
 }
@@ -168,20 +183,29 @@ void run()
     std::filesystem::create_directory("archipelago/save_data");
 
     setup_logging();
-    CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)handle_input, NULL, NULL, NULL);
-
     force_offline();
 
+    const int tps = 0; // ticks per second
+    int loop_counter = 0;
     while (true) {
+        handle_input();
+
         apclient_poll();
 
         if (!is_apclient_connected()) continue;
 
         handle_check_locations();
-        handle_give_items();
         handle_death_link();
 
-        Sleep(1000 / 2);
+        // artifical delay between giving items
+        // to prevent items not giving
+        if (loop_counter >= tps) {
+            handle_give_items();
+            loop_counter = 0;
+        }
+
+        loop_counter++;
+        Sleep(1000 / tps);
     }
 }
 
