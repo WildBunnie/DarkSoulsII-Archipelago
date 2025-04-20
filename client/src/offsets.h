@@ -16,6 +16,7 @@ namespace function_offsets {
     const uintptr_t get_item_info = 0x4ff6e0;
     const uintptr_t get_hovering_item_info = 0x105A40;
     const uintptr_t remove_item_from_inventory = 0x233ED0;
+    const uintptr_t virtual_to_archive_path = 0x57EB70;
 #elif defined(_M_X64)
     const uintptr_t give_items_on_reward = 0x199CC0;
     const uintptr_t give_items_on_pickup = 0x1E4590;
@@ -28,6 +29,7 @@ namespace function_offsets {
     const uintptr_t get_item_info = 0x503620;
     const uintptr_t get_hovering_item_info = 0x38170;
     const uintptr_t remove_item_from_inventory = 0x1AF1E0;
+    const uintptr_t virtual_to_archive_path = 0x89C5A0;
 #endif
 };
 

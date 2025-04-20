@@ -178,9 +178,10 @@ void run()
         "Type '/help' for more information\n"
         "-----------------------------------------------------");
 
-    // make sure the archipelago folder exists
+    // make sure the folders we need exist
     std::filesystem::create_directory("archipelago");
     std::filesystem::create_directory("archipelago/save_data");
+    std::filesystem::create_directory("archipelago/textures");
 
     setup_logging();
     force_offline();
