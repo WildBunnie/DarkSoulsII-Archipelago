@@ -30,7 +30,7 @@ struct ParamRow {
 
 void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed_str, std::set<int32_t> ignore, std::vector<uintptr_t> param_offsets)
 {
-    uintptr_t param_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, param_offsets);
+    uintptr_t param_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets);
     int first_row_offset = 0x44 - sizeof(uintptr_t); // 0x3C for x64 and 0x40 for x86
     ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + first_row_offset);
 
@@ -117,7 +117,7 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
 
 void override_item_prices()
 {
-    uintptr_t param_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, ParamOffsets::ItemParam);
+    uintptr_t param_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::item_param);
     ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x86
 
     for (int i = 0; i < 10000; ++i) {
@@ -144,7 +144,7 @@ void override_shoplineup_param(std::map<int32_t, int32_t> rewards, std::string s
     // set the values properly in the shop params
     override_item_prices();
 
-    uintptr_t param_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, ParamOffsets::ShopLineupParam);
+    uintptr_t param_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::shop_lineup_param);
     ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x86
 
     typedef struct {
@@ -262,8 +262,8 @@ void override_item_params(std::map<int32_t, int32_t> rewards, std::string seed, 
     patch_memory(get_base_address() + 0x316A9F, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 #endif
 
-    override_itemlot_param(rewards, seed, ignore, ParamOffsets::ItemLotParam2_Other);
-    override_itemlot_param(rewards, seed, ignore, ParamOffsets::ItemLotParam2_Chr);
+    override_itemlot_param(rewards, seed, ignore, param_offsets::item_lot_param2_other);
+    override_itemlot_param(rewards, seed, ignore, param_offsets::item_lot_param2_chr);
     override_shoplineup_param(rewards, seed, ignore);
 
     auto end_time = high_resolution_clock::now();

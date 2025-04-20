@@ -50,9 +50,9 @@ void give_items(ItemStruct items, int num_items)
     create_popup_structure_t create_popup = (create_popup_structure_t)(base_address + function_offsets::create_popup_structure);
     show_item_popup_t show_popup = (show_item_popup_t)(base_address + function_offsets::show_item_popup);
 
-    add_items(resolve_pointer(base_address, PointerOffsets::BaseA, PointerOffsets::AvailableItemBag), &items, num_items, 0);
+    add_items(resolve_pointer(base_address, pointer_offsets::base_a, pointer_offsets::available_item_bag), &items, num_items, 0);
     create_popup((uintptr_t)display_struct, &items, num_items, 1);
-    show_popup(resolve_pointer(base_address, PointerOffsets::BaseA, PointerOffsets::ItemGiveWindow), (uintptr_t)display_struct);
+    show_popup(resolve_pointer(base_address, pointer_offsets::base_a, pointer_offsets::item_give_window), (uintptr_t)display_struct);
 }
 
 bool is_statue(int item_id)
@@ -67,7 +67,7 @@ void unpetrify_statue(int statue_id)
     }
 
     WorldFlagOffset statueOffset = statue_offsets[statue_id];
-    uintptr_t worldFlagsPtr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, PointerOffsets::WorldFlags);
+    uintptr_t worldFlagsPtr = resolve_pointer(get_base_address(), pointer_offsets::base_a, pointer_offsets::world_flags);
 
     uint8_t value = read_value<uint8_t>(worldFlagsPtr + statueOffset.offset);
     value |= (1 << statueOffset.bit_start);
@@ -78,7 +78,7 @@ int32_t previous_hp, current_hp = -1;
 bool player_just_died()
 {
     previous_hp = current_hp;
-    uintptr_t hp_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, PointerOffsets::HP);
+    uintptr_t hp_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, pointer_offsets::hp);
     current_hp = read_value<int32_t>(hp_ptr);
     if (previous_hp != current_hp && previous_hp > 0 && current_hp <= 0) {
         spdlog::debug("YOU DIED");
@@ -89,7 +89,7 @@ bool player_just_died()
 
 bool kill_player()
 {
-    uintptr_t hp_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, PointerOffsets::HP);
+    uintptr_t hp_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, pointer_offsets::hp);
     int32_t hp = read_value<int32_t>(hp_ptr);
     if (hp > 0) {
         write_value<int32_t>(hp_ptr, 0);
@@ -100,7 +100,7 @@ bool kill_player()
 
 bool is_player_ingame()
 {
-    uintptr_t state_ptr = resolve_pointer(get_base_address(), PointerOffsets::BaseA, PointerOffsets::GameState);
+    uintptr_t state_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, pointer_offsets::game_state);
     int32_t state = read_value<int32_t>(state_ptr);;
     if (state == 30) {
         return true;

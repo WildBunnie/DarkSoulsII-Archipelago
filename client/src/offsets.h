@@ -9,7 +9,7 @@ namespace function_offsets {
     const uintptr_t give_items_on_pickup = 0x25BD90;
     const uintptr_t give_shop_item = 0x22B340;
     const uintptr_t items_fit_in_inventory = 0x22BB60;
-    //const uintptr_t add_shop_item_to_inventory = 0x22B340; // Same as AddItemsToInventory in vanilla
+    // const uintptr_t add_shop_item_to_inventory = 0x22B340; // Same as AddItemsToInventory in vanilla
     const uintptr_t add_items_to_inventory = 0x22AD20;
     const uintptr_t create_popup_structure = 0x11F430;
     const uintptr_t show_item_popup = 0x4FA9B0;
@@ -31,95 +31,95 @@ namespace function_offsets {
 #endif
 };
 
-namespace PointerOffsets {
+namespace pointer_offsets {
 #ifdef _M_IX86
-    const uintptr_t BaseA = 0x1150414;
-    const std::vector<uintptr_t> GameState = { 0xDEC };
-    const std::vector<uintptr_t> HP = { 0x74, 0xFC };
-    const std::vector<uintptr_t> AvailableItemBag = { 0x60, 0x8, 0x8, 0x0 };
-    const std::vector<uintptr_t> ItemGiveWindow = { 0xCC4, 0x0 };
-    const std::vector<uintptr_t> WorldFlags = { 0x44, 0x10, 0x28, 0x0, 0x0 };
+    const uintptr_t base_a = 0x1150414;
+    const std::vector<uintptr_t> game_state = { 0xDEC };
+    const std::vector<uintptr_t> hp = { 0x74, 0xFC };
+    const std::vector<uintptr_t> available_item_bag = { 0x60, 0x8, 0x8, 0x0 };
+    const std::vector<uintptr_t> item_give_window = { 0xCC4, 0x0 };
+    const std::vector<uintptr_t> world_flags = { 0x44, 0x10, 0x28, 0x0, 0x0 };
 #elif defined(_M_X64)
-    const uintptr_t BaseA = 0x16148F0;
-    const std::vector<uintptr_t> GameState = { 0x24AC };
-    const std::vector<uintptr_t> HP = { 0xD0, 0x168 };
-    const std::vector<uintptr_t> AvailableItemBag = { 0xA8, 0x10, 0x10, 0x0 };
-    const std::vector<uintptr_t> ItemGiveWindow = { 0x22E0, 0x0 };
-    const std::vector<uintptr_t> WorldFlags = { 0x70, 0x20, 0x18, 0x0 };
+    const uintptr_t base_a = 0x16148F0;
+    const std::vector<uintptr_t> game_state = { 0x24AC };
+    const std::vector<uintptr_t> hp = { 0xD0, 0x168 };
+    const std::vector<uintptr_t> available_item_bag = { 0xA8, 0x10, 0x10, 0x0 };
+    const std::vector<uintptr_t> item_give_window = { 0x22E0, 0x0 };
+    const std::vector<uintptr_t> world_flags = { 0x70, 0x20, 0x18, 0x0 };
 #endif
 };
 
-namespace Patches {
+namespace patches {
 #ifdef _M_IX86
-    const std::vector<uint8_t> noWeaponReqPatch = { 0xC2, 0x04, 0x00 };
-    const std::vector<uint8_t> menuWeaponReqPatch = {
+    const std::vector<uint8_t> no_weapon_req_patch = { 0xC2, 0x04, 0x00 };
+    const std::vector<uint8_t> menu_weapon_req_patch = {
         0xC7, 0x46, 0x70, 0x01, 0x00, 0x00, 0x00, 0x90,
         0xC7, 0x46, 0x72, 0x01, 0x00, 0x00, 0x00, 0x90,
         0xC7, 0x46, 0x74, 0x01, 0x00, 0x00, 0x00, 0x90,
         0xC7, 0x46, 0x76, 0x01, 0x00, 0x00, 0x00, 0x90
     };
-    const std::vector<uint8_t> noPowerStanceReq = { 0x66, 0x0F, 0xEF, 0xC9 };
-    const std::vector<uint8_t> noSpellCastReq = { 0xEB };
-    const std::vector<uint8_t> noSpellMenuIntReq = { 0x66, 0xBE, 0x00, 0x00 };
-    const std::vector<uint8_t> noSpellMenuFthReq = { 0x66, 0xBA, 0x00, 0x00 };
-    const std::vector<uint8_t> infiniteTorch = { 0x90, 0x90, 0x90, 0x90 };
-    const std::vector<uint8_t> UnbreakableChests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE6 };
-    const std::vector<uint8_t> DissapearingChestItems = { 0x90, 0x90 };
+    const std::vector<uint8_t> no_power_stance_req = { 0x66, 0x0F, 0xEF, 0xC9 };
+    const std::vector<uint8_t> no_spell_cast_req = { 0xEB };
+    const std::vector<uint8_t> no_spell_menu_int_req = { 0x66, 0xBE, 0x00, 0x00 };
+    const std::vector<uint8_t> no_spell_menu_fth_req = { 0x66, 0xBA, 0x00, 0x00 };
+    const std::vector<uint8_t> infinite_torch = { 0x90, 0x90, 0x90, 0x90 };
+    const std::vector<uint8_t> unbreakable_chests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE6 };
+    const std::vector<uint8_t> disappearing_chest_items = { 0x90, 0x90 };
 #elif defined(_M_X64)
-    const std::vector<uint8_t> noWeaponReqPatch = { 0xC3, 0x90, 0x90, 0x90, 0x90 };
-    const std::vector<uint8_t> menuWeaponReqPatch = {
+    const std::vector<uint8_t> no_weapon_req_patch = { 0xC3, 0x90, 0x90, 0x90, 0x90 };
+    const std::vector<uint8_t> menu_weapon_req_patch = {
         0x90, 0x90, 0x90, 0x90, 0xB0, 0x01, 0x66, 0x89, 0x4B, 0x70,
         0x90, 0x90, 0x90, 0x90, 0x66, 0x89, 0x4B, 0x72, 0x90, 0x90,
         0x90, 0x90, 0x66, 0x89, 0x4B, 0x74, 0x90, 0x90, 0x90, 0x90
     };
-    const std::vector<uint8_t> noPowerStanceReq = { 0x66, 0x0F, 0xEF, 0xC0, 0x90, 0x90, 0x90, 0x90 };
-    const std::vector<uint8_t> noSpellCastReq = { 0xEB };
-    const std::vector<uint8_t> noSpellMenuIntReq = { 0x31, 0xC9, 0x90, 0x90 };
-    const std::vector<uint8_t> noSpellMenuFthReq = { 0x31, 0xC9, 0x90, 0x90 };
-    const std::vector<uint8_t> infiniteTorch = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-    const std::vector<uint8_t> UnbreakableChests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE3 };
-    const std::vector<uint8_t> DissapearingChestItems = { 0x90, 0x90 };
+    const std::vector<uint8_t> no_power_stance_req = { 0x66, 0x0F, 0xEF, 0xC0, 0x90, 0x90, 0x90, 0x90 };
+    const std::vector<uint8_t> no_spell_cast_req = { 0xEB };
+    const std::vector<uint8_t> no_spell_menu_int_req = { 0x31, 0xC9, 0x90, 0x90 };
+    const std::vector<uint8_t> no_spell_menu_fth_req = { 0x31, 0xC9, 0x90, 0x90 };
+    const std::vector<uint8_t> infinite_torch = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+    const std::vector<uint8_t> unbreakable_chests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE3 };
+    const std::vector<uint8_t> disappearing_chest_items = { 0x90, 0x90 };
 #endif
 };
 
-namespace PatchesOffsets {
+namespace patches_offsets {
 #ifdef _M_IX86
-    const uintptr_t noWeaponReqPatchOffset = 0x372ff0;
-    const uintptr_t menuWeaponReqPatchOffset = 0x14E50A2;
-    const uintptr_t noPowerStanceStrReq = 0x378398;
-    const uintptr_t noPowerStanceDexReq = 0x3783D7;
-    const uintptr_t noSpellCastIntReq = 0x3C02CF;
-    const uintptr_t noSpellCastFthReq = 0x3C02E7;
-    const uintptr_t noSpellMenuIntReq = 0x236E72;
-    const uintptr_t noSpellMenuFthReq = 0x236E7A;
-    const uintptr_t infiniteTorchOffset = 0x23950E;
-    const uintptr_t UnbreakableChests = 0x24EDFC;
-    const uintptr_t DissapearingChestItems = 0x259FDA;
+    const uintptr_t no_weapon_req = 0x372ff0;
+    const uintptr_t menu_weapon_req = 0x14E50A2;
+    const uintptr_t no_power_stance_str_req = 0x378398;
+    const uintptr_t no_power_stance_dex_req = 0x3783D7;
+    const uintptr_t no_spell_cast_int_req = 0x3C02CF;
+    const uintptr_t no_spell_cast_fth_req = 0x3C02E7;
+    const uintptr_t no_spell_menu_int_req = 0x236E72;
+    const uintptr_t no_spell_menu_fth_req = 0x236E7A;
+    const uintptr_t infinite_torch = 0x23950E;
+    const uintptr_t unbreakable_chests = 0x24EDFC;
+    const uintptr_t disappearing_chest_items = 0x259FDA;
 #elif defined(_M_X64)
-    const uintptr_t noWeaponReqPatchOffset = 0x34A980;
-    const uintptr_t menuWeaponReqPatchOffset = 0x201EC0;
-    const uintptr_t noPowerStanceStrReq = 0x35025C;
-    const uintptr_t noPowerStanceDexReq = 0x35028B;
-    const uintptr_t noSpellCastIntReq = 0x397915;
-    const uintptr_t noSpellCastFthReq = 0x39792C;
-    const uintptr_t noSpellMenuIntReq = 0x1B8E7C;
-    const uintptr_t noSpellMenuFthReq = 0x1B8E87;
-    const uintptr_t infiniteTorchOffset = 0x1BBD1C;
-    const uintptr_t UnbreakableChests = 0x1D3C29;
-    const uintptr_t DissapearingChestItems = 0x1E35E3;
+    const uintptr_t no_weapon_req = 0x34A980;
+    const uintptr_t menu_weapon_req = 0x201EC0;
+    const uintptr_t no_power_stance_str_req = 0x35025C;
+    const uintptr_t no_power_stance_dex_req = 0x35028B;
+    const uintptr_t no_spell_cast_int_req = 0x397915;
+    const uintptr_t no_spell_cast_fth_req = 0x39792C;
+    const uintptr_t no_spell_menu_int_req = 0x1B8E7C;
+    const uintptr_t no_spell_menu_fth_req = 0x1B8E87;
+    const uintptr_t infinite_torch = 0x1BBD1C;
+    const uintptr_t unbreakable_chests = 0x1D3C29;
+    const uintptr_t disappearing_chest_items = 0x1E35E3;
 #endif
 };
 
-namespace ParamOffsets {
+namespace param_offsets {
 #ifdef _M_IX86
-    const std::vector<uintptr_t> ShopLineupParam = { 0x60, 0x58, 0x94, 0x0 };
-    const std::vector<uintptr_t> ItemParam = { 0x60, 0x10, 0x94, 0x0 };
-    const std::vector<uintptr_t> ItemLotParam2_Other = { 0x60, 0x30, 0x94, 0x0 };
-    const std::vector<uintptr_t> ItemLotParam2_Chr = { 0x60, 0x28, 0x94, 0x0 };
+    const std::vector<uintptr_t> shop_lineup_param = { 0x60, 0x58, 0x94, 0x0 };
+    const std::vector<uintptr_t> item_param = { 0x60, 0x10, 0x94, 0x0 };
+    const std::vector<uintptr_t> item_lot_param2_other = { 0x60, 0x30, 0x94, 0x0 };
+    const std::vector<uintptr_t> item_lot_param2_chr = { 0x60, 0x28, 0x94, 0x0 };
 #elif defined(_M_X64)
-    const std::vector<uintptr_t> ShopLineupParam = { 0xA8, 0xB0, 0xD8, 0x0 };
-    const std::vector<uintptr_t> ItemParam = { 0xA8, 0x20, 0xD8, 0x0 };
-    const std::vector<uintptr_t> ItemLotParam2_Other = { 0xA8, 0x60, 0xD8, 0x0 };
-    const std::vector<uintptr_t> ItemLotParam2_Chr = { 0xA8, 0x50, 0xD8, 0x0 };
+    const std::vector<uintptr_t> shop_lineup_param = { 0xA8, 0xB0, 0xD8, 0x0 };
+    const std::vector<uintptr_t> item_param = { 0xA8, 0x20, 0xD8, 0x0 };
+    const std::vector<uintptr_t> item_lot_param2_other = { 0xA8, 0x60, 0xD8, 0x0 };
+    const std::vector<uintptr_t> item_lot_param2_chr = { 0xA8, 0x50, 0xD8, 0x0 };
 #endif
 }
