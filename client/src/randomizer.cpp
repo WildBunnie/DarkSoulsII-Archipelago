@@ -28,6 +28,21 @@ struct ParamRow {
 };
 #endif
 
+// make it so locksones are not sellable
+// and make it so they dont drop from rats
+void patch_lockstone_stuff()
+{
+    uintptr_t base_address = get_base_address();
+
+    uintptr_t item_param = resolve_pointer(base_address, pointer_offsets::base_a, param_offsets::item_param);
+    uint32_t offset = sizeof(uintptr_t) == 4 ? 0x1AB20 : 0x1E984; // 0x1AB20 in x32 and 0x1E984 in x64
+    write_value<int32_t>(item_param + offset, 2240); // set it so lockstones have the same usage param as branches
+
+    uintptr_t itemlot_chr_param = resolve_pointer(base_address, pointer_offsets::base_a, param_offsets::item_lot_param2_chr);
+    offset = sizeof(uintptr_t) == 4 ? 0xAAD8 : 0x10A7C; // 0xAAD8 in x32 and 0x10A7C in x64
+    write_value<float_t>(itemlot_chr_param + offset, 0.0f); // make rats have 0% chance to drop lockstone
+}
+
 void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed_str, std::set<int32_t> ignore, std::vector<uintptr_t> param_offsets)
 {
     uintptr_t param_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets);
@@ -261,6 +276,8 @@ void override_item_params(std::map<int32_t, int32_t> rewards, std::string seed, 
     // this doesnt happen in sotfs
     patch_memory(get_base_address() + 0x316A9F, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 #endif
+
+    patch_lockstone_stuff();
 
     override_itemlot_param(rewards, seed, ignore, param_offsets::item_lot_param2_other);
     override_itemlot_param(rewards, seed, ignore, param_offsets::item_lot_param2_chr);
