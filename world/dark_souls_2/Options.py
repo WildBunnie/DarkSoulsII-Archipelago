@@ -35,6 +35,14 @@ class GameVersion(Choice):
     option_sotfs = 0
     option_vanilla = 1
 
+class EarlyBlacksmith(Choice):
+    """Force Lenigrast's key into an early sphere in your world or across all worlds."""
+    display_name = "Early Blacksmith"
+    option_random = 0
+    option_early_global = 1
+    option_early_local = 2
+    default = option_early_local
+
 class KeepInfiniteLifegems(Toggle):
     """Keep Melentia's infinite supply of lifegems"""
     display_name = "Keep Infinite Lifegems"
@@ -54,6 +62,7 @@ class DS2Options(PerGameCommonOptions):
     no_weapon_req: NoWeaponRequirements
     no_spell_req: NoSpellRequirements
     enable_ngp: EnableNGPOption
+    early_blacksmith: EarlyBlacksmith
     infinite_lifegems: KeepInfiniteLifegems
     exclude_locations: DS2ExcludeLocations
     start_inventory: DS2StartInventory

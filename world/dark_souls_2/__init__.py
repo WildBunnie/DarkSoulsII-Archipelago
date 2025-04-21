@@ -43,6 +43,12 @@ class DS2World(World):
     item_name_groups = group_table
     location_name_groups = location_name_groups
 
+    def generate_early(self) -> None:
+        if self.options.early_blacksmith == "early_global":
+            self.multiworld.early_items[self.player]["Lenigrast's Key"] = 1
+        elif self.options.early_blacksmith == "early_local":
+            self.multiworld.local_early_items[self.player]["Lenigrast's Key"] = 1
+
     def create_regions(self):
 
         regions = {}
