@@ -1,48 +1,51 @@
 #pragma once
 
 #include <windows.h>
-#include <vector>
-#include <list>
+#include <ws2def.h>
 #include <set>
+#include <WS2tcpip.h>
+#include <cstdint>
 #include <map>
-#include <WinSock2.h>
-#include <winsock.h>
-#include <Ws2tcpip.h>
-#include <minhook.h>
-#include <iostream>
+#include <list>
+#include <string>
 
-struct locationReward {
-    int64_t item_id;
-    std::string item_name;
-    std::string player_name;
-    bool isLocal; // wheter the item is local to our world
-};
+// taken from modengine
+// https://github.com/rainergeis/ModEngine-DS2-Compatible/blob/master/DS3ModEngine/ModLoader.h
+typedef struct
+{
+    wchar_t* string;
+    void* unk;
+    UINT64 length;
+    UINT64 capacity;
 
-class Hooks {
-public:
-    bool initHooks();
-    void giveItems(std::vector<int32_t> ids);
-    void showLocationRewardMessage(int32_t locationId);
-    void patchWeaponRequirements();
-    void patchSpellRequirements();
-    void patchInfiniteTorch();
-    void overrideShopParams();
-    bool unpetrifyStatue(int statueId);
-    int getUnusedItem(std::wstring name, int id);
+} DLString;
 
-    bool playerJustDied();
-    bool isPlayerInGame();
-    bool killPlayer();
+void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, int32_t> custom_items);
+void force_offline();
+std::list<int32_t> get_locations_to_check();
+void clear_locations_to_check();
+void set_item_name(int32_t item_id, std::wstring item_name);
 
-    std::set<int64_t> locationsToCheck;
-    std::list<int64_t> checkedLocations;
-    std::map<int64_t, locationReward> locationRewards;
-    std::map<int, std::wstring> unusedItemNames;
-    bool isDeathLink;
+extern "C" int __cdecl get_pickup_id(uintptr_t param_1, uintptr_t baseAddress);
 
-#ifdef _M_IX86
-    const char* addressToBlock = "frpg2-steam-ope.fromsoftware.jp";
-#elif defined(_M_X64)
-    const char* addressToBlock = "frpg2-steam64-ope-login.fromsoftware-game.net";
-#endif
-};
+typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const ADDRINFOA* pHints, PADDRINFOA* ppResult);
+
+typedef void (__thiscall *give_items_on_reward_t) (uintptr_t, uintptr_t, int32_t, int32_t, int32_t);
+typedef char (__thiscall *give_items_on_pickup_t) (uintptr_t, uintptr_t);
+typedef char (__thiscall *give_shop_item_t)       (uintptr_t, uintptr_t, int32_t);
+
+typedef int  (__thiscall *remove_item_from_inventory_t) (uintptr_t, uintptr_t, uintptr_t, int32_t);
+
+typedef const wchar_t* (__cdecl *get_item_info_t)             (int32_t, int32_t);
+typedef uintptr_t      (__thiscall *get_hovering_item_info_t) (uintptr_t, uintptr_t);
+
+typedef size_t(__thiscall* virtual_to_archive_path_t)(uintptr_t, DLString*);
+
+#define HOOKS \
+    HOOK(give_items_on_pickup) \
+    HOOK(give_items_on_reward) \
+    HOOK(give_shop_item) \
+    HOOK(remove_item_from_inventory) \
+    HOOK(get_item_info) \
+    HOOK(get_hovering_item_info) \
+    HOOK(virtual_to_archive_path)

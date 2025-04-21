@@ -60,7 +60,6 @@ class DS2World(World):
                 if location_data.ngp and not self.options.enable_ngp: continue
                 if location_data.sotfs and not self.options.game_version == "sotfs": continue
                 if location_data.vanilla and not self.options.game_version == "vanilla": continue
-                if location_data.code == 75400601 and self.options.infinite_lifegems: continue
 
                 if location_data.code == None: # event
                     location = DS2Location(self.player, location_data.name, None, region, None, False)
@@ -238,6 +237,10 @@ class DS2World(World):
         # LOCATIONS
         ## MAJULA
         self.set_location_rule("[Majula] Wooden chest in Lenigrast's workshop", lambda state: state.has("Lenigrast's Key", self.player))
+        self.set_location_rule("[Majula] Library room in Cale's house", lambda state: state.has("House Key", self.player))
+        self.set_location_rule("[Majula] Corpse in Cale's house basement", lambda state: state.has("House Key", self.player))
+        self.set_location_rule("[Majula] Metal chest in Cale's house basement", lambda state: state.has("House Key", self.player))
+        self.set_location_rule("[Majula] Wooden chest on the attic of Majula mansion", lambda state: state.has("House Key", self.player))
         ## PURSUER
         self.set_location_rule("[FOFG] Just before pursuer arena", lambda state: state.has("Soldier Key", self.player))
         if self.options.enable_ngp:
@@ -270,9 +273,8 @@ class DS2World(World):
         self.set_location_rule("[FOFG] First corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
         self.set_location_rule("[FOFG] Second corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
         ## TSELDORA DEN
-        # tseldora den key is not in pool rn
-        # self.set_location_rule("[Tseldora] Metal chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
-        # self.set_location_rule("[Tseldora] Wooden chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
+        self.set_location_rule("[Tseldora] Metal chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
+        self.set_location_rule("[Tseldora] Wooden chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
         self.set_location_rule("[Tseldora] Metal chest behind locked door in pickaxe room", lambda state: state.has("Brightstone Key", self.player))
         ## FORGOTTEN KEY
         self.set_location_rule("[Pit] First metal chest behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
@@ -281,7 +283,13 @@ class DS2World(World):
         if self.options.game_version == "sotfs": 
             self.set_location_rule("[Pit] Corpse behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
         self.set_location_rule("[Gutter] Urn behind the forgotten door", lambda state: state.has("Forgotten Key", self.player))
-        
+        ## BASTILLE KEY
+        self.set_location_rule("[Bastille] In a cell next to Straid's cell", lambda state: state.has("Bastille Key", self.player))
+        self.set_location_rule("[SinnersRise] In locked cell left side upper level", lambda state: state.has("Bastille Key", self.player))
+        self.set_location_rule("[SinnersRise] In right side oil-sconce room just before the Sinner", lambda state: state.has("Bastille Key", self.player))
+        if self.options.enable_ngp:
+            self.set_location_rule("[Bastille] In a cell next to Straid's cell in NG+", lambda state: state.has("Bastille Key", self.player))
+    
         self.set_location_rule("[ShadedWoods] Gift from Manscorpion Tark after defeating Najka", lambda state: state.has("Ring of Whispers", self.player))
 
         #STATUES
@@ -371,8 +379,6 @@ class DS2World(World):
         set_rule(self.multiworld.get_location(name, self.player), state)
 
     def set_shop_rules(self):
-        if not self.options.infinite_lifegems:
-            self.set_location_rule("[Merchant Hag Melentia - Majula] Lifegem", lambda state: state.has("Defeat the Last Giant", self.player))
         self.set_location_rule("[Sweet Shalquoir - Royal Rat Authority, Royal Rat Vanguard] Flying Feline Boots", lambda state: 
                                state.has("Defeat the Royal Rat Authority", self.player) and state.has("Defeat the Royal Rat Vanguard", self.player))
         
@@ -408,4 +414,4 @@ class DS2World(World):
                     self.set_location_rule(location.name, lambda state: state.has("Defeat the Smelter Demon", self.player))
                     
     def fill_slot_data(self) -> dict:
-        return self.options.as_dict("death_link","game_version","no_weapon_req","no_spell_req")
+        return self.options.as_dict("death_link","game_version","no_weapon_req","no_spell_req","infinite_lifegems")

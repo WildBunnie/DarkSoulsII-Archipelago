@@ -1,246 +1,35 @@
 #include "hooks.h"
+
 #include "offsets.h"
-#include <spdlog/spdlog.h>
-#include "ds2.h"
 #include "memory.h"
+#include "game_functions.h"
+#include "ds2.h"
+
+#include "spdlog/spdlog.h"
+#include "minhook.h"
+
+#include <map>
 #include <cwctype>
-extern Hooks* GameHooks;
+#include <iostream>
+#include <fstream>
+#include <sys/stat.h>
 
-// ============================= Utils =============================
+getaddrinfo_t original_getaddrinfo;
 
-bool showItem = true;
+#define HOOK(name) name##_t original_##name;
+HOOKS
+#undef HOOK
 
-struct Item {
-    int32_t idk;
-    int32_t itemId;
-    int32_t durability;
-    int16_t amount;
-    int8_t upgrade;
-    int8_t infusion;
-};
+bool hooks_enabled = false;
+std::map<int, std::wstring> item_names;
+std::map<int32_t, std::string> _reward_names;
+std::map<int32_t, int32_t> _custom_items;
+std::list<int32_t> locations_to_check;
 
-struct ItemStruct {
-    Item items[8];
-};
-
-#ifdef _M_IX86
-struct ParamRow {
-    uint32_t paramId;
-    uint32_t rewardOffset;
-    uint32_t unknown;
-};
-#elif defined(_M_X64)
-struct ParamRow {
-    uint8_t padding1[4];
-    uint32_t paramId;
-    uint8_t padding2[4];
-    uint32_t rewardOffset;
-    uint8_t padding3[4];
-    uint32_t unknown;
-};
-#endif
-
-// function that allows us to get the itemLotId on giveItemsOnPickup
-extern "C" int __cdecl get_pickup_id(uintptr_t param_1, uintptr_t baseAddress);
-
-// hooking this function to always start the game offline
-// by blocking the game's dns lookup
-typedef INT(__stdcall* getaddrinfo_t)(PCSTR pNodeName, PCSTR pServiceName, const ADDRINFOA* pHints, PADDRINFOA* ppResult);
-
-// fuction is called when player receives a reward (boss, covenant, npc or event)
-typedef void(__thiscall* giveItemsOnReward_t)(UINT_PTR thisPtr, UINT_PTR pItemLot, INT idk1, INT idk2, INT idk3);
-// fuction is called when player picks up an item
-typedef void(__thiscall* giveItemsOnPickup_t)(uintptr_t this_ptr, uintptr_t param_1);
-// this function is called when the player buys an item
-typedef char(__thiscall* giveShopItem_t)(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3);
-
-typedef char(__thiscall* items_fit_in_inventory)(uintptr_t, uintptr_t, int32_t);
-items_fit_in_inventory original_items_fit_in_inventory;
-
-
-// this function adds the item to the players inventory
-typedef void(__thiscall* addShopItemToInventory_t)(UINT_PTR, UINT_PTR, UINT_PTR);
-// this function adds the item to the players inventory
-typedef char(__thiscall* addItemsToInventory_t)(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3);
-// this function creates the structure that is passed to the function that displays the item popup
-typedef void(__cdecl* createPopupStructure_t)(UINT_PTR displayStruct, ItemStruct* items, INT amountOfItems, INT displayMode);
-// this function displays the item popup
-typedef void(__thiscall* showItemPopup_t)(UINT_PTR thisPtr, UINT_PTR displayStruct);
-
-// this function given an itemId return a pointer to the item's name
-typedef const wchar_t* (__cdecl* getItemNameFromId_t)(INT32 arg1, INT32 itemId);
-
-typedef int32_t (__thiscall* remove_item_from_inventory)(uintptr_t, uintptr_t, uintptr_t , uint32_t);
-remove_item_from_inventory original_remove_item_from_inventory;
-
-getaddrinfo_t originalGetaddrinfo = nullptr;
-
-giveItemsOnReward_t originalGiveItemsOnReward = nullptr;
-giveItemsOnPickup_t originalGiveItemsOnPickup = nullptr;
-giveShopItem_t originalGiveShopItem = nullptr;
-
-addShopItemToInventory_t originalAddShopItemToInventory = nullptr;
-addItemsToInventory_t originalAddItemsToInventory = nullptr;
-createPopupStructure_t originalCreatePopupStructure = nullptr;
-showItemPopup_t originalShowItemPopup = nullptr;
-
-getItemNameFromId_t originalGetItemNameFromId = nullptr;
-
-typedef uintptr_t(__thiscall* get_hovering_item_name)(uintptr_t, uintptr_t);
-get_hovering_item_name original_get_hovering_item_name;
-
-uintptr_t baseAddress;
-
-// this strategy with the booleans is not the best
-// but if we dont call the original the item wont be removed from the map
-bool giveNextItem = true;
-bool showNextItem = true;
-
-uintptr_t GetPointerAddress(uintptr_t gameBaseAddr, uintptr_t address, std::vector<uintptr_t> offsets)
+std::wstring remove_special_characters(const std::wstring& input)
 {
-    uintptr_t offset_null = NULL;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(gameBaseAddr + address), &offset_null, sizeof(offset_null), 0);
-    uintptr_t pointeraddress = offset_null; // the address we need
-    for (size_t i = 0; i < offsets.size() - 1; i++) // we dont want to change the last offset value so we do -1
-    {
-        ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pointeraddress + offsets.at(i)), &pointeraddress, sizeof(pointeraddress), 0);
-    }
-    return pointeraddress += offsets.at(offsets.size() - 1); // adding the last offset
-}
-
-void PatchMemory(uintptr_t address, const std::vector<BYTE>& bytes) {
-    DWORD oldProtect;
-    VirtualProtect(reinterpret_cast<void*>(address), bytes.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
-    memcpy(reinterpret_cast<void*>(address), bytes.data(), bytes.size());
-    VirtualProtect(reinterpret_cast<void*>(address), bytes.size(), oldProtect, &oldProtect);
-}
-
-void overrideItemPrices() {
-
-    uintptr_t itemPramPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, ParamOffsets::ItemParam);
-    ParamRow* rowPtr = reinterpret_cast<ParamRow*>(itemPramPtr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x40
-
-    for (int i = 0; i < 10000; ++i) {
-        if (rowPtr[i].paramId == 0) return; // return if we reach the end
-        uintptr_t rewardPtr = itemPramPtr + rowPtr[i].rewardOffset;
-
-        uint32_t price = 1;
-        uintptr_t pricePtr = rewardPtr + 0x30;
-        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)pricePtr, &price, sizeof(uint32_t), NULL);
-
-        // this sets the item type id of unused items to "Weapon Resion/Ooze" so that their icon is all the same
-        // this should definetly be changed to another function, im just lazy
-        auto it = std::find(unusedItemIds.begin(), unusedItemIds.end(), rowPtr[i].paramId);
-        if (it != unusedItemIds.end()) {
-            uint32_t item_type_id = 600;
-            uintptr_t itemTypePtr = rewardPtr + 0x40;
-            WriteProcessMemory(GetCurrentProcess(), (LPVOID*)itemTypePtr, &item_type_id, sizeof(uint32_t), NULL);
-        }
-    }
-}
-
-void Hooks::overrideShopParams() {
-
-#ifdef _M_IX86
-    // for some reason in vanilla when you go through the start menu
-    // they always override the params with the defaults
-    // this patch makes the game not override the ShopLineupParam (and maybe others?)
-    // this doesnt happen in sotfs
-    PatchMemory(baseAddress + 0x316A9F, { 0x90, 0x90, 0x90, 0x90, 0x90 });
-#endif
-
-    // set all items base prices to 1 so that we can
-    // set the values properly in the shop params
-    overrideItemPrices();
-
-    uintptr_t shopParamPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, ParamOffsets::ShopLineupParam);
-    ParamRow *rowPtr = reinterpret_cast<ParamRow*>(shopParamPtr+0x44-sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x40
-
-    for (int i = 0; i < 10000; ++i) {      
-        if (rowPtr[i].paramId == 0) return; // return if we reach the end
-
-        uintptr_t rewardPtr = shopParamPtr + rowPtr[i].rewardOffset;
-
-        // we need to always set the price rate for situations where the item price is set to 1 but the location is excluded
-        // this happens, for example, with the infinite lifegems if the infinite lifegem option is set
-        float_t price_rate = shopPrices[rowPtr[i].paramId];
-        uintptr_t ratePtr = rewardPtr + 0x1C;
-        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)ratePtr, &price_rate, sizeof(float_t), NULL);
-
-        if (!locationRewards.contains(rowPtr[i].paramId)) continue; // skip if its not an archipelago location
-
-        locationReward archipelagoReward = locationRewards[rowPtr[i].paramId];
-        if (archipelagoReward.isLocal) {
-            WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &archipelagoReward.item_id, sizeof(uint32_t), NULL);
-        }
-        else {
-            // for now just use the last one
-            uint32_t unusedItemForShop = unusedItemIds[24];
-            WriteProcessMemory(GetCurrentProcess(), (LPVOID*)rewardPtr, &unusedItemForShop, sizeof(uint32_t), NULL);
-        }
-
-        //float_t enable_flag = -1.0f;
-        //uintptr_t enablePtr = rewardPtr + 0x8;
-        //WriteProcessMemory(GetCurrentProcess(), (LPVOID*)enablePtr, &enable_flag, sizeof(float_t), NULL);
-
-        // make sure items are not removed from the shops
-        // so that the player doesnt lose any checks
-        float_t disable_flag = -1.0f;
-        uintptr_t disablePtr = rewardPtr + 0xC;
-        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)disablePtr, &disable_flag, sizeof(float_t), NULL);
-
-        uint8_t amount = 1;
-        uintptr_t amountPtr = rewardPtr + 0x20;
-        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)amountPtr, &amount, sizeof(uint8_t), NULL);  
-    }
-}
-
-bool Hooks::unpetrifyStatue(int statueId) {
-    if (!statueOffsets.contains(statueId)) {
-        return false;
-    }
-
-    WorldFlagOffset statueOffset = statueOffsets[statueId];
-    uintptr_t worldFlagsPtr = GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::WorldFlags);
-
-    uint8_t currentValue;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(worldFlagsPtr+statueOffset.offset), &currentValue, sizeof(uint8_t), NULL);
-    currentValue |= (1 << statueOffset.bit_start);
-    WriteProcessMemory(GetCurrentProcess(), (LPVOID*)(worldFlagsPtr + statueOffset.offset), &currentValue, sizeof(uint8_t), NULL);
-    return true;
-}
-
-// TODO: receive the other item information like amount, upgrades and infusions
-void Hooks::giveItems(std::vector<int32_t> ids) {
-
-    if (ids.size() > 8) {
-        return;
-    }
-
-    ItemStruct itemStruct;
-
-    for (size_t i = 0; i < ids.size() && i < 8; ++i) {
-        Item item;
-        item.idk = 0;
-        item.itemId = ids[i];
-        item.durability = -1;
-        item.amount = 1;
-        item.upgrade = 0;
-        item.infusion = 0;
-
-        itemStruct.items[i] = item;
-    }
-
-    unsigned char displayStruct[0x200];
-
-    originalAddItemsToInventory(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::AvailableItemBag), &itemStruct, ids.size(), 0);
-    originalCreatePopupStructure((UINT_PTR)displayStruct, &itemStruct, ids.size(), 1);
-    originalShowItemPopup(GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::ItemGiveWindow), (UINT_PTR)displayStruct);
-}
-
-std::wstring removeSpecialCharacters(const std::wstring& input) {
     std::set<wchar_t> allowedChars = {
-        L'-', L'\'', L',', L' ', L':'
+        L'-', L'\'', L',', L' ', L':', L'+'
     };
 
     std::wstring output;
@@ -253,324 +42,234 @@ std::wstring removeSpecialCharacters(const std::wstring& input) {
     return output;
 }
 
-void Hooks::showLocationRewardMessage(int32_t locationId) {
-    if (!locationRewards.contains(locationId)) {
-        return;
+void write_binary_file_if_not_exists(const unsigned char* data, size_t size, const std::wstring& path)
+{
+    try {
+        // check if the file already exists
+        struct _stat buffer;
+        if (_wstat(path.c_str(), &buffer) == 0) {
+            return;
+        }
+
+        std::ofstream file(path, std::ios::binary);
+        file.write(reinterpret_cast<const char*>(data), size);
+        file.close();
+
+        std::wstring log_msg = L"Successfully wrote binary data to " + path;
+        spdlog::debug(std::string(log_msg.begin(), log_msg.end()));
     }
-
-    locationReward reward = locationRewards[locationId];
-
-    // we don't want to show this message
-    // for item from our world
-    if (reward.isLocal) {
-        return;
+    catch (const std::exception& e) {
+        spdlog::debug("Error writing binary file: {}", e.what());
     }
-
-    // the game uses utf-16 so we convert to wide string
-    std::wstring player_name_wide(reward.player_name.begin(), reward.player_name.end());
-    std::wstring item_name_wide(reward.item_name.begin(), reward.item_name.end());
-
-    std::wstring message = player_name_wide + L"'s " + item_name_wide;
-
-    int item_id = unusedItemIds[0];
-    unusedItemNames[item_id] = removeSpecialCharacters(message);
-
-    giveItems({ item_id });
 }
 
-// returns the id for an unused item that will have the given name
-int Hooks::getUnusedItem(std::wstring name, int index) {
-    int item_id = unusedItemIds[index];
-    unusedItemNames[item_id] = removeSpecialCharacters(name);
-    return item_id;
+void handle_location_checked(int32_t location_id)
+{
+    // if the location has an item from other player
+    // set the item to have the correct name
+    if (_reward_names.contains(location_id)) {
+        std::string item_name = _reward_names[location_id];
+        std::wstring item_name_wide(item_name.begin(), item_name.end());
+        item_names[the_item_id] = remove_special_characters(item_name_wide);
+    }
+    // if its a custom item, do whatever we need to do
+    if (_custom_items.contains(location_id)) {
+        int32_t item_id = _custom_items[location_id];
+        if (is_statue(item_id)) {
+            unpetrify_statue(item_id);
+        }
+    }
+    locations_to_check.push_back(location_id);
 }
 
-// ============================= HOOKS =============================
+INT __stdcall detour_getaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHints, PADDRINFOA* ppResult)
+{
+#ifdef _M_IX86
+    const char* address_to_block = "frpg2-steam-ope.fromsoftware.jp";
+#elif defined(_M_X64)
+    const char* address_to_block = "frpg2-steam64-ope-login.fromsoftware-game.net";
+#endif
 
-INT __stdcall detourGetaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHints, PADDRINFOA* ppResult) {
-
-    if (address && strcmp(address, GameHooks->addressToBlock) == 0) {
+    if (address && strcmp(address, address_to_block) == 0) {
         return EAI_FAIL;
     }
 
-    return originalGetaddrinfo(address, port, pHints, ppResult);
+    return original_getaddrinfo(address, port, pHints, ppResult);
 }
 
 #ifdef _M_IX86
-void __fastcall detourGiveItemsOnReward(UINT_PTR thisPtr, void* Unknown, UINT_PTR pItemLot, INT idk1, INT idk2, INT idk3) {
+void __fastcall detour_give_items_on_reward(uintptr_t param_1, void* _edx, uintptr_t param_2, int32_t param_3, int32_t param_4, int32_t param_5)
 #elif defined(_M_X64)
-void __cdecl detourGiveItemsOnReward(UINT_PTR thisPtr, UINT_PTR pItemLot, INT idk1, INT idk2, INT idk3) {
+void __cdecl detour_give_items_on_reward(uintptr_t param_1, uintptr_t param_2, int32_t param_3, int32_t param_4, int32_t param_5)
 #endif
-
-    int32_t itemLotId;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(pItemLot), &itemLotId, sizeof(itemLotId), NULL);
-    spdlog::debug("was rewarded: {}", itemLotId);
-
-    if (GameHooks->locationsToCheck.contains(itemLotId)) {
-        GameHooks->checkedLocations.push_back(itemLotId);
-        GameHooks->locationsToCheck.erase(itemLotId);
-        GameHooks->showLocationRewardMessage(itemLotId);
-        return;
-    }
-
-    return originalGiveItemsOnReward(thisPtr, pItemLot, idk1, idk2, idk3);
+{
+    int32_t itemlot_id = read_value<int32_t>(param_2);
+    spdlog::debug("was rewarded: {}", itemlot_id);
+    handle_location_checked(itemlot_id);
+    return original_give_items_on_reward(param_1, param_2, param_3, param_4, param_5);
 }
 
 #ifdef _M_IX86
-void __fastcall detourGiveItemsOnPickup(uintptr_t this_ptr, void* Unknown, uintptr_t param_1) {
+char __fastcall detour_give_items_on_pickup(uintptr_t param_1, void* _edx, uintptr_t param_2)
 #elif defined(_M_X64)
-void __cdecl detourGiveItemsOnPickup(uintptr_t this_ptr, uintptr_t param_1) {
+char __cdecl detour_give_items_on_pickup(uintptr_t param_1, uintptr_t param_2)
 #endif
-    int32_t itemLotId = get_pickup_id(param_1, baseAddress);
-    spdlog::debug("picked up: {}", itemLotId);
+{
+    int32_t itemlot_id = get_pickup_id(param_2, get_base_address());
+    spdlog::debug("picked up: {}", itemlot_id);
 
-    // 0 means its an item we dropped
-    if (itemLotId != 0 && !shopPrices.contains(itemLotId) && GameHooks->locationsToCheck.contains(itemLotId)) {
-        GameHooks->checkedLocations.push_back(itemLotId);
-        GameHooks->locationsToCheck.erase(itemLotId);
-        GameHooks->showLocationRewardMessage(itemLotId);
-        giveNextItem = false;
-        showNextItem = false;
+    // janky way to fix the problem that some pickups
+    // have the same id as some of the shop items
+    if (!shop_prices.contains(itemlot_id)) {
+        handle_location_checked(itemlot_id);
     }
 
-    return originalGiveItemsOnPickup(this_ptr, param_1);
+    return original_give_items_on_pickup(param_1, param_2);
 }
 
 #ifdef _M_IX86
-char __fastcall detourGiveShopItem(UINT_PTR thisPtr, void* Unknown, UINT_PTR param_2, INT param_3) {
+char __fastcall detour_give_shop_item(uintptr_t param_1, void* _edx, uintptr_t param_2, int32_t param_3)
 #elif defined(_M_X64)
-char __cdecl detourGiveShopItem(UINT_PTR thisPtr, UINT_PTR param_2, INT param_3) {
+char __cdecl detour_give_shop_item(uintptr_t param_1, uintptr_t param_2, int32_t param_3)
 #endif
-    int32_t shopLineupId;
-    uintptr_t ptr = param_2 + 2 * sizeof(uintptr_t); // 0x8 in x32 and 0x10 in x64
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)ptr, &shopLineupId, sizeof(shopLineupId), NULL);
-    spdlog::debug("just bought: {}", shopLineupId);
-
-    if (GameHooks->locationsToCheck.contains(shopLineupId)) {
-        GameHooks->checkedLocations.push_back(shopLineupId);
-        GameHooks->locationsToCheck.erase(shopLineupId);
-        giveNextItem = false;
-        showNextItem = false;
-    }
-
-    return originalGiveShopItem(thisPtr, param_2, param_3);
+{
+    uint32_t offset = sizeof(uintptr_t) == 4 ? 0x8 : 0x10; // 0x8 in x32 and 0x10 in x64
+    int32_t shop_lineup_id = read_value<int32_t>(param_2 + offset);
+    spdlog::debug("just bought: {}", shop_lineup_id);
+    handle_location_checked(shop_lineup_id);
+    return original_give_shop_item(param_1, param_2, param_3);
 }
 
-#ifdef _M_X64
-void __cdecl detourAddShopItemToInventory(UINT_PTR thisPtr, UINT_PTR param_2, UINT_PTR param_3) {
-    if (!giveNextItem) {
-        giveNextItem = true;
-        return;
-    }
-
-    return originalAddShopItemToInventory(thisPtr, param_2, param_3);
-}
-#endif
-
-#ifdef _M_IX86
-char __fastcall detour_items_fit_in_inventory(uintptr_t param_1, void* _edx, uintptr_t param_2, int32_t param_3) {
-#elif defined(_M_X64)
-char detour_items_fit_in_inventory(uintptr_t param_1, uintptr_t param_2, int32_t param_3) {
-#endif
-    // makes sure the pickup is removed from the ground
-    if (!giveNextItem) {
-        return 1;
-    }
-
-    return original_items_fit_in_inventory(param_1, param_2, param_3);
-}
-
-#ifdef _M_IX86
-char __fastcall detourAddItemsToInventory(UINT_PTR thisPtr, void* Unknown, ItemStruct* itemsList, INT amountToGive, INT param_3) {
-#elif defined(_M_X64)
-char __cdecl detourAddItemsToInventory(UINT_PTR thisPtr, ItemStruct* itemsList, INT amountToGive, INT param_3) {
-#endif
-    if (!giveNextItem) {
-        giveNextItem = true;
-        return 1;
-    }
-
-    return originalAddItemsToInventory(thisPtr, itemsList, amountToGive, param_3);
-}
-
-#ifdef _M_IX86
-void __fastcall detourShowItemPopup(UINT_PTR thisPtr, void* Unknown, UINT_PTR displayStruct) {
-#elif defined(_M_X64)
-void __cdecl detourShowItemPopup(UINT_PTR thisPtr, UINT_PTR displayStruct) {
-#endif
-    if (!showNextItem) {
-        showNextItem = true;
-        return;
-    }
-
-    return originalShowItemPopup(thisPtr, displayStruct);
-}
-
-const wchar_t* __cdecl detourGetItemNameFromId(INT32 arg1, INT32 itemId) {
-
-    if (GameHooks->unusedItemNames.contains(itemId)) {
-        if (arg1 == 8) {
-            return GameHooks->unusedItemNames[itemId].c_str();
+const wchar_t* __cdecl detour_get_item_info(int32_t flag, int32_t item_id)
+{
+    if (item_names.contains(item_id)) {
+        if (flag == 8) {
+            return item_names[item_id].c_str();
         }
-        else if (arg1 == 9) {
+        else if (flag == 9) {
             return L"Archipelago Item";
         }
     }
 
     // rename "Pharros' Lockstone" to "Master Lockstone"
-    if (itemId == 60536000) {
-        if (arg1 == 8) {
+    if (item_id == 60536000) {
+        if (flag == 8) {
             return L"Master Lockstone";
         }
-        else if (arg1 == 9) {
+        else if (flag == 9) {
             return L"Activates Pharros' contraptions (unlimited uses)";
         }
     }
 
-    return originalGetItemNameFromId(arg1, itemId);
+    return original_get_item_info(flag, item_id);
 }
 
 #ifdef _M_IX86
-uintptr_t __fastcall detour_get_hovering_item_name(uintptr_t param_1, void* _edx, uintptr_t param_2) {
-    int i = 0x8;
+uintptr_t __fastcall detour_get_hovering_item_info(uintptr_t param_1, void* _edx, uintptr_t param_2)
 #elif defined(_M_X64)
-uintptr_t __cdecl detour_get_hovering_item_name(uintptr_t param_1, uintptr_t param_2) {
-    int i = 0x10;
+uintptr_t __cdecl detour_get_hovering_item_info(uintptr_t param_1, uintptr_t param_2)
 #endif
-    uintptr_t ptr;
-    uint32_t itemlot;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(param_1 + i), &ptr, sizeof(uintptr_t), NULL);
+{
+    int offset = sizeof(uintptr_t) * 2; // 0x8 in x86 and 0x10 in x64
+    uintptr_t ptr = read_value<uintptr_t>(param_1 + offset);
     if (ptr != 0) {
-        ReadProcessMemory(GetCurrentProcess(), (LPVOID*)(ptr + i), &itemlot, sizeof(uint32_t), NULL);
-
-        locationReward reward = GameHooks->locationRewards[itemlot];
-
-        if (!reward.isLocal) {
-            std::wstring player_name_wide(reward.player_name.begin(), reward.player_name.end());
-            std::wstring item_name_wide(reward.item_name.begin(), reward.item_name.end());
-
-            std::wstring message = player_name_wide + L"'s " + item_name_wide;
-
-            int item_id = unusedItemIds[24];
-            GameHooks->unusedItemNames[item_id] = removeSpecialCharacters(message);
+        uint32_t itemlot_id = read_value<uint32_t>(ptr + offset);
+        if (_reward_names.contains(itemlot_id)) {
+            std::string item_name = _reward_names[itemlot_id];
+            std::wstring item_name_wide(item_name.begin(), item_name.end());
+            item_names[the_item_id] = remove_special_characters(item_name_wide);
         }
     }
-    return original_get_hovering_item_name(param_1, param_2);
+    return original_get_hovering_item_info(param_1, param_2);
 }
 
 #ifdef _M_IX86
-int32_t __fastcall detour_remove_item_from_inventory(uintptr_t param_1, void* _edx, uintptr_t param_2, uintptr_t inventory_item_ptr, uint32_t amount) {
-    uint32_t item_id = read_int(inventory_item_ptr + 0xC);
-    uint32_t current_amount = read_int(inventory_item_ptr + 0x18);
+int32_t __fastcall detour_remove_item_from_inventory(uintptr_t param_1, void* _edx, uintptr_t param_2, uintptr_t inventory_item_ptr, uint32_t amount_to_remove)
 #elif defined(_M_X64)
-int32_t __cdecl detour_remove_item_from_inventory(uintptr_t param_1, uintptr_t param_2, uintptr_t inventory_item_ptr, uint32_t amount) {
-    uint32_t item_id = read_int(inventory_item_ptr + 0x18);
-    uint32_t current_amount = read_int(inventory_item_ptr + 0x20);
+int32_t __cdecl detour_remove_item_from_inventory(uintptr_t param_1, uintptr_t param_2, uintptr_t inventory_item_ptr, uint32_t amount_to_remove)
 #endif
+{
+    uint32_t item_id_offset = sizeof(uintptr_t) == 4 ? 0xC : 0x18; // 0xC in x86 and 0x18 in x64
+    uint32_t amount_offset = sizeof(uintptr_t) == 4 ? 0x18 : 0x20; // 0x18 in x86 and 0x20 in x64
 
-    if (amount <= current_amount && item_id == 60536000) {
+    uint32_t item_id = read_value<int32_t>(inventory_item_ptr + item_id_offset);
+    uint32_t current_amount = read_value<int32_t>(inventory_item_ptr + amount_offset);
+
+    if (amount_to_remove <= current_amount && item_id == 60536000) {
         spdlog::debug("used a Pharros' Lockstone");
         return 0;
     }
 
-    return original_remove_item_from_inventory(param_1, param_2, inventory_item_ptr, amount);
+    return original_remove_item_from_inventory(param_1, param_2, inventory_item_ptr, amount_to_remove);
 }
 
-void Hooks::patchWeaponRequirements() {
-    // makes it so the function that checks requirements on onehand/twohand return without checking
-    PatchMemory(baseAddress + PatchesOffsets::noWeaponReqPatchOffset, Patches::noWeaponReqPatch);
-    // makes it so it doesnt load the values for the requirements to show in the menu
-    // this is mostly to not show the "unable to use this item efficiently" message
-    PatchMemory(baseAddress + PatchesOffsets::menuWeaponReqPatchOffset, Patches::menuWeaponReqPatch);
-    // instead of multiplying the value of the requirements with 1.5x, we set the register to 0
-    PatchMemory(baseAddress + PatchesOffsets::noPowerStanceStrReq, Patches::noPowerStanceReq);
-    PatchMemory(baseAddress + PatchesOffsets::noPowerStanceDexReq, Patches::noPowerStanceReq);
+#ifdef _M_IX86
+size_t __fastcall detour_virtual_to_archive_path(uintptr_t param_1, void* _edx, DLString* path)
+#elif defined(_M_X64)
+size_t __cdecl detour_virtual_to_archive_path(uintptr_t param_1, DLString* path)
+#endif
+{
+    if (path != nullptr && is_player_ingame())
+    {
+        const wchar_t* target = L"gamedata:/menu/tex/Icon/IC_0060375000.tpf";
+        const wchar_t* new_path = L"./archipelago/textures/IC_0060375000.tpf";
+        if (wcsncmp(path->string, target, wcslen(target)) == 0)
+        {
+            wcscpy_s(path->string, path->capacity, new_path);
+            path->length = wcslen(new_path);
+        }
+    }
+    return original_virtual_to_archive_path(param_1, path);
 }
 
-void Hooks::patchSpellRequirements() {
-    PatchMemory(baseAddress + PatchesOffsets::noSpellCastIntReq, Patches::noSpellCastReq);
-    PatchMemory(baseAddress + PatchesOffsets::noSpellCastFthReq, Patches::noSpellCastReq);
-    PatchMemory(baseAddress + PatchesOffsets::noSpellMenuIntReq, Patches::noSpellMenuIntReq);
-    PatchMemory(baseAddress + PatchesOffsets::noSpellMenuFthReq, Patches::noSpellMenuFthReq);
-}
+void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, int32_t> custom_items)
+{
+    uintptr_t base_address = get_base_address();
 
-void Hooks::patchInfiniteTorch() {
-    PatchMemory(baseAddress + PatchesOffsets::infiniteTorchOffset, Patches::infiniteTorch);
-}
+    _reward_names = reward_names;
+    _custom_items = custom_items;
 
-void patch_unbreakable_chests() {
-    PatchMemory(baseAddress + PatchesOffsets::UnbreakableChests, Patches::UnbreakableChests);
-}
+    if (hooks_enabled) return;
 
-void patch_disappearing_checks() {
-    // for some reason if the item doesnt fit in your inventory
-    // the chest will be empty, so we just make sure it always spawns
-    PatchMemory(baseAddress + PatchesOffsets::DissapearingChestItems, Patches::DissapearingChestItems);
-}
-
-bool Hooks::initHooks() {
-
-    HMODULE hModule = GetModuleHandleA("DarkSoulsII.exe");
-    baseAddress = (uintptr_t)hModule;
-
-    // putting it here for now instead of after connecting to ap
-    // just to make sure people NEVER lose checks cause of this
-    patch_unbreakable_chests();
-    patch_disappearing_checks();
+    // create the file with the archipelago texture
+    write_binary_file_if_not_exists(ap_texture_tpf, sizeof(ap_texture_tpf), L"archipelago/textures/IC_0060375000.tpf");
 
     MH_Initialize();
 
-    MH_CreateHookApi(L"ws2_32", "getaddrinfo", &detourGetaddrinfo, (LPVOID*)&originalGetaddrinfo);
+    #define HOOK(name) \
+    if (MH_CreateHook((LPVOID)(base_address + function_offsets::name), &detour_##name, (LPVOID*)&original_##name) != MH_OK) { \
+        spdlog::error("error creating hook {}", #name); \
+    } \
+    else if (MH_EnableHook((LPVOID)(base_address + function_offsets::name)) != MH_OK) { \
+        spdlog::error("error enabling hook {}", #name); \
+    } 
+    HOOKS
+    #undef HOOK
 
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnReward), &detourGiveItemsOnReward, (LPVOID*)&originalGiveItemsOnReward);
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveItemsOnPickup), &detourGiveItemsOnPickup, (LPVOID*)&originalGiveItemsOnPickup);
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GiveShopItem), &detourGiveShopItem, (LPVOID*)&originalGiveShopItem);
-
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ItemsFitInInventory), &detour_items_fit_in_inventory, (LPVOID*)&original_items_fit_in_inventory);
-#ifdef _M_X64
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddShopItemToInventory), &detourAddShopItemToInventory, (LPVOID*)&originalAddShopItemToInventory);
-#endif
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::AddItemsToInventory), &detourAddItemsToInventory, (LPVOID*)&originalAddItemsToInventory);
-    originalCreatePopupStructure = reinterpret_cast<createPopupStructure_t>(baseAddress + FunctionOffsets::CreatePopUpStruct);
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::ShowItemPopup), &detourShowItemPopup, (LPVOID*)&originalShowItemPopup);
-
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetItemNameFromId), &detourGetItemNameFromId, (LPVOID*)&originalGetItemNameFromId);
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::GetHoveringItemName), &detour_get_hovering_item_name, (LPVOID*)&original_get_hovering_item_name);
-
-    MH_CreateHook((LPVOID)(baseAddress + FunctionOffsets::RemoveItemFromInventory), &detour_remove_item_from_inventory, (LPVOID*)&original_remove_item_from_inventory);
-
-    MH_EnableHook(MH_ALL_HOOKS);
-
-    return true;
+    hooks_enabled = true;
 }
 
-int prevHp, curHp = -1;
-bool Hooks::playerJustDied() {
-    prevHp = curHp;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &curHp, sizeof(int), NULL);
-    if (prevHp != curHp && prevHp > 0 && curHp <= 0) {
-        spdlog::debug("YOU DIED");
-        return true;
-    }
-    return false;
+void force_offline()
+{
+    uintptr_t base_address = get_base_address();
+
+    MH_Initialize();
+    LPVOID target = nullptr;
+    MH_CreateHookApiEx(L"ws2_32", "getaddrinfo", &detour_getaddrinfo, (LPVOID*)&original_getaddrinfo, &target);
+    MH_EnableHook(target);
 }
 
-bool Hooks::killPlayer() {
-    int curHp;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &curHp, sizeof(int), NULL);
-    if (curHp > 0) {
-        int zeroHp = 0;
-        WriteProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::HP), &zeroHp, sizeof(int), NULL);
-        return true;
-    }
-    return false;
+std::list<int32_t> get_locations_to_check()
+{
+    return locations_to_check;
 }
 
-bool Hooks::isPlayerInGame() {
-    int value;
-    ReadProcessMemory(GetCurrentProcess(), (LPVOID*)GetPointerAddress(baseAddress, PointerOffsets::BaseA, PointerOffsets::GameState), &value, sizeof(int), NULL);
-    if (value == 30) {
-        return true;
-    }
-    return false;
+void clear_locations_to_check()
+{
+    locations_to_check.clear();
+}
+
+void set_item_name(int32_t item_id, std::wstring item_name)
+{
+    item_names[item_id] = item_name;
 }
