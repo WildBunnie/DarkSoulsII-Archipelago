@@ -39,3 +39,12 @@ void patch_disappearing_chests(uintptr_t base_address)
     // the chest will be empty, so we just make sure it always spawns
     patch_memory(base_address + patches_offsets::disappearing_chest_items, patches::disappearing_chest_items);
 }
+
+void patch_no_equip_load(uintptr_t base_address)
+{
+    // sets equip load to 0 when you equip something
+    patch_memory(base_address + patches_offsets::equip_load, patches::equip_load);
+    // makes it so when you are hovering items to equip the equip load shows as 0
+    patch_memory(base_address + patches_offsets::equip_load_menu, patches::equip_load_menu);
+}
+

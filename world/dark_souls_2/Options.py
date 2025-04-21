@@ -9,6 +9,10 @@ class NoSpellRequirements(Toggle):
     """Remove the requirements to cast spells"""
     display_name = "No Spell Requirements"
 
+class NoEquipLoad(Toggle):
+    """Disable the equip load constraint from the game."""
+    display_name = "No Equip Load"
+
 class OldIronKingDLC(Toggle):
     """Enable Crown of the Old Iron King DLC, randomizing items and locations within Brume Tower."""
     display_name = "Enable Crown of the Old Iron King DLC"
@@ -61,6 +65,7 @@ class DS2Options(PerGameCommonOptions):
     death_link: DeathLink
     no_weapon_req: NoWeaponRequirements
     no_spell_req: NoSpellRequirements
+    no_equip_load: NoEquipLoad
     enable_ngp: EnableNGPOption
     early_blacksmith: EarlyBlacksmith
     infinite_lifegems: KeepInfiniteLifegems

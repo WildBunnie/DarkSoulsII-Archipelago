@@ -67,6 +67,8 @@ namespace patches {
     const std::vector<uint8_t> infinite_torch = { 0x90, 0x90, 0x90, 0x90 };
     const std::vector<uint8_t> unbreakable_chests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE6 };
     const std::vector<uint8_t> disappearing_chest_items = { 0x90, 0x90 };
+    const std::vector<uint8_t> equip_load = { 0xD9, 0xEE, 0x90, 0x90, 0x90 };
+    const std::vector<uint8_t> equip_load_menu = { 0x31, 0xD2, 0x90 };
 #elif defined(_M_X64)
     const std::vector<uint8_t> no_weapon_req_patch = { 0xC3, 0x90, 0x90, 0x90, 0x90 };
     const std::vector<uint8_t> menu_weapon_req_patch = {
@@ -81,6 +83,8 @@ namespace patches {
     const std::vector<uint8_t> infinite_torch = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
     const std::vector<uint8_t> unbreakable_chests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE3 };
     const std::vector<uint8_t> disappearing_chest_items = { 0x90, 0x90 };
+    const std::vector<uint8_t> equip_load = { 0x31, 0xC9, 0x89, 0x4B, 0x44 };
+    const std::vector<uint8_t> equip_load_menu = { 0x89, 0x81, 0x9C, 0xA2, 0x00, 0x00, 0x90 };
 #endif
 };
 
@@ -97,6 +101,8 @@ namespace patches_offsets {
     const uintptr_t infinite_torch = 0x23950E;
     const uintptr_t unbreakable_chests = 0x24EDFC;
     const uintptr_t disappearing_chest_items = 0x259FDA;
+    const uintptr_t equip_load = 0x376B87;
+    const uintptr_t equip_load_menu = 0x14C83D;
 #elif defined(_M_X64)
     const uintptr_t no_weapon_req = 0x34A980;
     const uintptr_t menu_weapon_req = 0x201EC0;
@@ -109,6 +115,8 @@ namespace patches_offsets {
     const uintptr_t infinite_torch = 0x1BBD1C;
     const uintptr_t unbreakable_chests = 0x1D3C29;
     const uintptr_t disappearing_chest_items = 0x1E35E3;
+    const uintptr_t equip_load = 0x34A79E;
+    const uintptr_t equip_load_menu = 0x99D71;
 #endif
 };
 

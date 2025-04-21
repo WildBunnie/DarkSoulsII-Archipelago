@@ -106,6 +106,9 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		if (data.contains("no_spell_req") && data.at("no_spell_req") == 1) {
 			patch_spell_requirements(base_address);
 		}
+		if (data.contains("no_equip_load") && data.at("no_equip_load") == 1) {
+			patch_no_equip_load(base_address);
+		}
 
 		locations_to_ignore.insert(1700000); // estus flask from emerald herald
 		if (data.contains("infinite_lifegems") && data.at("infinite_lifegems") == 1) {
