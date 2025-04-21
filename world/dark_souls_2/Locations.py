@@ -1220,7 +1220,7 @@ location_table = {
         LocationData(None, "Defeat Velstadt", None, event=True),
         LocationData(333000, "[Crypt] Velstadt drop", ['Soul of Velstadt']),
         LocationData(333001, "[Crypt] Velstadt drop in NG+", ['Soul of Velstadt', "Royal Soldier's Ring+2"], ngp=True),
-        LocationData(333000, "[Crypt] Drop from an Insolent Knight that spawns when you light up the Crypt", ['Fragrant Branch of Yore'], sotfs=True, skip=True),
+        LocationData(2240100, "[Crypt] Drop from an Insolent Knight that spawns when you light up the Crypt", ['Fragrant Branch of Yore'], sotfs=True, skip=True),
         LocationData(20245000, "[Crypt] Metal chest near the torch that lights up the big statues", ['Soul Vessel']),
         LocationData(20245010, "[Crypt] Wooden chest on left side of the doorway leading to the great hall and Velstadt", ['Magic Stone', 'Darknight Stone']),
         LocationData(20245020, "[Crypt] Metal chest on balcony of the second graveyard room", ['Dried Fingers', 'Bonfire Ascetic', 'Twinkling Titanite']),
