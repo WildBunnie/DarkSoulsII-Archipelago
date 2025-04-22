@@ -126,10 +126,14 @@ namespace param_offsets {
     const std::vector<uintptr_t> item_param = { 0x60, 0x10, 0x94, 0x0 };
     const std::vector<uintptr_t> item_lot_param2_other = { 0x60, 0x30, 0x94, 0x0 };
     const std::vector<uintptr_t> item_lot_param2_chr = { 0x60, 0x28, 0x94, 0x0 };
+    const std::vector<uintptr_t> player_status_param = { 0x18, 0x398, 0x94, 0x0 };
+    const std::vector<uintptr_t> weapon_param = { 0x18, 0x210, 0x94, 0x0 };
 #elif defined(_M_X64)
     const std::vector<uintptr_t> shop_lineup_param = { 0xA8, 0xB0, 0xD8, 0x0 };
     const std::vector<uintptr_t> item_param = { 0xA8, 0x20, 0xD8, 0x0 };
     const std::vector<uintptr_t> item_lot_param2_other = { 0xA8, 0x60, 0xD8, 0x0 };
     const std::vector<uintptr_t> item_lot_param2_chr = { 0xA8, 0x50, 0xD8, 0x0 };
+    const std::vector<uintptr_t> player_status_param = { 0x18, 0x730, 0xD8, 0x0 };
+    const std::vector<uintptr_t> weapon_param = { 0x18, 0x420, 0xD8, 0x0 };
 #endif
 }

@@ -28,6 +28,30 @@ struct ParamRow {
 };
 #endif
 
+struct PlayerStatus {
+    int8_t idc1[36]; // body,hollow and build type
+    int32_t items[10];
+    uint16_t item_amounts[10];
+    int32_t spells[10];
+    int32_t right_weapons[3];
+    int32_t left_weapons[3];
+    int32_t head_armor;
+    int32_t chest_armor;
+    int32_t hands_armor;
+    int32_t legs_armor;
+    int32_t rings[4];
+    uint32_t reinforcements[6];
+    int32_t unk04;
+    int32_t player_status_items[3];
+    int32_t unk05;
+    int32_t arrows[2];
+    int32_t bolts[2];
+    int16_t arrow_amounts[2];
+    int16_t bolt_amounts[2];
+    int32_t gestures[8];
+    int8_t idc2[4];
+};
+
 // make it so locksones are not sellable
 // and make it so they dont drop from rats
 void patch_lockstone_stuff()
@@ -288,4 +312,222 @@ void override_item_params(std::map<int32_t, int32_t> rewards, std::string seed, 
 
     spdlog::info("Randomization complete!");
     spdlog::debug("randomization finished in {} ms.", duration.count());
+}
+
+struct StatBlock {
+    int16_t str = 0;
+    int16_t dex = 0;
+    int16_t intl = 0;
+    int16_t fth = 0;
+};
+
+enum StarterClass {
+    Warrior = 1,
+    Knight = 2,
+    Bandit = 3,
+    Cleric = 4,
+    Sorcerer = 5,
+    Explorer = 6,
+    Swordsman = 7,
+    Deprived = 8
+};
+
+std::map<int32_t, StatBlock> get_weapons()
+{
+    uintptr_t param_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::weapon_param);
+    ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x86
+    std::map<int32_t, StatBlock> result;
+
+    for (int i = 0; i < 10000; i++) {
+        int param_id = row_ptr[i].param_id;
+
+        if (param_id == 12020000) break; // reached the end
+
+        uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
+
+        StatBlock req;
+        req.str = read_value<int16_t>(reward_ptr + 0x18);
+        req.dex = read_value<int16_t>(reward_ptr + 0x1A);
+        req.intl = read_value<int16_t>(reward_ptr + 0x1C);
+        req.fth = read_value<int16_t>(reward_ptr + 0x1E);
+
+        result[param_id] = req;
+    }
+
+    return result;
+}
+
+int32_t get_valid_random_item(std::string seed_str, std::set<int32_t> items, std::map<int32_t, StatBlock> item_requirements, StatBlock current_stats)
+{
+    std::hash<std::string> hasher;
+    size_t seed = hasher(seed_str);
+    std::default_random_engine rng(static_cast<unsigned int>(seed));
+
+    std::vector<int32_t> valid_items;
+    for (auto item_id : items) {
+        if (item_requirements.contains(item_id)) {
+            StatBlock req = item_requirements[item_id];
+            if (req.str <= current_stats.str &&
+                req.dex <= current_stats.dex &&
+                req.intl <= current_stats.intl &&
+                req.fth <= current_stats.fth)
+            {
+                valid_items.push_back(item_id);
+            }
+        }
+    }
+
+    if (valid_items.empty()) {
+        spdlog::debug("No valid items found for given stats.");
+        return 3400000;
+    }
+
+    std::uniform_int_distribution<size_t> dist(0, valid_items.size() - 1);
+    return valid_items[dist(rng)];
+}
+
+int32_t get_random_item(std::string seed_str, std::set<int32_t> items)
+{
+    std::hash<std::string> hasher;
+    size_t seed = hasher(seed_str);
+    std::default_random_engine rng(static_cast<unsigned int>(seed));
+
+    std::vector<int32_t> item_vec(items.begin(), items.end());
+    std::uniform_int_distribution<size_t> dist(0, item_vec.size() - 1);
+    return item_vec[dist(rng)];
+}
+
+int get_random_amount(std::string seed_str, int min = 1, int max = 5)
+{
+    std::hash<std::string> hasher;
+    size_t hash = hasher(seed_str);
+    std::default_random_engine rng(static_cast<unsigned int>(hash));
+    std::uniform_int_distribution<int> dist(min, max);
+    return dist(rng);
+}
+
+StatBlock get_class_stats(StarterClass class_id)
+{
+    switch (class_id) {
+        case Warrior:   return { 15, 11, 5, 5 };
+        case Knight:    return { 11, 8, 3, 6 };
+        case Bandit:    return { 9, 14, 1, 8 };
+        case Cleric:    return { 11, 5, 4, 12 };
+        case Sorcerer:  return { 3, 7, 14, 4 };
+        case Explorer:  return { 6, 6, 5, 5 };
+        case Swordsman: return { 9, 16, 7, 5 };
+        case Deprived:  return { 6, 6, 6, 6 };
+        default:
+            spdlog::warn("Unknown class_id {}", static_cast<int>(class_id));
+            return { -1, -1, -1, -1 };
+    }
+}
+
+void randomize_starter_classes(std::string seed_str, ClassRandomizationFlag flag)
+{
+    uintptr_t param_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::player_status_param);
+    ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x86
+
+    std::map<int32_t, StatBlock> weapons = get_weapons();
+
+    // we leave deprived non randomized
+    for (int i = Warrior; i < Deprived; ++i) {
+        PlayerStatus* param = reinterpret_cast<PlayerStatus*>(param_ptr + row_ptr[i].reward_offset);
+
+        StatBlock class_stats = get_class_stats(static_cast<StarterClass>(i));
+        if (flag == TWO_HANDABLE) {
+            class_stats.str *= 2;
+        }
+        else if (flag == FULL_RANDOM) {
+            class_stats.str = 1000;
+            class_stats.dex = 1000;
+            class_stats.intl = 1000;
+            class_stats.fth = 1000;
+        }
+
+        std::string class_seed = seed_str + std::to_string(i);
+
+        param->items[0] = get_random_item(class_seed, goods);
+        param->item_amounts[0] = 7; // 7 cause the explorer has 7 items, random could also be cool
+
+        param->right_weapons[0] = get_valid_random_item(class_seed, melee_weapons, weapons, class_stats);
+        param->right_weapons[1] = 3400000;
+        param->right_weapons[2] = 3400000;
+        param->left_weapons[0] = 3400000;
+        param->left_weapons[1] = 3400000;
+        param->left_weapons[2] = 3400000;
+
+        switch (i) {
+            case Warrior: {
+                param->head_armor = get_random_item(class_seed, head_armor);
+                param->chest_armor = get_random_item(class_seed, chest_armor);
+                param->hands_armor = get_random_item(class_seed, hands_armor);
+                param->legs_armor = get_random_item(class_seed, legs_armor);
+
+                param->left_weapons[0] = get_valid_random_item(class_seed, shields, weapons, class_stats);
+                break;
+            }
+            case Knight: {
+                param->chest_armor = get_random_item(class_seed, chest_armor);
+                param->hands_armor = get_random_item(class_seed, hands_armor);
+                param->legs_armor = get_random_item(class_seed, legs_armor);
+                break;
+            }
+            case Bandit: {
+                param->head_armor = get_random_item(class_seed, head_armor);
+                param->chest_armor = get_random_item(class_seed, chest_armor);
+                param->hands_armor = get_random_item(class_seed, hands_armor);
+                param->legs_armor = get_random_item(class_seed, legs_armor);
+
+                param->left_weapons[0] = get_valid_random_item(class_seed, bows, weapons, class_stats);
+                param->arrows[0] = get_random_item(seed_str, arrows);
+                param->arrow_amounts[0] = get_random_amount(seed_str, param->arrow_amounts[0] - 10, param->arrow_amounts[0] + 10);
+                break;
+            }
+            case Cleric: {
+                param->chest_armor = get_random_item(class_seed, chest_armor);
+
+                param->left_weapons[0] = get_valid_random_item(class_seed, chimes, weapons, class_stats);
+
+                param->spells[0] = get_random_item(class_seed, miracles);
+                break;
+            }
+            case Sorcerer: {
+                param->chest_armor = get_random_item(class_seed, chest_armor);
+                param->legs_armor = get_random_item(class_seed, legs_armor);
+
+                param->left_weapons[0] = get_valid_random_item(class_seed, staffs, weapons, class_stats);
+
+                param->spells[0] = get_random_item(class_seed, sorceries);
+                break;
+            }
+            case Swordsman: {
+                param->head_armor = get_random_item(class_seed, head_armor);
+                param->chest_armor = get_random_item(class_seed, chest_armor);
+                param->hands_armor = get_random_item(class_seed, hands_armor);
+                param->legs_armor = get_random_item(class_seed, legs_armor);
+
+                param->left_weapons[0] = get_valid_random_item(class_seed, melee_weapons, weapons, class_stats);
+                break;
+            }
+            case Explorer: {
+                param->head_armor = get_random_item(class_seed, head_armor);
+                param->chest_armor = get_random_item(class_seed, chest_armor);
+                param->hands_armor = get_random_item(class_seed, hands_armor);
+                param->legs_armor = get_random_item(class_seed, legs_armor);
+
+                for (int i = 0; i < 7; i++) {
+                    param->items[i] = get_random_item(class_seed + std::to_string(i), goods);
+                    param->item_amounts[i] = 1;
+                }
+                param->bolts[0] = get_random_item(seed_str, bolts);
+                param->bolt_amounts[0] = get_random_amount(seed_str, param->bolt_amounts[0] - 10, param->bolt_amounts[0] + 10);
+                break;
+            }
+        }
+
+        // force reinforcements to 0
+        for (int i = 0; i < 6; i++)
+            param->reinforcements[i] = 0;
+    }
 }

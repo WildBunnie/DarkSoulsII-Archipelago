@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import PerGameCommonOptions, DeathLink, Toggle, Choice, ExcludeLocations, StartInventory
+from Options import PerGameCommonOptions, DeathLink, Toggle, Choice, ExcludeLocations, StartInventory, DefaultOnToggle
 
 class NoWeaponRequirements(Toggle):
     """Remove the requirements to wield weapons"""
@@ -12,6 +12,18 @@ class NoSpellRequirements(Toggle):
 class NoEquipLoad(Toggle):
     """Disable the equip load constraint from the game."""
     display_name = "No Equip Load"
+
+class RandomizeStartingLoadout(DefaultOnToggle):
+    """Randomizes the equipment characters begin with."""
+    display_name = "Randomize Starting Loadout"
+
+class StartingWeaponRequirement(Choice):
+    """Forces starting weapons to meet the chosen requirement."""
+    display_name = "Starting Weapon Requirement"
+    option_usable_with_one_hand = 0
+    option_usable_with_two_hands = 1
+    option_random = 2
+    default = option_usable_with_two_hands
 
 class OldIronKingDLC(Toggle):
     """Enable Crown of the Old Iron King DLC, randomizing items and locations within Brume Tower."""
@@ -66,6 +78,8 @@ class DS2Options(PerGameCommonOptions):
     no_weapon_req: NoWeaponRequirements
     no_spell_req: NoSpellRequirements
     no_equip_load: NoEquipLoad
+    randomize_starting_loadout: RandomizeStartingLoadout
+    starting_weapon_requirement: StartingWeaponRequirement
     enable_ngp: EnableNGPOption
     early_blacksmith: EarlyBlacksmith
     infinite_lifegems: KeepInfiniteLifegems

@@ -115,6 +115,13 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 			locations_to_ignore.insert(75400601);
 		}
 
+		if (data.contains("randomize_starting_loadout") && data.at("randomize_starting_loadout") == 1) {
+			if (data.contains("starting_weapon_requirement")) {
+				ClassRandomizationFlag flag = static_cast<ClassRandomizationFlag>(data.at("starting_weapon_requirement"));
+				randomize_starter_classes(ap->get_seed(), flag);
+			}
+		}
+
 		// we store an uuid we create in the server's data storage
 		// this allows us to have an unique identifier for each room
 		room_id_key = "roomid_" + std::to_string(ap->get_team_number()) + "_" + ap->get_slot();
