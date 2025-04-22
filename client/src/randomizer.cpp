@@ -516,6 +516,8 @@ void randomize_starter_classes(std::string seed_str, ClassRandomizationFlag flag
                 param->hands_armor = get_random_item(class_seed, hands_armor);
                 param->legs_armor = get_random_item(class_seed, legs_armor);
 
+                param->rings[0] = -1; // maybe i shouldnt remove his ring idk
+
                 for (int i = 0; i < 7; i++) {
                     param->items[i] = get_random_item(class_seed + std::to_string(i), goods);
                     param->item_amounts[i] = 1;
@@ -529,5 +531,25 @@ void randomize_starter_classes(std::string seed_str, ClassRandomizationFlag flag
         // force reinforcements to 0
         for (int i = 0; i < 6; i++)
             param->reinforcements[i] = 0;
+    }
+
+    // gifts
+    for (int i = 10; i <= 16; ++i) {
+        PlayerStatus* param = reinterpret_cast<PlayerStatus*>(param_ptr + row_ptr[i].reward_offset);
+
+        std::string gift_seed = seed_str + std::to_string(i);
+        if (i == 10) {
+            int32_t ring = get_random_item(gift_seed + std::to_string(i), rings);
+            param->rings[0] = ring - (ring % 10); // make last digit 0 so that its a +0 ring
+        }
+        else {
+            param->items[0] = get_random_item(gift_seed + std::to_string(i), goods);
+            param->item_amounts[0] = 1;
+        }
+
+        for (int i = 1; i < 10; i++) {
+            param->items[i] = -1;
+            param->item_amounts[i] = 0;
+        }
     }
 }
