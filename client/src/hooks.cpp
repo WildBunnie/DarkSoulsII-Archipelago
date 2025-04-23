@@ -2,7 +2,6 @@
 
 #include "offsets.h"
 #include "memory.h"
-#include "game_functions.h"
 #include "ds2.h"
 
 #include "spdlog/spdlog.h"
@@ -21,6 +20,7 @@ HOOKS
 #undef HOOK
 
 bool hooks_enabled = false;
+bool _autoequip = false;
 std::map<int, std::wstring> item_names;
 std::map<int32_t, std::string> _reward_names;
 std::map<int32_t, int32_t> _custom_items;
@@ -95,6 +95,17 @@ INT __stdcall detour_getaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHi
     }
 
     return original_getaddrinfo(address, port, pHints, ppResult);
+}
+
+#ifdef _M_IX86
+void __fastcall detour_add_item_to_inventory(uintptr_t param_1, void* _edx, Item* param_2)
+#elif defined(_M_X64)
+void __cdecl detour_add_item_to_inventory(uintptr_t param_1, Item* param_2)
+#endif
+{
+    original_add_item_to_inventory(param_1, param_2);
+    if (_autoequip) equip_last_received_item();
+    return;
 }
 
 #ifdef _M_IX86
@@ -222,12 +233,13 @@ size_t __cdecl detour_virtual_to_archive_path(uintptr_t param_1, DLString* path)
     return original_virtual_to_archive_path(param_1, path);
 }
 
-void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, int32_t> custom_items)
+void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, int32_t> custom_items, bool autoequip)
 {
     uintptr_t base_address = get_base_address();
 
     _reward_names = reward_names;
     _custom_items = custom_items;
+    _autoequip = autoequip;
 
     if (hooks_enabled) return;
 

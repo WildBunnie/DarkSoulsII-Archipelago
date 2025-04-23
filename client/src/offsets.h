@@ -9,7 +9,7 @@ namespace function_offsets {
     const uintptr_t give_items_on_pickup = 0x25BD90;
     const uintptr_t give_shop_item = 0x22B340;
     const uintptr_t items_fit_in_inventory = 0x22BB60;
-    // const uintptr_t add_shop_item_to_inventory = 0x22B340; // Same as AddItemsToInventory in vanilla
+    const uintptr_t add_item_to_inventory = 0x229C00;
     const uintptr_t add_items_to_inventory = 0x22AD20;
     const uintptr_t create_popup_structure = 0x11F430;
     const uintptr_t show_item_popup = 0x4FA9B0;
@@ -17,12 +17,13 @@ namespace function_offsets {
     const uintptr_t get_hovering_item_info = 0x105A40;
     const uintptr_t remove_item_from_inventory = 0x233ED0;
     const uintptr_t virtual_to_archive_path = 0x57EB70;
+    const uintptr_t equip_item = 0x233530;
 #elif defined(_M_X64)
     const uintptr_t give_items_on_reward = 0x199CC0;
     const uintptr_t give_items_on_pickup = 0x1E4590;
     const uintptr_t give_shop_item = 0x1A76A0;
     const uintptr_t items_fit_in_inventory = 0x1ABA90;
-    const uintptr_t add_shop_item_to_inventory = 0x1AA810;
+    const uintptr_t add_item_to_inventory = 0x1AA810;
     const uintptr_t add_items_to_inventory = 0x1A7470;
     const uintptr_t create_popup_structure = 0x5D950;
     const uintptr_t show_item_popup = 0x501080;
@@ -30,6 +31,7 @@ namespace function_offsets {
     const uintptr_t get_hovering_item_info = 0x38170;
     const uintptr_t remove_item_from_inventory = 0x1AF1E0;
     const uintptr_t virtual_to_archive_path = 0x89C5A0;
+    const uintptr_t equip_item = 0x1B3D50;
 #endif
 };
 

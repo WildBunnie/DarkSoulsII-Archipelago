@@ -13,6 +13,10 @@ class NoEquipLoad(Toggle):
     """Disable the equip load constraint from the game."""
     display_name = "No Equip Load"
 
+class AutoEquip(Toggle):
+    """Automatically equips any received armor, weapons or shields."""
+    display_name = "Auto-Equip"
+
 class RandomizeStartingLoadout(DefaultOnToggle):
     """Randomizes the equipment characters begin with."""
     display_name = "Randomize Starting Loadout"
@@ -78,6 +82,7 @@ class DS2Options(PerGameCommonOptions):
     no_weapon_req: NoWeaponRequirements
     no_spell_req: NoSpellRequirements
     no_equip_load: NoEquipLoad
+    autoequip: AutoEquip
     randomize_starting_loadout: RandomizeStartingLoadout
     starting_weapon_requirement: StartingWeaponRequirement
     enable_ngp: EnableNGPOption

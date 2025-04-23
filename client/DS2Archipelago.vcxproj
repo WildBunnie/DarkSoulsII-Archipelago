@@ -211,6 +211,7 @@
     <ClCompile Include="src\game_functions.cpp" />
     <ClCompile Include="src\hooks.cpp" />
     <ClCompile Include="src\memory.cpp" />
+    <ClCompile Include="src\params.cpp" />
     <ClCompile Include="src\patches.cpp" />
     <ClCompile Include="src\patches.h" />
     <ClCompile Include="src\randomizer.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="src\hooks.h" />
     <ClInclude Include="src\memory.h" />
     <ClInclude Include="src\offsets.h" />
+    <ClInclude Include="src\params.h" />
     <ClInclude Include="src\randomizer.h" />
   </ItemGroup>
   <ItemGroup>

@@ -2,10 +2,13 @@
 
 #include "offsets.h"
 #include "memory.h"
+#include "ds2.h"
+#include "params.h"
 
 #include "spdlog/spdlog.h"
 
 #include <iostream>
+#include <map>
 
 struct WorldFlagOffset {
     uint32_t offset;
@@ -40,6 +43,44 @@ std::map<int, WorldFlagOffset> statue_offsets = {
     {14, {0xC9F, 5}}  // Unpetrify Cyclops Statue in Aldia's Keep
 #endif
 };
+
+std::map<int32_t, int8_t> item_categories;
+std::map<ItemCategory, int32_t> equip_slots = {
+    { Weapon,      0 },
+    { Shield,      1 },
+    { HeadArmor,   6 },
+    { ChestArmor,  7 },
+    { HandsArmor,  8 },
+    { LegsArmor,   9 }
+};
+void equip_last_received_item()
+{
+    uintptr_t base_address = get_base_address();
+    uintptr_t inventory_ptr = resolve_pointer(base_address, pointer_offsets::base_a, pointer_offsets::available_item_bag);
+    
+#ifdef _M_IX86
+    uintptr_t ptr = read_value<uintptr_t>(inventory_ptr + 0x8);
+    uintptr_t last_inventory_slot_ptr = read_value<uintptr_t>(ptr + 0x1E0C0);
+    int32_t item_id = read_value<int32_t>(last_inventory_slot_ptr + 0x10);
+    int16_t inventory_slot_id = read_value<int16_t>(last_inventory_slot_ptr + 0x14);
+#elif defined(_M_X64)
+    uintptr_t ptr = read_value<uintptr_t>(inventory_ptr + 0x10);
+    uintptr_t last_inventory_slot_ptr = read_value<uintptr_t>(ptr + 0x25980);
+    int32_t item_id = read_value<int32_t>(last_inventory_slot_ptr + 0x14);
+    int16_t inventory_slot_id = read_value<int16_t>(last_inventory_slot_ptr + 0x1C);
+#endif
+    
+    if (item_categories.empty()) {
+        item_categories = get_item_categories();
+    }
+
+    ItemCategory category = static_cast<ItemCategory>(item_categories[item_id]);
+
+    if (equip_slots.contains(category)) {
+        equip_item_t equip_item = (equip_item_t)(base_address + function_offsets::equip_item);
+        equip_item(ptr, equip_slots[category], item_id, inventory_slot_id);
+    }
+}
 
 void give_items(ItemStruct items, int num_items)
 {

@@ -3,6 +3,7 @@
 #include "offsets.h"
 #include "memory.h"
 #include "ds2.h"
+#include "params.h"
 
 #include "spdlog/spdlog.h"
 
@@ -10,23 +11,6 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
-
-#ifdef _M_IX86
-struct ParamRow {
-    int32_t param_id;
-    int32_t reward_offset;
-    int32_t unknown;
-};
-#elif defined(_M_X64)
-struct ParamRow {
-    uint8_t padding1[4];
-    int32_t param_id;
-    uint8_t padding2[4];
-    int32_t reward_offset;
-    uint8_t padding3[4];
-    int32_t unknown;
-};
-#endif
 
 struct PlayerStatus {
     int8_t idc1[36]; // body,hollow and build type
@@ -314,13 +298,6 @@ void override_item_params(std::map<int32_t, int32_t> rewards, std::string seed, 
     spdlog::debug("randomization finished in {} ms.", duration.count());
 }
 
-struct StatBlock {
-    int16_t str = 0;
-    int16_t dex = 0;
-    int16_t intl = 0;
-    int16_t fth = 0;
-};
-
 enum StarterClass {
     Warrior = 1,
     Knight = 2,
@@ -331,31 +308,6 @@ enum StarterClass {
     Swordsman = 7,
     Deprived = 8
 };
-
-std::map<int32_t, StatBlock> get_weapons()
-{
-    uintptr_t param_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::weapon_param);
-    ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x86
-    std::map<int32_t, StatBlock> result;
-
-    for (int i = 0; i < 10000; i++) {
-        int param_id = row_ptr[i].param_id;
-
-        if (param_id == 12020000) break; // reached the end
-
-        uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
-
-        StatBlock req;
-        req.str = read_value<int16_t>(reward_ptr + 0x18);
-        req.dex = read_value<int16_t>(reward_ptr + 0x1A);
-        req.intl = read_value<int16_t>(reward_ptr + 0x1C);
-        req.fth = read_value<int16_t>(reward_ptr + 0x1E);
-
-        result[param_id] = req;
-    }
-
-    return result;
-}
 
 int32_t get_valid_random_item(std::string seed_str, std::set<int32_t> items, std::map<int32_t, StatBlock> item_requirements, StatBlock current_stats)
 {
@@ -428,7 +380,7 @@ void randomize_starter_classes(std::string seed_str, ClassRandomizationFlag flag
     uintptr_t param_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::player_status_param);
     ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x86
 
-    std::map<int32_t, StatBlock> weapons = get_weapons();
+    std::map<int32_t, StatBlock> weapons = get_weapon_requirements();
 
     // we leave deprived non randomized
     for (int i = Warrior; i < Deprived; ++i) {

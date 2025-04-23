@@ -34,6 +34,7 @@ std::string room_id_key;
 std::string room_id_value;
 bool fatal_error = false;
 bool death_link = false;
+bool autoequip = false;
 bool save_loaded = false;
 bool _died_by_deathlink = false;
 int last_received_index = -1;
@@ -108,6 +109,9 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		}
 		if (data.contains("no_equip_load") && data.at("no_equip_load") == 1) {
 			patch_no_equip_load(base_address);
+		}
+		if (data.contains("autoequip") && data.at("autoequip") == 1) {
+			autoequip = true;
 		}
 
 		locations_to_ignore.insert(1700000); // estus flask from emerald herald
@@ -194,7 +198,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 			}
 		}
 		override_item_params(location_rewards, ap->get_seed(), locations_to_ignore);
-		init_hooks(reward_names, custom_items);
+		init_hooks(reward_names, custom_items, autoequip);
 	});
 
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& received_items) {
