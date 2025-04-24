@@ -20,6 +20,7 @@ typedef char(__thiscall* add_items_to_inventory_t) (uintptr_t, ItemStruct*, int3
 typedef void(__cdecl*    create_popup_structure_t) (uintptr_t, ItemStruct*, int32_t, int32_t);
 typedef void(__thiscall* show_item_popup_t)        (uintptr_t, uintptr_t);
 typedef void(__thiscall* equip_item_t)             (uintptr_t, int32_t slot, int32_t item_id, int32_t);
+typedef void(__thiscall* unequip_item_t)           (uintptr_t, int32_t slot);
 
 void equip_last_received_item();
 void give_items(ItemStruct items, int num_items);

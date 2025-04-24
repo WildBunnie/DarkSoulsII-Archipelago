@@ -51,13 +51,21 @@ std::map<ItemCategory, int32_t> equip_slots = {
     { HeadArmor,   6 },
     { ChestArmor,  7 },
     { HandsArmor,  8 },
-    { LegsArmor,   9 }
+    { LegsArmor,   9 },
+    { Ring,       10 }
 };
+
+int ring_index = 0;
+
 void equip_last_received_item()
 {
     uintptr_t base_address = get_base_address();
+
+    equip_item_t equip_item = (equip_item_t)(base_address + function_offsets::equip_item);
+    unequip_item_t unequip_item = (unequip_item_t)(base_address + function_offsets::unequip_item);
+
     uintptr_t inventory_ptr = resolve_pointer(base_address, pointer_offsets::base_a, pointer_offsets::available_item_bag);
-    
+
 #ifdef _M_IX86
     uintptr_t ptr = read_value<uintptr_t>(inventory_ptr + 0x8);
     uintptr_t last_inventory_slot_ptr = read_value<uintptr_t>(ptr + 0x1E0C0);
@@ -69,15 +77,46 @@ void equip_last_received_item()
     int32_t item_id = read_value<int32_t>(last_inventory_slot_ptr + 0x14);
     int16_t inventory_slot_id = read_value<int16_t>(last_inventory_slot_ptr + 0x1C);
 #endif
-    
+
     if (item_categories.empty()) {
         item_categories = get_item_categories();
     }
 
     ItemCategory category = static_cast<ItemCategory>(item_categories[item_id]);
 
-    if (equip_slots.contains(category)) {
-        equip_item_t equip_item = (equip_item_t)(base_address + function_offsets::equip_item);
+    if (category == Ring) {
+        uintptr_t equipped_rings_ptr = resolve_pointer(base_address, pointer_offsets::base_a, pointer_offsets::equiped_rings);
+
+        // unequip ring if its already equiped
+        for (int i = 0; i < 4; i++) {
+            int32_t equipped_ring = read_value<int32_t>(equipped_rings_ptr + (i * 4));
+
+            // if we set the last digit to 0 we get the +0 ring
+            int32_t base_equipped_ring = (equipped_ring / 10) * 10;
+            int32_t base_ring_to_equip = (item_id / 10) * 10;
+
+            if (base_equipped_ring == base_ring_to_equip) {
+                unequip_item(ptr, equip_slots[category] + i);
+                break;
+            }
+        }
+
+        equip_item(ptr, equip_slots[category] + ring_index, item_id, inventory_slot_id);
+
+        ring_index++;
+        if (ring_index > 3) {
+            ring_index = 0;
+        }
+    }
+    else if (category == Weapon) {
+        if (melee_weapons.contains(item_id)) {
+            equip_item(ptr, equip_slots[category], item_id, inventory_slot_id);
+        }
+        else {
+            equip_item(ptr, 3, item_id, inventory_slot_id); // non melee weapons go to left weapon 2
+        }
+    }
+    else if (equip_slots.contains(category)) {
         equip_item(ptr, equip_slots[category], item_id, inventory_slot_id);
     }
 }

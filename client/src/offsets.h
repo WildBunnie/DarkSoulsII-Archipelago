@@ -18,6 +18,7 @@ namespace function_offsets {
     const uintptr_t remove_item_from_inventory = 0x233ED0;
     const uintptr_t virtual_to_archive_path = 0x57EB70;
     const uintptr_t equip_item = 0x233530;
+    const uintptr_t unequip_item = 0x232B80;
 #elif defined(_M_X64)
     const uintptr_t give_items_on_reward = 0x199CC0;
     const uintptr_t give_items_on_pickup = 0x1E4590;
@@ -32,6 +33,7 @@ namespace function_offsets {
     const uintptr_t remove_item_from_inventory = 0x1AF1E0;
     const uintptr_t virtual_to_archive_path = 0x89C5A0;
     const uintptr_t equip_item = 0x1B3D50;
+    const uintptr_t unequip_item = 0x1B4330;
 #endif
 };
 
@@ -43,6 +45,7 @@ namespace pointer_offsets {
     const std::vector<uintptr_t> available_item_bag = { 0x60, 0x8, 0x8, 0x0 };
     const std::vector<uintptr_t> item_give_window = { 0xCC4, 0x0 };
     const std::vector<uintptr_t> world_flags = { 0x44, 0x10, 0x28, 0x0, 0x0 };
+    const std::vector<uintptr_t> equiped_rings = { 0x74, 0xF0, 0xA04 };
 #elif defined(_M_X64)
     const uintptr_t base_a = 0x16148F0;
     const std::vector<uintptr_t> game_state = { 0x24AC };
@@ -50,6 +53,7 @@ namespace pointer_offsets {
     const std::vector<uintptr_t> available_item_bag = { 0xA8, 0x10, 0x10, 0x0 };
     const std::vector<uintptr_t> item_give_window = { 0x22E0, 0x0 };
     const std::vector<uintptr_t> world_flags = { 0x70, 0x20, 0x18, 0x0 };
+    const std::vector<uintptr_t> equiped_rings = { 0xD0, 0x378, 0x20, 0x458 };
 #endif
 };
 

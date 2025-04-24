@@ -104,7 +104,8 @@ void __cdecl detour_add_item_to_inventory(uintptr_t param_1, Item* param_2)
 #endif
 {
     original_add_item_to_inventory(param_1, param_2);
-    if (_autoequip) equip_last_received_item();
+    if (_autoequip && std::find(unused_item_ids.begin(), unused_item_ids.end(), param_2->item_id) == unused_item_ids.end())
+        equip_last_received_item();
     return;
 }
 
