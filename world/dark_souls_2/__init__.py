@@ -179,6 +179,8 @@ class DS2World(World):
                 if item_data.category not in repetable_categories and item_data.name in items_in_pool: continue
                 # skip sotfs items if we are not in sotfs
                 if item_data.sotfs and not self.options.game_version == "sotfs": continue
+                # skip items from dlcs not turned on
+                if not self.is_dlc_allowed(item_data.dlc): continue
 
                 item = self.create_item(item_data.name, item_data.category)
                 items_in_pool.append(item_data.name)
@@ -210,17 +212,19 @@ class DS2World(World):
         classification = ItemClassification.progression if name in progression_items or category==ItemCategory.STATUE else ItemClassification.filler
         return DS2Item(name, classification, code, self.player, category)
 
-    def is_dlc_allowed(dlc, options):
+    def is_dlc_allowed(self, dlc):
+        if dlc == None: return True
+
         dlc_conditions = {
-            DLC.SUNKEN_KING: options.sunken_king_dlc,
-            DLC.OLD_IRON_KING: options.old_iron_king_dlc,
-            DLC.IVORY_KING: options.ivory_king_dlc
+            DLC.SUNKEN_KING: self.options.sunken_king_dlc,
+            DLC.OLD_IRON_KING: self.options.old_iron_king_dlc,
+            DLC.IVORY_KING: self.options.ivory_king_dlc
         }
 
         if dlc == DLC.ALL:
             return any(dlc_conditions.values())
         
-        return dlc_conditions.get(dlc, False)
+        return dlc_conditions[dlc]
 
     def set_rules(self):
 
@@ -249,6 +253,7 @@ class DS2World(World):
         self.set_location_rule("[Majula] Wooden chest on the attic of Majula mansion", lambda state: state.has("House Key", self.player))
         ## PURSUER
         self.set_location_rule("[FOFG] Just before pursuer arena", lambda state: state.has("Soldier Key", self.player))
+        self.set_location_rule("[FOFG] In a crevasse in floor near the eagles nest", lambda state: state.has("Soldier Key", self.player))
         if self.options.enable_ngp:
             self.set_location_rule("[FOFG] Just before pursuer arena in NG+", lambda state: state.has("Soldier Key", self.player))
         self.set_location_rule("Defeat the Pursuer (in the proper arena)", lambda state: state.has("Soldier Key", self.player))

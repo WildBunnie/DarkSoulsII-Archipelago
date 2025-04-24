@@ -1107,7 +1107,7 @@ item_list: list[ItemData] = [
     ItemData(50960000, "Soul Vessel", ItemCategory.CONSUMABLE),
     ItemData(50970000, "Undead Lockaway Key", ItemCategory.KEY_ITEM),
     ItemData(50990000, "Dull Ember", ItemCategory.KEY_ITEM),
-    ItemData(51000000, "Crushed Eye Orb", ItemCategory.KEY_ITEM),
+    ItemData(51000000, "Crushed Eye Orb", ItemCategory.KEY_ITEM, skip=True),
     ItemData(51010000, "Simpleton's Spice", ItemCategory.CONSUMABLE),
     ItemData(51020000, "Skeptic's Spice", ItemCategory.CONSUMABLE),
     ItemData(51030000, "Aldia Key", ItemCategory.KEY_ITEM),
