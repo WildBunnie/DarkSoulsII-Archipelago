@@ -33,7 +33,7 @@ void patch_unbreakable_chests(uintptr_t base_address)
     patch_memory(base_address + patches_offsets::unbreakable_chests, patches::unbreakable_chests);
 }
 
-void patch_disappearing_chests(uintptr_t base_address)
+void patch_disappearing_checks(uintptr_t base_address)
 {
     // for some reason if the item doesn't fit in your inventory
     // the chest will be empty, so we just make sure it always spawns
@@ -46,5 +46,14 @@ void patch_no_equip_load(uintptr_t base_address)
     patch_memory(base_address + patches_offsets::equip_load, patches::equip_load);
     // makes it so when you are hovering items to equip the equip load shows as 0
     patch_memory(base_address + patches_offsets::equip_load_menu, patches::equip_load_menu);
+}
+
+void patch_qol(uintptr_t base_address)
+{
+    // ported from https://github.com/r3sus/Resouls/tree/main/ds2s/mods
+    // no logos
+    patch_memory(base_address + patches_offsets::no_logos, { 0x01 });
+    // no "press start button"
+    patch_memory(base_address + patches_offsets::no_press_start, { 0x02 });
 }
 

@@ -6,6 +6,8 @@
 #include "game_functions.h"
 #include "offsets.h"
 #include "ds2.h"
+#include "patches.h"
+#include "memory.h"
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
@@ -185,6 +187,9 @@ void run()
 
     setup_logging();
     force_offline();
+
+    uintptr_t base_address = get_base_address();
+    patch_qol(base_address);
 
     const int tps = 60; // ticks per second
     int loop_counter = 0;
