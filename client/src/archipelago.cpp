@@ -32,6 +32,7 @@ APClient* ap;
 
 std::string room_id_key;
 std::string room_id_value;
+std::string player_seed;
 bool fatal_error = false;
 bool death_link = false;
 bool autoequip = false;
@@ -81,6 +82,9 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 	ap->set_slot_connected_handler([](const json& data) {
 		spdlog::debug("received slot data: {}", data.dump());
 
+		// we do this so different players in the same room dont have the same items
+		player_seed = ap->get_seed() + ap->get_player_alias(ap->get_player_number()) + std::to_string(ap->get_team_number());
+
 		if (data.contains("game_version") && data.at("game_version") != GAME_VERSION) {
 			spdlog::error("The client's game version does not match the version chosen on the yaml file. "
 				"Please change to the correct game version or change the yaml file and generate a new game.");
@@ -122,7 +126,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		if (data.contains("randomize_starting_loadout") && data.at("randomize_starting_loadout") == 1) {
 			if (data.contains("starting_weapon_requirement")) {
 				ClassRandomizationFlag flag = static_cast<ClassRandomizationFlag>(data.at("starting_weapon_requirement"));
-				randomize_starter_classes(ap->get_seed(), flag);
+				randomize_starter_classes(player_seed, flag);
 			}
 		}
 
@@ -197,7 +201,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 				reward_names[item.location] = player_name + "' " + item_name;
 			}
 		}
-		override_item_params(location_rewards, ap->get_seed(), locations_to_ignore);
+		override_item_params(location_rewards, player_seed, locations_to_ignore);
 		init_hooks(reward_names, custom_items, autoequip);
 	});
 
