@@ -1,7 +1,7 @@
 import string
 import random
 
-from worlds.AutoWorld import World
+from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import set_rule, add_item_rule
 from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType, Tutorial
 from .Items import item_list, progression_items, repetable_categories, group_table, ItemCategory, DLC
