@@ -3,7 +3,7 @@ import random
 
 from worlds.AutoWorld import World
 from worlds.generic.Rules import set_rule, add_item_rule
-from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType
+from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType, Tutorial
 from .Items import item_list, progression_items, repetable_categories, group_table, ItemCategory, DLC
 from .Locations import location_table, location_name_groups
 from .Options import DS2Options
@@ -30,6 +30,19 @@ class DS2Item(Item):
         super(DS2Item, self).__init__(
             name, classification, code, player
         )
+
+class DarkSouls2Web(WebWorld):
+    theme = "stone"
+    setup_en = Tutorial(
+        "Multiworld Setup Guide",
+        "A guide to setting up the Archipelago Dark Souls II randomizer on your computer.",
+        "English",
+        "setup_en.md",
+        "setup/en",
+        ["WildBunnie"]
+    )
+
+    tutorials = [setup_en]
 
 class DS2World(World):
 

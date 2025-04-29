@@ -1382,7 +1382,7 @@ location_table = {
         LocationData(50365560, "[DLC2] Metal chest up the ladder from the second Ashen Idol", ['Titanite Slab']),
         LocationData(50365570, "[DLC2] Metal chest in the dark cursed area next to the Foyer bonfire", ['Fire Snake']),
         LocationData(50365580, "[DLC2] Metal chest in room with lizard; jump from the elevator going up from foyer", ['Brightbug']),
-        LocationData(50365590, "[DLC2] Vanilla pdbx8 :metal chest behind explodable wall in the corridor with fume sorcerers", ['Petrified Dragon Bone']),
+        LocationData(50365590, "[DLC2] Metal chest behind explodable wall in the corridor with fume sorcerers", ['Petrified Dragon Bone']),
         LocationData(50365650, "[DLC2] Metal chest in the upper floor of curved corridor opposite the gate to Sir Alonne", ['Smelter Wedge']),
         LocationData(50365680, "[DLC2] Netal chest on the top floor of the multi-level room", ['Strength Ring']),
         LocationData(50365690, "[DLC2] Metal chest behind illusory wall from the elevator shaft going up from the Upper Floor bonfire", ['Hollow Skin']),
