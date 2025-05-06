@@ -68,6 +68,11 @@ progression_items: list[str] = [
     "Ring of Whispers"
 ]
 
+useful_items: list[str] = [
+    "Estus Flask Shard",
+    "Sublime Bone Dust"
+]
+
 item_list: list[ItemData] = [
     ItemData(1, "Unpetrify Statue in Things Betwixt", ItemCategory.STATUE, sotfs=True),
     ItemData(2, "Unpetrify Rosabeth of Melfia", ItemCategory.STATUE),
