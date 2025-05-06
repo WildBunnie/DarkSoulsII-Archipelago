@@ -4,7 +4,7 @@ import random
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import set_rule, add_item_rule
 from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType, Tutorial
-from .Items import item_list, progression_items, repetable_categories, group_table, ItemCategory, DLC
+from .Items import item_list, progression_items, useful_items, repetable_categories, group_table, ItemCategory, DLC
 from .Locations import location_table, location_name_groups
 from .Options import DS2Options
 from typing import Optional
@@ -222,7 +222,7 @@ class DS2World(World):
 
     def create_item(self, name: str, category=None) -> DS2Item:
         code = self.item_name_to_id[name]
-        classification = ItemClassification.progression if name in progression_items or category==ItemCategory.STATUE else ItemClassification.filler
+        classification = ItemClassification.progression if name in progression_items or category==ItemCategory.STATUE else ItemClassification.useful if name in useful_items else ItemClassification.filler
         return DS2Item(name, classification, code, self.player, category)
 
     def is_dlc_allowed(self, dlc):
