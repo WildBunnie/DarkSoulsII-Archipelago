@@ -1052,7 +1052,7 @@ location_table = {
         LocationData(309701, "[MemoryJeigh] Giant Lord drop in NG+", ['Giant Lord Soul', "Giant's Kinship", 'Ring of Giants+2'], ngp=True),
         LocationData(20106100, "[MemoryJeigh] First left in Giant Lord's memory", ['Bonfire Ascetic']),
         LocationData(20106110, "[MemoryJeigh] On the battlefield", ['Old Radiant Lifegem']),
-        LocationData(20106111, "[MemoryJeigh] On the battlefield (2)", ['Divine Blessing']),
+        LocationData(20106111, "[MemoryJeigh] On the battlefield in NG+", ['Divine Blessing'], ngp=True),
         LocationData(20106120, "[MemoryJeigh] Up the second set of stairs in the Giant Lord memory", ['Fire Seed']),
     ],
     "Memory of Vammar":[
