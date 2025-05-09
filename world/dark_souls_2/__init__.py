@@ -244,8 +244,9 @@ class DS2World(World):
         for location in self.multiworld.get_locations(self.player):
             if location.shop:
                 add_item_rule(location, lambda item: 
-                              item.player != self.player or
-                              item.category not in [ItemCategory.AMMO, ItemCategory.CONSUMABLE, ItemCategory.STATUE])
+                              (item.player != self.player or
+                              item.category not in [ItemCategory.AMMO, ItemCategory.CONSUMABLE, ItemCategory.STATUE]) and
+                              item.classification in [ItemClassification.filler, ItemClassification.trap])
 
         self.set_shop_rules()
 
