@@ -122,6 +122,14 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
             // zero out the amounts of the other items
             void* ptr = reinterpret_cast<void*>(amount_ptr + 1);
             std::memset(ptr, 0, 9 * sizeof(int8_t));
+
+            // zero out the reinforcement level
+            ptr = reinterpret_cast<void*>(amount_ptr + 0xA);
+            std::memset(ptr, 0, 10 * sizeof(int8_t));
+
+            // zero out the infusions
+            ptr = reinterpret_cast<void*>(amount_ptr + 0x14);
+            std::memset(ptr, 0, 10 * sizeof(int8_t));
         }
         else {
             uintptr_t offset = row_ptr[i].reward_offset;
