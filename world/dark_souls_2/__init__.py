@@ -73,7 +73,7 @@ class DS2World(World):
         for region_name in location_table:
             if region_name == "Shulva" and not self.options.sunken_king_dlc: continue
             if region_name == "Brume Tower" and not self.options.old_iron_king_dlc: continue
-            if region_name == "Eleum Loyce" and not self.options.ivory_king_dlc: continue
+            if region_name in ["Eleum Loyce","Frigid Outskirts"] and not self.options.ivory_king_dlc: continue
             region = self.create_region(region_name)
             for location_data in location_table[region_name]:
                 if location_data.ngp and not self.options.enable_ngp: continue
@@ -144,6 +144,8 @@ class DS2World(World):
             regions["Iron Keep"].connect(regions["Brume Tower"])
         if self.options.ivory_king_dlc:
             regions["Shaded Woods"].connect(regions["Eleum Loyce"])
+            regions["Eleum Loyce"].connect(regions["Frigid Outskirts"])
+            
 
     def create_region(self, name):
         return Region(name, self.player, self.multiworld)
@@ -360,9 +362,8 @@ class DS2World(World):
             if self.options.old_iron_king_dlc:
                 self.set_connection_rule("Iron Keep", "Brume Tower", lambda state: state.has("Heavy Iron Key", self.player))
             if self.options.ivory_king_dlc:
-                self.set_connection_rule("Shaded Woods", "Eleum Loyce", lambda state: 
-                                            state.has("Frozen Flower", self.player) and 
-                                            state.has("Open Shrine of Winter", self.player))
+                self.set_connection_rule("Shaded Woods", "Eleum Loyce", lambda state: state.has("Frozen Flower", self.player))
+                self.set_connection_rule("Eleum Loyce", "Frigid Outskirts", lambda state: state.has("Garrison Ward Key", self.player))
 
         self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
         self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))

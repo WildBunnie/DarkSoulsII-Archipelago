@@ -65,7 +65,8 @@ progression_items: list[str] = [
     "Tseldora Den Key",
     "Iron Key",
     "Brightstone Key",
-    "Ring of Whispers"
+    "Ring of Whispers",
+    "Garrison Ward Key"
 ]
 
 useful_items: list[str] = [
