@@ -163,9 +163,10 @@ class DS2World(World):
             event_item = DS2Item(event.name, ItemClassification.progression, None, self.player, None)
             self.multiworld.get_location(event.name, self.player).place_locked_item(event_item)
         
-        # set the giant's kinship at the original location
-        # because killing the giant lord is necessary to kill nashandra
+        # these items are paperwheights, the event is triggered by interacting with the check no matter the item
+        # for that reason, for now, we just place the item in the default location to not confuse players
         self.multiworld.get_location("[MemoryJeigh] Giant Lord drop", self.player).place_locked_item(self.create_item("Giant's Kinship"))
+        self.multiworld.get_location("[DLC3] On altar", self.player).place_locked_item(self.create_item("Eye of the Priestess"))
 
         max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
 
