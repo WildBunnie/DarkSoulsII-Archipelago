@@ -1,5 +1,6 @@
 from collections import defaultdict
 import json
+import re
 
 files = ["ItemLotParam2_Chr.csv","ItemLotParam2_Other.csv","ShopLineupParam.csv"]
 
@@ -22,68 +23,118 @@ with open("sotfs/ItemParam.csv") as file:
         item_names[int(line.split(",")[0])] = line.split(",")[1].strip()
 
 ap_to_game = defaultdict(int)
+game_to_ap = defaultdict(list)
 locations = defaultdict(list)
     
-location_name_fixes = {
-    "[Betwixt]":"TB:",
-    "[Crows]":"TB:",
-    "[Majula]":"MA:",
-    "[FOFG]":"FOFG:",
-    "[Tseldora]":"BC:",
-    "[AldiasKeep]":"AK:",
-    "[Bastille]":"LB:",
-    "[HarvestValley]":"HV:",
-    "[EarthernPeak]":"EP:",
-    "[Wharf]":"NMW:",
-    "[IronKeep]":"IK:",
-    "[Copse]":"HK:",
-    "[Gutter]":"GUT:",
-    "[Aerie]":"DA:",
-    "[Heides]":"HTF:",
-    "[ShadedWoods]":"SW:",
-    "[Pharros]":"DP:",
-    "[Pit]":"PIT:",
-    "[Amana]":"SA:",
-    "[Drangleic]":"DC:",
-    "[Crypt]":"UC:"
+region_names = {
+    "ThingsBetwixt":"TB",
+    "Majula":"MA",
+    "FOFG":"FOFG",
+    "Tseldora":"BCT",
+    "AldiasKeep":"AK",
+    "TheLostBastille":"LB",
+    "HarvestValley":"HV",
+    "EarthenPeak":"EP",
+    "NoMansWharf":"NMW",
+    "IronKeep":"IK",
+    "HuntsmansCopse":"HC",
+    "TheGutter":"GUT",
+    "DragonAerie":"DA",
+    "HeidesTowerOfFlame":"HTF",
+    "ShadedWoods":"SW",
+    "DoorsOfPharros":"DP",
+    "ThePit":"PIT",
+    "ShrineOfAmana":"SA",
+    "DrangleicCastle":"DC",
+    "UndeadCrypt":"UC",
+    "BelfryLuna":"BL",
+    "UndeadPurgatory":"UP",
+    "GraveOfSaints":"GS",
+    "MemoryOfJeigh":"MJ",
+    "BlackGulch":"BG",
+    "DragonShrine":"DS",
+    "BelfrySol":"BS",
+    "MemoryOfOrro":"MO",
+    "MemoryOfVammar":"MV",
 }
 
 bundle_ids = set()
 items_with_amounts = set()
 current_id = 10000
+
+def fix_shop_name(s):
+    match = re.match(r'^\[(.*?)\]\s*(.*)$', s) or re.match(r'^(.*?)\s*\[(.*?)\]$', s)
+    if not match:
+        return s  # return unchanged if no brackets found
+
+    if s.startswith('['):
+        info, item = match.groups()
+    else:
+        item, info = match.groups()
+
+    # Replace dashes with "in"/"after" and "and"
+    parts = [part.strip() for part in info.split('-')]
+    if len(parts) > 1:
+        connector = "in" if parts[1] in region_names else "after"
+        info_reworded = f"{parts[0]} {connector} {parts[1]}"
+        if len(parts) > 2:
+            info_reworded += ' and ' + ' and '.join(parts[2:])
+    else:
+        info_reworded = parts[0]
+
+    return info_reworded
+
 def create_location(location_id, location_name, item_id, chance, amount, sotfs=False, vanilla=False, keep_id=False):
     global current_id
 
     if location_id < 200000000 and chance != 100:
         return
-    elif location_id < 300000000 and chance == 0:
+    elif 200000000 <= location_id < 300000000 and (chance != 1 or "[Crows]" in location_name):
         return
-    elif location_id < 400000000 and item_id not in item_names:
+    elif 300000000 <= location_id < 400000000 and item_id not in item_names:
         return
     
     if amount == 0:
         return
 
     item_name = item_names[item_id].replace("- ",", ")
-    item_name += f" x{amount}" if amount != 1 else ""
+    item_name += f" x{amount}" if amount != 1  else ""
 
     if amount > 1 and location_id < 300000000:
         bundle_ids.add(item_id+amount)
         items_with_amounts.add(f"ItemData({item_id + amount}, \"{item_name}\", ItemCategory.CONSUMABLE, amount={amount}),")
 
-    region = "i have no idea" if location_id not in regions else regions[location_id]
+    region = "Undefined" if location_id not in regions else regions[location_id]
+    
+    if 300000000 <= location_id < 400000000:
+        location_name = fix_shop_name(location_name)
 
-    for fix in location_name_fixes:
-        location_name = location_name.replace(fix, location_name_fixes[fix] + f" {item_name} -")
+    location_name = re.sub(r' \[REG:\d+\]', '', location_name)
+    location_name = re.sub(r' \[GEN:\d+\]', '', location_name)
+    location_name = location_name.replace(" (NPC)","")
+
+    if location_id < 200000000:
+        location_name += " (drop)"
+
+    prefix = f"[{region}]" if region not in region_names else f"{region_names[region]}:"
+    if location_id < 300000000:
+        if location_name.startswith("["):
+            location_name = re.sub(r'^\[.*?\]\s*', f'{prefix} {item_name} - ', location_name, count=1)
+    else:
+        location_name = f'{prefix} {item_name} - ' + location_name
 
     location = f"LocationData({current_id}, \"{location_name}\""
-    location += ", sotfs=True" if sotfs else ", vanilla=True" if vanilla else ""
-    location += ", ngp=True" if " ng+" in location.lower() else ""
     location += ", missable=True" if location_id < 200000000 else ""
+    location += ", ngp=True" if " ng+" in location.lower() else ""
+    location += ", sotfs=True" if sotfs else ", vanilla=True" if vanilla else ""
     location += ")"
+
+    # if location_id >= 300000000 and amount != 1:
+    #     location = "#" + location
+
     locations[region].append(location)
 
-    ap_to_game[current_id] = location_id
+    game_to_ap[location_id].append(current_id)
 
     if not keep_id:
         current_id += 1
@@ -184,7 +235,14 @@ for region in locations:
         print(f"        {location},")
     print("    ],")
 
-print(json.dumps(ap_to_game, indent=4))
+lines = [f"std::map<int, std::vector<int>> ap_location_map = {{"]
+for key, values in game_to_ap.items():
+    value_list = ", ".join(str(v) for v in values)
+    lines.append(f"    {{{key}, {{{value_list}}}}},")
+lines.append("};")
+for line in lines:
+    print(line)
+
 
 s = sorted(bundle_ids)
 print(set(s))
