@@ -142,6 +142,9 @@ class DS2World(World):
             regions["The Gutter"].connect(regions["Shulva"])
         if self.options.old_iron_king_dlc:
             regions["Iron Keep"].connect(regions["Brume Tower"])
+            regions["Brume Tower"].connect(regions["Brume Tower - scepter"])
+            regions["Brume Tower - scepter"].connect(regions["Iron Passage"])
+            regions["Iron Passage"].connect(regions["Memory of the Old Iron King"])
         if self.options.ivory_king_dlc:
             regions["Shaded Woods"].connect(regions["Eleum Loyce"])
             regions["Eleum Loyce"].connect(regions["Frigid Outskirts"])
@@ -357,14 +360,20 @@ class DS2World(World):
         self.set_location_rule("[GraveOfSaints] 2nd floor on other side of the drawbridges", lambda state: state.has("Master Lockstone", self.player))
 
         # CONNECTIONS
-        if self.options.game_version == "sotfs":
-            if self.options.sunken_king_dlc:
-                self.set_connection_rule("The Gutter", "Shulva", lambda state: state.has("Dragon Talon", self.player))
-            if self.options.old_iron_king_dlc:
-                self.set_connection_rule("Iron Keep", "Brume Tower", lambda state: state.has("Heavy Iron Key", self.player))
-            if self.options.ivory_king_dlc:
-                self.set_connection_rule("Shaded Woods", "Eleum Loyce", lambda state: state.has("Frozen Flower", self.player))
-                self.set_connection_rule("Eleum Loyce", "Frigid Outskirts", lambda state: state.has("Garrison Ward Key", self.player))
+        
+        if self.options.sunken_king_dlc:
+            if self.options.game_version == "sotfs": self.set_connection_rule("The Gutter", "Shulva", lambda state: state.has("Dragon Talon", self.player))
+        if self.options.old_iron_king_dlc:
+            if self.options.game_version == "sotfs": self.set_connection_rule("Iron Keep", "Brume Tower", lambda state: state.has("Heavy Iron Key", self.player))
+            self.set_connection_rule("Brume Tower", "Brume Tower - scepter", lambda state: state.has("Scorching Iron Scepter", self.player))
+            self.set_connection_rule("Brume Tower - scepter", "Iron Passage", lambda state: state.has("Tower Key", self.player))
+            self.set_connection_rule("Iron Passage", "Memory of the Old Iron King", lambda state: state.has("Ashen Mist Heart", self.player))
+            self.set_location_rule("[DLC2] Wooden chest in the left of the dark cursed area next to the Foyer bonfire", lambda state: state.has("Tower Key", self.player))
+            self.set_location_rule("[DLC2] Metal chest in the dark cursed area next to the Foyer bonfire", lambda state: state.has("Tower Key", self.player))
+            self.set_location_rule("[DLC2] On altar in the dark cursed area next to the Foyer bonfire", lambda state: state.has("Tower Key", self.player))
+        if self.options.ivory_king_dlc:
+            if self.options.game_version == "sotfs": self.set_connection_rule("Shaded Woods", "Eleum Loyce", lambda state: state.has("Frozen Flower", self.player))
+            self.set_connection_rule("Eleum Loyce", "Frigid Outskirts", lambda state: state.has("Garrison Ward Key", self.player))
 
         self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
         self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
