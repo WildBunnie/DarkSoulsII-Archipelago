@@ -71,8 +71,8 @@ class DS2World(World):
         regions["Menu"] = menu_region
     
         for region_name in location_table:
-            if region_name == "Shulva" and not self.options.sunken_king_dlc: continue
-            if region_name == "Brume Tower" and not self.options.old_iron_king_dlc: continue
+            if region_name in ["Shulva", "Shulva - Sanctum Key", "Shulva - Dragon Stone"] and not self.options.sunken_king_dlc: continue
+            if region_name in ["Brume Tower","Brume Tower - scepter", "Iron Passage", "Memory of the Old Iron King"] and not self.options.old_iron_king_dlc: continue
             if region_name in ["Eleum Loyce","Frigid Outskirts"] and not self.options.ivory_king_dlc: continue
             region = self.create_region(region_name)
             for location_data in location_table[region_name]:
