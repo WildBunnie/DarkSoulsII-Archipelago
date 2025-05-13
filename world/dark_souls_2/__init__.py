@@ -189,6 +189,9 @@ class DS2World(World):
                 elif item_name == "Pharros' Lockstone":
                     if "Master Lockstone" in items_in_pool: continue
                     item_data = next((item for item in item_list if item.name == "Master Lockstone"), None)
+                elif item_name == "Smelter Wedge":
+                    if "Smelter Wedge x11" in items_in_pool: continue
+                    item_data = next((item for item in item_list if item.name == "Smelter Wedge x11"), None)
                 else:
                     item_data = next((item for item in item_list if item.name == item_name), None)
                     assert item_data, f"location's default item not in item list '{item_name}'"
@@ -372,6 +375,9 @@ class DS2World(World):
             self.set_location_rule("[DLC2] Wooden chest in the left of the dark cursed area next to the Foyer bonfire", lambda state: state.has("Tower Key", self.player))
             self.set_location_rule("[DLC2] Metal chest in the dark cursed area next to the Foyer bonfire", lambda state: state.has("Tower Key", self.player))
             self.set_location_rule("[DLC2] On altar in the dark cursed area next to the Foyer bonfire", lambda state: state.has("Tower Key", self.player))
+            self.set_location_rule("[DLC2] Fume Knight drop", lambda state: state.has("Smelter Wedge x11", self.player))
+            if self.options.enable_ngp: self.set_location_rule("[DLC2] Fume Knight drop in NG+", lambda state: state.has("Smelter Wedge x11", self.player))
+
         if self.options.ivory_king_dlc:
             if self.options.game_version == "sotfs": self.set_connection_rule("Shaded Woods", "Eleum Loyce", lambda state: state.has("Frozen Flower", self.player))
             self.set_connection_rule("Eleum Loyce", "Frigid Outskirts", lambda state: state.has("Garrison Ward Key", self.player))

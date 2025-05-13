@@ -14,6 +14,8 @@ const std::vector<int> unused_item_ids = {
    65270000, 65280000, 65290000, 900008182, 900008183
 };
 
+const std::set<int64_t> item_bundles = { 53200011 };
+
 // i just use these for randomizing the classes
 // these are not very reliable at telling the item's category
 // since thing i dont want in the starter classes are in misc and skip for example
