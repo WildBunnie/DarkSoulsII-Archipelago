@@ -140,6 +140,8 @@ class DS2World(World):
 
         if self.options.sunken_king_dlc:
             regions["The Gutter"].connect(regions["Shulva"])
+            regions["Shulva"].connect(regions["Shulva - Sanctum Key"])
+            regions["Shulva"].connect(regions["Shulva - Dragon Stone"])
         if self.options.old_iron_king_dlc:
             regions["Iron Keep"].connect(regions["Brume Tower"])
             regions["Brume Tower"].connect(regions["Brume Tower - scepter"])
@@ -367,6 +369,8 @@ class DS2World(World):
         
         if self.options.sunken_king_dlc:
             if self.options.game_version == "sotfs": self.set_connection_rule("The Gutter", "Shulva", lambda state: state.has("Dragon Talon", self.player))
+            self.set_connection_rule("Shulva", "Shulva - Sanctum Key", lambda state: state.has("Eternal Sanctum Key", self.player))
+            self.set_connection_rule("Shulva", "Shulva - Dragon Stone", lambda state: state.has("Dragon Stone", self.player))
         if self.options.old_iron_king_dlc:
             if self.options.game_version == "sotfs": self.set_connection_rule("Iron Keep", "Brume Tower", lambda state: state.has("Heavy Iron Key", self.player))
             self.set_connection_rule("Brume Tower", "Brume Tower - scepter", lambda state: state.has("Scorching Iron Scepter", self.player))
@@ -377,7 +381,6 @@ class DS2World(World):
             self.set_location_rule("[DLC2] On altar in the dark cursed area next to the Foyer bonfire", lambda state: state.has("Tower Key", self.player))
             self.set_location_rule("[DLC2] Fume Knight drop", lambda state: state.has("Smelter Wedge x11", self.player))
             if self.options.enable_ngp: self.set_location_rule("[DLC2] Fume Knight drop in NG+", lambda state: state.has("Smelter Wedge x11", self.player))
-
         if self.options.ivory_king_dlc:
             if self.options.game_version == "sotfs": self.set_connection_rule("Shaded Woods", "Eleum Loyce", lambda state: state.has("Frozen Flower", self.player))
             self.set_connection_rule("Eleum Loyce", "Frigid Outskirts", lambda state: state.has("Garrison Ward Key", self.player))
