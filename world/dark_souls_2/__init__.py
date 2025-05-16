@@ -148,7 +148,7 @@ class DS2World(World):
             regions["Brume Tower - scepter"].connect(regions["Iron Passage"])
             regions["Iron Passage"].connect(regions["Memory of the Old Iron King"])
         if self.options.ivory_king_dlc:
-            regions["Shaded Woods"].connect(regions["Eleum Loyce"])
+            regions["Drangleic Castle"].connect(regions["Eleum Loyce"])
             regions["Eleum Loyce"].connect(regions["Frigid Outskirts"])
             
 
@@ -168,7 +168,7 @@ class DS2World(World):
             event_item = DS2Item(event.name, ItemClassification.progression, None, self.player, None)
             self.multiworld.get_location(event.name, self.player).place_locked_item(event_item)
         
-        # these items are paperwheights, the event is triggered by interacting with the check no matter the item
+        # these items are paperweights, the event is triggered by interacting with the check no matter the item
         # for that reason, for now, we just place the item in the default location to not confuse players
         self.multiworld.get_location("[MemoryJeigh] Giant Lord drop", self.player).place_locked_item(self.create_item("Giant's Kinship"))
         if self.options.ivory_king_dlc:
@@ -382,7 +382,7 @@ class DS2World(World):
             self.set_location_rule("[DLC2] Fume Knight drop", lambda state: state.has("Smelter Wedge x11", self.player))
             if self.options.enable_ngp: self.set_location_rule("[DLC2] Fume Knight drop in NG+", lambda state: state.has("Smelter Wedge x11", self.player))
         if self.options.ivory_king_dlc:
-            if self.options.game_version == "sotfs": self.set_connection_rule("Shaded Woods", "Eleum Loyce", lambda state: state.has("Frozen Flower", self.player))
+            if self.options.game_version == "sotfs": self.set_connection_rule("Drangleic Castle", "Eleum Loyce", lambda state: state.has("Frozen Flower", self.player))
             self.set_connection_rule("Eleum Loyce", "Frigid Outskirts", lambda state: state.has("Garrison Ward Key", self.player))
 
         self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
