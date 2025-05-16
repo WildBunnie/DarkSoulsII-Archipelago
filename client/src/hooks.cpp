@@ -29,7 +29,7 @@ std::list<int32_t> locations_to_check;
 std::wstring remove_special_characters(const std::wstring& input)
 {
     std::set<wchar_t> allowedChars = {
-        L'-', L'\'', L',', L' ', L':', L'+'
+        L'-', L'\'', L',', L' ', L':', L'+', L'&'
     };
 
     std::wstring output;

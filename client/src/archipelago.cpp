@@ -198,7 +198,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 
 				std::string player_name = ap->get_player_alias(item.player);
 				std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));
-				reward_names[item.location] = player_name + "' " + item_name;
+				reward_names[item.location] = player_name + "'s " + item_name;
 			}
 		}
 		override_item_params(location_rewards, player_seed, locations_to_ignore);

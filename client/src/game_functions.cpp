@@ -122,14 +122,6 @@ void equip_last_received_item()
     }
 }
 
-// yes its ducplicated cause i dont want to change the other one to a set rn
-std::set<int32_t> _unused_item_ids = {
-   3400000, 3401000, 21001100, 21001101, 21001102, 21001103, 21600000,
-   21610000, 21620000, 21630000, 21640000, 21650000, 21660000, 21670000,
-   21680000, 21690000, 21700000, 21710000, 26590000, 26750000, 26770000,
-   26800000, 26900000, 27521000, 60375000, 65240000, 65250000, 65260000,
-   65270000, 65280000, 65290000, 900008182, 900008183
-};
 void give_items(ItemStruct items, int num_items)
 {
     uintptr_t base_address = get_base_address();
@@ -139,16 +131,8 @@ void give_items(ItemStruct items, int num_items)
     create_popup_structure_t create_popup = (create_popup_structure_t)(base_address + function_offsets::create_popup_structure);
     show_item_popup_t show_popup = (show_item_popup_t)(base_address + function_offsets::show_item_popup);
 
-    // if the item struct has unused items (that we use for custom items)
-    // replace it with 100 so that the "add items" function doesnt fail
-    // but we still want the display struct to have the custom items
-    create_popup((uintptr_t)display_struct, &items, num_items, 1);
-    for (int i = 0; i < num_items; i++) {
-        if (_unused_item_ids.contains(items.items[i].item_id)) {
-            items.items[i].item_id = 100;
-        }
-    }
     add_items(resolve_pointer(base_address, pointer_offsets::base_a, pointer_offsets::available_item_bag), &items, num_items, 0);
+    create_popup((uintptr_t)display_struct, &items, num_items, 1);
     show_popup(resolve_pointer(base_address, pointer_offsets::base_a, pointer_offsets::item_give_window), (uintptr_t)display_struct);
 }
 
