@@ -30,18 +30,15 @@ class StartingWeaponRequirement(Choice):
     default = option_usable_with_two_hands
 
 class OldIronKingDLC(Toggle):
-    """Enable Crown of the Old Iron King DLC, randomizing items and locations within Brume Tower.
-    NOT RECOMMENDED, WORK IN PROGRESS"""
+    """Enable Crown of the Old Iron King DLC, randomizing items and locations within Brume Tower."""
     display_name = "Enable Crown of the Old Iron King DLC"
 
 class IvoryKingDLC(Toggle):
-    """Enable Crown of the Ivory King DLC, randomizing items and locations within Frozen Eleum Loyce.
-    NOT RECOMMENDED, WORK IN PROGRESS"""
+    """Enable Crown of the Ivory King DLC, randomizing items and locations within Frozen Eleum Loyce."""
     display_name = "Enable Crown of the Ivory King DLC"
 
 class SunkenKingDLC(Toggle):
-    """Enable Crown of the Sunken King DLC, randomizing items and locations within Shulva.
-    NOT RECOMMENDED, WORK IN PROGRESS"""
+    """Enable Crown of the Sunken King DLC, randomizing items and locations within Shulva."""
     display_name = "Enable Crown of the Sunken King DLC"
     
 class EnableNGPOption(Toggle):

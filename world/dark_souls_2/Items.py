@@ -65,7 +65,13 @@ progression_items: list[str] = [
     "Tseldora Den Key",
     "Iron Key",
     "Brightstone Key",
-    "Ring of Whispers"
+    "Ring of Whispers",
+    "Garrison Ward Key",
+    "Scorching Iron Scepter",
+    "Tower Key",
+    "Smelter Wedge x11",
+    "Eternal Sanctum Key",
+    "Dragon Stone"
 ]
 
 useful_items: list[str] = [
@@ -1124,7 +1130,8 @@ item_list: list[ItemData] = [
     ItemData(52500000, "Garrison Ward Key", ItemCategory.KEY_ITEM, dlc=DLC.IVORY_KING),
     ItemData(52650000, "Dragon Stone", ItemCategory.KEY_ITEM, dlc=DLC.SUNKEN_KING),
     ItemData(53100000, "Scorching Iron Scepter", ItemCategory.KEY_ITEM, dlc=DLC.OLD_IRON_KING),
-    ItemData(53200000, "Smelter Wedge", ItemCategory.CONSUMABLE, dlc=DLC.OLD_IRON_KING),
+    ItemData(53200000, "Smelter Wedge", ItemCategory.CONSUMABLE, dlc=DLC.OLD_IRON_KING, skip=True),
+    ItemData(53200011, "Smelter Wedge x11", ItemCategory.KEY_ITEM, dlc=DLC.OLD_IRON_KING),
     ItemData(53300000, "Soul of Nadalia, Bride of Ash", ItemCategory.CONSUMABLE, dlc=DLC.OLD_IRON_KING),
     ItemData(53600000, "Eye of the Priestess", ItemCategory.KEY_ITEM, dlc=DLC.IVORY_KING),
     ItemData(60010000, "Lifegem", ItemCategory.CONSUMABLE),

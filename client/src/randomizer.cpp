@@ -113,11 +113,20 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
 
         uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
         if (rewards.contains(param_id) && !shop_prices.contains(param_id)) {
+            int32_t item_id = rewards[param_id];
+
+            int8_t amount = 1;
+            if (item_bundles.contains(item_id)) {
+                int bundle_amount = item_id % 1000;
+                item_id = item_id - bundle_amount;
+                amount = bundle_amount;
+            }
+
             uintptr_t item_ptr = reward_ptr + 0x2C;
-            write_value<int32_t>(item_ptr, rewards[param_id]);
+            write_value<int32_t>(item_ptr, item_id);
 
             uintptr_t amount_ptr = reward_ptr + 0x4;
-            write_value<int8_t>(amount_ptr, 1);
+            write_value<int8_t>(amount_ptr, amount);
 
             // zero out the amounts of the other items
             void* ptr = reinterpret_cast<void*>(amount_ptr + 1);
@@ -250,8 +259,17 @@ void override_shoplineup_param(std::map<int32_t, int32_t> rewards, std::string s
         if (param_id >= 77601000 && param_id <= 77602121) continue; // skip ornifex trades
 
         if (rewards.contains(param_id)) {
-            write_value<int32_t>(reward_ptr, rewards[param_id]);
-            write_value<uint8_t>(amount_ptr, 1);
+            int32_t item_id = rewards[param_id];
+
+            int8_t amount = 1;
+            if (item_bundles.contains(item_id)) {
+                int bundle_amount = item_id % 1000;
+                item_id = item_id - bundle_amount;
+                amount = bundle_amount;
+            }
+
+            write_value<int32_t>(reward_ptr, item_id);
+            write_value<uint8_t>(amount_ptr, amount);
         }
         else {
             int32_t item_id = read_value<int32_t>(reward_ptr);
