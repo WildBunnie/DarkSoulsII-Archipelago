@@ -238,7 +238,7 @@ class DS2World(World):
 
     def create_item(self, name: str, category=None) -> DS2Item:
         code = self.item_name_to_id[name]
-        classification = ItemClassification.progression if name in progression_items or category==ItemCategory.STATUE else ItemClassification.useful if name in useful_items else ItemClassification.filler
+        classification = ItemClassification.progression if name in progression_items or name in useful_items or category==ItemCategory.STATUE else ItemClassification.filler
         return DS2Item(name, classification, code, self.player, category)
 
     def is_dlc_allowed(self, dlc):
@@ -332,6 +332,10 @@ class DS2World(World):
             self.set_location_rule("[Bastille] In a cell next to Straid's cell in NG+", lambda state: state.has("Bastille Key", self.player))
     
         self.set_location_rule("[ShadedWoods] Gift from Manscorpion Tark after defeating Najka", lambda state: state.has("Ring of Whispers", self.player))
+        ## VENDRICK
+        self.set_location_rule("[Amana] On a throne behind a door that opens after defeating vendrick", lambda state: state.has("Soul of a Giant", self.player, 5))
+        self.set_location_rule("[Amana] Metal chest behind a door that opens after defeating vendrick", lambda state: state.has("Soul of a Giant", self.player, 5))
+
 
         #STATUES
         if self.options.game_version == "sotfs":
