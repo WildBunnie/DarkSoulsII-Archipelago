@@ -194,6 +194,9 @@ class DS2World(World):
                 elif item_name == "Smelter Wedge":
                     if "Smelter Wedge x11" in items_in_pool: continue
                     item_data = next((item for item in item_list if item.name == "Smelter Wedge x11"), None)
+                elif item_name == "Soul of a Giant":
+                    if "Soul of a Giant" in items_in_pool: continue
+                    item_data = next((item for item in item_list if item.name == item_name), None)
                 else:
                     item_data = next((item for item in item_list if item.name == item_name), None)
                     assert item_data, f"location's default item not in item list '{item_name}'"
@@ -210,6 +213,7 @@ class DS2World(World):
                 item = self.create_item(item_data.name, item_data.category)
                 items_in_pool.append(item_data.name)
                 pool.append(item)
+                if item_data.name == "Soul of a Giant": pool.extend([item] * 4)
 
         diff = len(pool) - max_pool_size
 
