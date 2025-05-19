@@ -26,6 +26,7 @@ class ItemCategory(Enum):
     SPELL = 11
     STAFF_OR_CHIME = 12
     STATUE = 13 
+    HEALING = 14
 
 @dataclass
 class ItemData:
@@ -36,10 +37,10 @@ class ItemData:
     sotfs: Optional[bool] = False # whether the location is only in sotfs
     skip: Optional[bool] = False # if true, item will not be added to the item pool
 
-repetable_categories: list[ItemCategory] = [
+repeatable_categories: list[ItemCategory] = [
     ItemCategory.CONSUMABLE,
     ItemCategory.UPGRADE_MATERIAL,
-    ItemCategory.AMMO,
+    ItemCategory.AMMO
 ]
 
 progression_items: list[str] = [
@@ -76,7 +77,8 @@ progression_items: list[str] = [
 
 useful_items: list[str] = [
     "Estus Flask Shard",
-    "Sublime Bone Dust"
+    "Sublime Bone Dust",
+    "Soul of a Giant"
 ]
 
 item_list: list[ItemData] = [
@@ -1191,8 +1193,8 @@ item_list: list[ItemData] = [
     ItemData(60500000, "Very Good! Carving", ItemCategory.USABLE_ITEM, skip=True),
     ItemData(60510000, "Rubbish", ItemCategory.CONSUMABLE, skip=True),
     ItemData(60511000, "Petrified Something", ItemCategory.CONSUMABLE),
-    ItemData(60525000, "Estus Flask Shard", ItemCategory.CONSUMABLE),
-    ItemData(60526000, "Sublime Bone Dust", ItemCategory.CONSUMABLE),
+    ItemData(60525000, "Estus Flask Shard", ItemCategory.HEALING),
+    ItemData(60526000, "Sublime Bone Dust", ItemCategory.HEALING),
     ItemData(60527000, "Bonfire Ascetic", ItemCategory.CONSUMABLE),
     ItemData(60530000, "Alluring Skull", ItemCategory.CONSUMABLE),
     ItemData(60531000, "Lloyd's Talisman", ItemCategory.CONSUMABLE),
@@ -1353,6 +1355,7 @@ category_names = {
     ItemCategory.SPELL: "Spells",
     ItemCategory.STAFF_OR_CHIME: "Staffs and Chimes",
     ItemCategory.STATUE: "Statues",
+    ItemCategory.HEALING: "Estus Upgrades",
 }
 
 group_table: Dict[str, Set[str]] = {

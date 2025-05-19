@@ -4,7 +4,7 @@ import random
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import set_rule, add_item_rule
 from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType, Tutorial
-from .Items import item_list, progression_items, useful_items, repetable_categories, group_table, ItemCategory, DLC
+from .Items import item_list, progression_items, useful_items, repeatable_categories, group_table, ItemCategory, DLC
 from .Locations import location_table, location_name_groups
 from .Options import DS2Options
 from typing import Optional
@@ -201,7 +201,7 @@ class DS2World(World):
                 # skip unwanted items
                 if item_data.skip: continue
                 # dont allow duplicates
-                if item_data.category not in repetable_categories and item_data.name in items_in_pool: continue
+                if item_data.category not in repeatable_categories and item_data.name not in useful_items and item_data.name in items_in_pool: continue
                 # skip sotfs items if we are not in sotfs
                 if item_data.sotfs and not self.options.game_version == "sotfs": continue
                 # skip items from dlcs not turned on
@@ -217,12 +217,12 @@ class DS2World(World):
         if diff > 0:
             while diff != 0:
                 item = random.choice(pool)
-                if item.category in repetable_categories:
+                if item.category in repeatable_categories and item.name not in useful_items:
                     pool.remove(item)
                     diff -= 1
         # fill pool with filler items
         elif diff < 0:
-            filler_items = [item for item in item_list if item.category in repetable_categories and not item.skip and not item.sotfs and self.is_dlc_allowed(item.dlc)]
+            filler_items = [item for item in item_list if item.category in repeatable_categories and not item.skip and not item.sotfs and self.is_dlc_allowed(item.dlc)]
             for _ in range(abs(diff)):
                 item_data = random.choice(filler_items)
                 item = self.create_item(item_data.name, item_data.category)
