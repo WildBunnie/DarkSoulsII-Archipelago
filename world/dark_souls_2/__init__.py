@@ -349,6 +349,9 @@ class DS2World(World):
         self.set_location_rule("[GraveOfSaints] 1st floor on other side of the drawbridges", lambda state: state.has("Master Lockstone", self.player))
         self.set_location_rule("[GraveOfSaints] 2nd floor on other side of the drawbridges", lambda state: state.has("Master Lockstone", self.player))
 
+        # kings ring 
+        self.set_location_rule("[FOFG] On scaffolding near the Place Unbeknownst bonfire", lambda state: state.has("King's Ring", self.player))
+
         # CONNECTIONS
         
         if self.options.sunken_king_dlc:

@@ -178,8 +178,6 @@ location_table = {
         LocationData(10106390, "[FOFG] Behind corner outside cardinal tower", ['Witching Urn']),
         LocationData(10106400, "[FOFG] In front of the pile of garbage that blocks the big gate to the fire area", ['Lifegem']),
         LocationData(10106410, "[FOFG] Next to upper level of the elevator", ['Fire Arrow']),
-        LocationData(10106420, "[FOFG] On scaffolding near the Place Unbeknownst bonfire", ['Twinkling Titanite'], vanilla=True),
-        LocationData(10106420, "[FOFG] On scaffolding near the Place Unbeknownst bonfire", ['Twinkling Titanite', 'Fragrant Branch of Yore'], sotfs=True),
         LocationData(10106440, "[FOFG] In the middle of the ballista trap area", ['Great Soul Arrow']),
         LocationData(10106450, "[FOFG] In the middle of the ballista trap area (2)", ['Large Soul of a Lost Undead', 'Blue Wooden Shield']),
         LocationData(10106460, "[FOFG] First corpse in the upper fire area", ['Firedrake Stone']),
@@ -238,6 +236,8 @@ location_table = {
         LocationData(10106610, "[FOFG] Second corpse at rooftop near Soldier's Rest bonfire", ['Bastard Sword'], sotfs=True),
         LocationData(10106620, "[FOFG] Third corpse at rooftop near Soldier's Rest bonfire", ['Whip'], sotfs=True),
         LocationData(10106630, "[FOFG] Fourth corpse at rooftop near Soldier's Rest bonfire", ['Human Effigy'], sotfs=True),
+        LocationData(10106420, "[FOFG] On scaffolding near the Place Unbeknownst bonfire", ['Twinkling Titanite'], vanilla=True),
+        LocationData(10106420, "[FOFG] On scaffolding near the Place Unbeknownst bonfire", ['Twinkling Titanite', 'Fragrant Branch of Yore'], sotfs=True),
     ],
     "Brightstone Cove": [
         LocationData(106000, "[Tseldora] Prowling Magus and Congregation drop", ['Titanite Slab']),
