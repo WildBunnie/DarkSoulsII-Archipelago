@@ -732,7 +732,7 @@ location_table = {
         LocationData(77200605, "[Magerold of Lanafir] Human Effigy", ["Human Effigy"], shop=True),
         LocationData(77200606, "[Magerold of Lanafir] Fragrant Branch of Yore", ["Fragrant Branch of Yore"], shop=True),
     ],
-    "Huntman's Copse": [
+    "Huntsman's Copse": [
         LocationData(None, "Defeat the Skeleton Lords", None, event=True),
         LocationData(154000, "[Copse] Skeleton Lords drop", ["Skeleton Lord's Soul"]),
         LocationData(154001, "[Copse] Skeleton Lords drop in NG+", ["Skeleton Lord's Soul", 'Clear Bluestone Ring+2'], ngp=True),

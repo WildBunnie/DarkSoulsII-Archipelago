@@ -95,7 +95,7 @@ class DS2World(World):
         regions["Majula"].connect(regions["Forest of Fallen Giants"])
         regions["Majula"].connect(regions["Shaded Woods"])
         regions["Majula"].connect(regions["Heide's Tower of Flame"])
-        regions["Majula"].connect(regions["Huntman's Copse"])
+        regions["Majula"].connect(regions["Huntsman's Copse"])
         regions["Majula"].connect(regions["Grave of Saints"])
 
         regions["Grave of Saints"].connect(regions["The Gutter"])
@@ -120,7 +120,7 @@ class DS2World(World):
         regions["Lost Bastille - After Key"].connect(regions["Late Lost Bastille"])
         regions["Late Lost Bastille"].connect(regions["Sinners' Rise"])
         
-        regions["Huntman's Copse"].connect(regions["Earthen Peak"])
+        regions["Huntsman's Copse"].connect(regions["Earthen Peak"])
         regions["Earthen Peak"].connect(regions["Iron Keep"])
         regions["Iron Keep"].connect(regions["Belfry Sol"])
 
@@ -369,8 +369,8 @@ class DS2World(World):
             if self.options.game_version == "sotfs": self.set_connection_rule("Drangleic Castle", "Eleum Loyce", lambda state: state.has("Frozen Flower", self.player))
             self.set_connection_rule("Eleum Loyce", "Frigid Outskirts", lambda state: state.has("Garrison Ward Key", self.player))
 
-        self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
-        self.set_connection_rule("Huntman's Copse", "Earthen Peak", lambda state: state.has("Defeat the Skeleton Lords", self.player))
+        self.set_connection_rule("Majula", "Huntsman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
+        self.set_connection_rule("Huntsman's Copse", "Earthen Peak", lambda state: state.has("Defeat the Skeleton Lords", self.player))
         self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
         self.set_connection_rule("Majula", "Shaded Woods", lambda state: state.has("Unpetrify Rosabeth of Melfia", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "FOFG - Soldier Key", lambda state: state.has("Soldier Key", self.player))
