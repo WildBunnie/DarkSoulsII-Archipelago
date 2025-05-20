@@ -6,4 +6,4 @@ Closes #<issue number here>.
 
 <!--What are the changes that you made?-->
 
-### Aditional Information
+### Additional Information
