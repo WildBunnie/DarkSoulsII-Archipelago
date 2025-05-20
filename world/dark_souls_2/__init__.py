@@ -335,7 +335,11 @@ class DS2World(World):
         ## VENDRICK
         self.set_location_rule("[Amana] On a throne behind a door that opens after defeating vendrick", lambda state: state.has("Soul of a Giant", self.player, 5))
         self.set_location_rule("[Amana] Metal chest behind a door that opens after defeating vendrick", lambda state: state.has("Soul of a Giant", self.player, 5))
-
+        ## SKELETON LORDS
+        self.set_location_rule("Defeat the Skeleton Lords", lambda state: state.has("Undead Lockaway Key", self.player))
+        self.set_location_rule("[Copse] Skeleton Lords drop", lambda state: state.has("Defeat the Skeleton Lords", self.player))
+        if self.options.enable_ngp:
+            self.set_location_rule("[Copse] Skeleton Lords drop in NG+", lambda state: state.has("Defeat the Skeleton Lords", self.player))
 
         #STATUES
         if self.options.game_version == "sotfs":
@@ -394,6 +398,7 @@ class DS2World(World):
             self.set_connection_rule("Eleum Loyce", "Frigid Outskirts", lambda state: state.has("Garrison Ward Key", self.player))
 
         self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
+        self.set_connection_rule("Huntman's Copse", "Earthen Peak", lambda state: state.has("Defeat the Skeleton Lords", self.player))
         self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
         self.set_connection_rule("Majula", "Shaded Woods", lambda state: state.has("Unpetrify Rosabeth of Melfia", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "Lost Bastille - FOFG", lambda state: state.has("Soldier Key", self.player))
