@@ -29,6 +29,7 @@ class StartingWeaponRequirement(Choice):
     option_no_requirements = 2
     default = option_usable_with_two_hands
 
+
 class OldIronKingDLC(Toggle):
     """Enable Crown of the Old Iron King DLC, randomizing items and locations within Brume Tower."""
     display_name = "Enable Crown of the Old Iron King DLC"
@@ -57,6 +58,20 @@ class GameVersion(Choice):
     option_sotfs = 0
     option_vanilla = 1
 
+class CombatLogic(Choice):
+    """Determines the distribution of Estus Flask Shards and Sublime Bone Dust.
+    Easy - Most shards/dust available fairly early on
+    Medium - Moderate amount of shards/dust available early in the game
+    Hard - There is minimal logical requirement for shards/dust to be available before the end of the game
+    Disabled - There is zero requirements for shards/dust anywhere; Lost Bastille is Sphere 1 in Scholar, and Sinners' Rise is Sphere 1 in vanilla.
+    """
+    display_name = "Combat Logic"
+    option_easy = 0
+    option_medium = 1
+    option_hard = 2
+    option_disabled = 3
+    default = option_medium
+
 class EarlyBlacksmith(Choice):
     """Force Lenigrast's key into an early sphere in your world or across all worlds."""
     display_name = "Early Blacksmith"
@@ -80,6 +95,7 @@ class DS2StartInventory(StartInventory):
 @dataclass
 class DS2Options(PerGameCommonOptions):
     game_version: GameVersion
+    combat_logic: CombatLogic
     death_link: DeathLink
     no_weapon_req: NoWeaponRequirements
     no_spell_req: NoSpellRequirements

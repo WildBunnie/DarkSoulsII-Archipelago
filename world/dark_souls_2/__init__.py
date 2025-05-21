@@ -2,7 +2,7 @@ import string
 import random
 
 from worlds.AutoWorld import World, WebWorld
-from worlds.generic.Rules import set_rule, add_item_rule
+from worlds.generic.Rules import set_rule, add_item_rule, add_rule
 from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType, Tutorial
 from .Items import item_list, progression_items, useful_items, repeatable_categories, group_table, ItemCategory, DLC
 from .Locations import location_table, location_name_groups
@@ -95,16 +95,17 @@ class DS2World(World):
         regions["Majula"].connect(regions["Forest of Fallen Giants"])
         regions["Majula"].connect(regions["Shaded Woods"])
         regions["Majula"].connect(regions["Heide's Tower of Flame"])
-        regions["Majula"].connect(regions["Huntman's Copse"])
+        regions["Majula"].connect(regions["Huntsman's Copse"])
         regions["Majula"].connect(regions["Grave of Saints"])
 
         regions["Grave of Saints"].connect(regions["The Gutter"])
         regions["The Gutter"].connect(regions["Dark Chasm of Old"])
 
-        regions["Forest of Fallen Giants"].connect(regions["Memory of Jeigh"])
         regions["Forest of Fallen Giants"].connect(regions["Memory of Vammar"])
-        regions["Forest of Fallen Giants"].connect(regions["Memory of Orro"])
-        regions["Forest of Fallen Giants"].connect(regions["Lost Bastille - FOFG"])
+        regions["Forest of Fallen Giants"].connect(regions["FOFG - Soldier Key"])
+        regions["FOFG - Soldier Key"].connect(regions["Memory of Orro"])
+        regions["FOFG - Soldier Key"].connect(regions["Memory of Jeigh"])
+        regions["FOFG - Soldier Key"].connect(regions["Lost Bastille - FOFG"])
 
         regions["Heide's Tower of Flame"].connect(regions["No-man's Wharf"])
         regions["No-man's Wharf"].connect(regions["Lost Bastille - Wharf"])
@@ -119,7 +120,7 @@ class DS2World(World):
         regions["Lost Bastille - After Key"].connect(regions["Late Lost Bastille"])
         regions["Late Lost Bastille"].connect(regions["Sinners' Rise"])
         
-        regions["Huntman's Copse"].connect(regions["Earthen Peak"])
+        regions["Huntsman's Copse"].connect(regions["Earthen Peak"])
         regions["Earthen Peak"].connect(regions["Iron Keep"])
         regions["Iron Keep"].connect(regions["Belfry Sol"])
 
@@ -238,7 +239,7 @@ class DS2World(World):
 
     def create_item(self, name: str, category=None) -> DS2Item:
         code = self.item_name_to_id[name]
-        classification = ItemClassification.progression if name in progression_items or name in useful_items or category==ItemCategory.STATUE else ItemClassification.filler
+        classification = ItemClassification.progression if name in progression_items or category==ItemCategory.STATUE else ItemClassification.progression_skip_balancing if name in useful_items else ItemClassification.filler
         return DS2Item(name, classification, code, self.player, category)
 
     def is_dlc_allowed(self, dlc):
@@ -281,39 +282,6 @@ class DS2World(World):
         self.set_location_rule("[Majula] Corpse in Cale's house basement", lambda state: state.has("House Key", self.player))
         self.set_location_rule("[Majula] Metal chest in Cale's house basement", lambda state: state.has("House Key", self.player))
         self.set_location_rule("[Majula] Wooden chest on the attic of Majula mansion", lambda state: state.has("House Key", self.player))
-        self.set_location_rule("[Maughlin the Armourer - Lost Sinner] Penal Mask", lambda state: state.has("Defeat the Lost Sinner", self.player))
-        self.set_location_rule("[Maughlin the Armourer - Lost Sinner] Penal Straightjacket", lambda state: state.has("Defeat the Lost Sinner", self.player))
-        self.set_location_rule("[Maughlin the Armourer - Lost Sinner] Penal Handcuffs", lambda state: state.has("Defeat the Lost Sinner", self.player))
-        self.set_location_rule("[Maughlin the Armourer - Lost Sinner] Penal Skirt", lambda state: state.has("Defeat the Lost Sinner", self.player))
-        ## PURSUER
-        self.set_location_rule("[FOFG] Just before pursuer arena", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("[FOFG] In a crevasse in floor near the eagles nest", lambda state: state.has("Soldier Key", self.player))
-        if self.options.enable_ngp:
-            self.set_location_rule("[FOFG] Just before pursuer arena in NG+", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("Defeat the Pursuer (in the proper arena)", lambda state: state.has("Soldier Key", self.player))
-        ## Soldier's Rest
-        self.set_location_rule("[FOFG] In the beginning of the dark skeleton tunnel", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("[FOFG] At the end of the dark skeleton tunnel", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("[FOFG] In the small stone house near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("[FOFG] Wooden chest near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("[FOFG] First corpse at rooftop near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("[FOFG] Wooden chest near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("[FOFG] Next to portcullis near Soldier's rest bonfire", lambda state: state.has("Soldier Key", self.player))
-        if self.options.game_version == "sotfs":
-            self.set_location_rule("[FOFG] Second corpse at rooftop near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
-            self.set_location_rule("[FOFG] Third corpse at rooftop near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
-            self.set_location_rule("[FOFG] Fourth corpse at rooftop near Soldier's Rest bonfire", lambda state: state.has("Soldier Key", self.player))
-        ## Before Kings Door
-        self.set_location_rule("[FOFG] Wooden chest in a side corridor on the way to the king's door", lambda state: state.has("Soldier Key", self.player))
-        if self.options.game_version == "sotfs":
-            self.set_location_rule("[FOFG] Wooden chest next to king's door", lambda state: state.has("Soldier Key", self.player))
-        ## UPPER FLOOR CARDINAL TOWER
-        self.set_location_rule("[FOFG] Wooden chest in upper floor of cardinal tower", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("[FOFG] Metal chest in upper floor of cardinal tower", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("[FOFG] Drop onto tree branch from upper floor of Cardinal Tower", lambda state: state.has("Soldier Key", self.player))
-        self.set_location_rule("[FOFG] Behind the wagon at Cardinal Tower upper floor", lambda state: state.has("Soldier Key", self.player))
-        if self.options.game_version == "sotfs":
-            self.set_location_rule("[FOFG] Behind a table at cardinal tower upper floor", lambda state: state.has("Soldier Key", self.player))
         ## LOWER FIRE AREA
         self.set_location_rule("[FOFG] First corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
         self.set_location_rule("[FOFG] Second corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
@@ -339,7 +307,11 @@ class DS2World(World):
         ## VENDRICK
         self.set_location_rule("[Amana] On a throne behind a door that opens after defeating vendrick", lambda state: state.has("Soul of a Giant", self.player, 5))
         self.set_location_rule("[Amana] Metal chest behind a door that opens after defeating vendrick", lambda state: state.has("Soul of a Giant", self.player, 5))
-
+        ## SKELETON LORDS
+        self.set_location_rule("Defeat the Skeleton Lords", lambda state: state.has("Undead Lockaway Key", self.player))
+        self.set_location_rule("[Copse] Skeleton Lords drop", lambda state: state.has("Defeat the Skeleton Lords", self.player))
+        if self.options.enable_ngp:
+            self.set_location_rule("[Copse] Skeleton Lords drop in NG+", lambda state: state.has("Defeat the Skeleton Lords", self.player))
 
         #STATUES
         if self.options.game_version == "sotfs":
@@ -381,6 +353,9 @@ class DS2World(World):
         self.set_location_rule("[GraveOfSaints] 1st floor on other side of the drawbridges", lambda state: state.has("Master Lockstone", self.player))
         self.set_location_rule("[GraveOfSaints] 2nd floor on other side of the drawbridges", lambda state: state.has("Master Lockstone", self.player))
 
+        # kings ring 
+        self.set_location_rule("[FOFG] On scaffolding near the Place Unbeknownst bonfire", lambda state: state.has("King's Ring", self.player))
+
         # CONNECTIONS
         
         if self.options.sunken_king_dlc:
@@ -401,21 +376,19 @@ class DS2World(World):
             if self.options.game_version == "sotfs": self.set_connection_rule("Drangleic Castle", "Eleum Loyce", lambda state: state.has("Frozen Flower", self.player))
             self.set_connection_rule("Eleum Loyce", "Frigid Outskirts", lambda state: state.has("Garrison Ward Key", self.player))
 
-        self.set_connection_rule("Majula", "Huntman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
+        self.set_connection_rule("Majula", "Huntsman's Copse", lambda state: state.has("Rotate the Majula Rotunda", self.player))
+        self.set_connection_rule("Huntsman's Copse", "Earthen Peak", lambda state: state.has("Defeat the Skeleton Lords", self.player))
         self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
         self.set_connection_rule("Majula", "Shaded Woods", lambda state: state.has("Unpetrify Rosabeth of Melfia", self.player))
-        self.set_connection_rule("Forest of Fallen Giants", "Lost Bastille - FOFG", lambda state: state.has("Soldier Key", self.player))
+        self.set_connection_rule("Forest of Fallen Giants", "FOFG - Soldier Key", lambda state: state.has("Soldier Key", self.player))
         self.set_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("King's Ring", self.player))
         self.set_connection_rule("Shaded Woods", "Drangleic Castle", lambda state: state.has("Open Shrine of Winter", self.player))
         self.set_connection_rule("Drangleic Castle", "King's Passage", lambda state: state.has("Key to King's Passage", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "Memory of Vammar", lambda state: state.has("Ashen Mist Heart", self.player))
-        self.set_connection_rule("Forest of Fallen Giants", "Memory of Orro", lambda state: 
-                                    state.has("Ashen Mist Heart", self.player) and
-                                    state.has("Defeat the Pursuer (in the proper arena)", self.player))
-        self.set_connection_rule("Forest of Fallen Giants", "Memory of Jeigh", lambda state: 
+        self.set_connection_rule("FOFG - Soldier Key", "Memory of Orro", lambda state: state.has("Ashen Mist Heart", self.player))
+        self.set_connection_rule("FOFG - Soldier Key", "Memory of Jeigh", lambda state: 
                                     state.has("King's Ring", self.player) and 
-                                    state.has("Ashen Mist Heart", self.player) and 
-                                    state.has("Soldier Key", self.player))
+                                    state.has("Ashen Mist Heart", self.player))
         self.set_connection_rule("Drangleic Castle", "Throne of Want", lambda state: state.has("King's Ring", self.player))
         self.set_connection_rule("Iron Keep", "Belfry Sol", lambda state: state.has("Master Lockstone", self.player))
 
@@ -426,7 +399,10 @@ class DS2World(World):
             self.set_connection_rule("Early Lost Bastille", "Lost Bastille - After Statue", lambda state: state.has("Unpetrify Statue in Lost Bastille", self.player))
         elif self.options.game_version == "vanilla":
             self.set_connection_rule("Lost Bastille - After Key", "Late Lost Bastille", lambda state: state.has("Master Lockstone", self.player))
-            
+        
+        #This is down here because we don't want to have the rules get overwritten from putting it before, since it adds rules on top of pre-existing connections
+        self.add_combat_rules()
+
         set_rule(self.multiworld.get_location("Defeat Nashandra", self.player), lambda state: state.has("Giant's Kinship", self.player))
 
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Defeat Nashandra", self.player)
@@ -434,11 +410,19 @@ class DS2World(World):
         # from Utils import visualize_regions
         # visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
 
+    #set/overwrites rules
     def set_connection_rule(self, fromRegion, toRegion, state):
         set_rule(self.multiworld.get_entrance(f"{fromRegion} -> {toRegion}", self.player), state)
 
     def set_location_rule(self, name, state):
         set_rule(self.multiworld.get_location(name, self.player), state)
+    
+    #adds new rules on top of pre-existing rules
+    def add_connection_rule(self, fromRegion, toRegion, state):
+        add_rule(self.multiworld.get_entrance(f"{fromRegion} -> {toRegion}", self.player), state)
+    
+    def add_location_rule(self, name, state):
+        add_rule(self.multiworld.get_location(name, self.player), state)
 
     def set_shop_rules(self):
         self.set_location_rule("[Sweet Shalquoir - Royal Rat Authority, Royal Rat Vanguard] Flying Feline Boots", lambda state: 
@@ -474,6 +458,82 @@ class DS2World(World):
                     self.set_location_rule(location.name, lambda state: state.has("Defeat Velstadt", self.player))
                 elif " - Smelter Demon]" in location.name:
                     self.set_location_rule(location.name, lambda state: state.has("Defeat the Smelter Demon", self.player))
-                    
+    def add_combat_rules(self):
+
+        if self.options.combat_logic == "easy":
+        
+            #Lost Sinner Route
+            self.add_connection_rule("FOFG - Soldier Key", "Lost Bastille - FOFG", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("No-man's Wharf", "Lost Bastille - Wharf", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("Late Lost Bastille", "Sinners' Rise", lambda state: state.has("Estus Flask Shard", self.player, 7) and state.has("Sublime Bone Dust", self.player, 3))
+            #Old Iron King Route
+            self.add_location_rule("Defeat the Skeleton Lords", lambda state: state.has("Estus Flask Shard", self.player, 4) and state.has("Sublime Bone Dust", self.player, 2))
+            self.add_location_rule("[Chariot] Executioner's Chariot drop", lambda state: state.has("Estus Flask Shard", self.player, 2) and state.has("Sublime Bone Dust", self.player, 1))
+            if self.options.enable_ngp:
+                self.add_location_rule("[Chariot] Executioner's Chariot drop in NG+", lambda state: state.has("Estus Flask Shard", self.player, 2) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_location_rule("[Chariot] Above the stairs leading to the bonfire", lambda state: state.has("Estus Flask Shard", self.player, 2) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("Earthen Peak", "Iron Keep", lambda state: state.has("Estus Flask Shard", self.player, 7) and state.has("Sublime Bone Dust", self.player, 3))
+            #The Rotten Route
+            self.add_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("Grave of Saints", "The Gutter", lambda state: state.has("Estus Flask Shard", self.player, 5) and state.has("Sublime Bone Dust", self.player, 2))
+            #Duke's Dear Freja Route(especially the Royal Rat Authority)
+            self.add_connection_rule("Shaded Woods", "Doors of Pharros", lambda state: state.has("Estus Flask Shard", self.player, 5) and state.has("Sublime Bone Dust", self.player, 2))
+            self.add_connection_rule("Doors of Pharros", "Brightstone Cove", lambda state: state.has("Estus Flask Shard", self.player, 7) and state.has("Sublime Bone Dust", self.player, 3))
+            #Late game
+            self.add_connection_rule("Shaded Woods", "Drangleic Castle", lambda state: state.has("Estus Flask Shard", self.player, 9) and state.has("Sublime Bone Dust", self.player, 4))
+            self.add_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("Estus Flask Shard", self.player, 9) and state.has("Sublime Bone Dust", self.player, 4))
+            if self.options.sunken_king_dlc:
+                self.add_connection_rule("The Gutter", "Shulva", lambda state: state.has("Estus Flask Shard", self.player, 12) and state.has("Sublime Bone Dust", self.player, 5))
+            if self.options.old_iron_king_dlc:
+                self.add_connection_rule("Iron Keep", "Brume Tower", lambda state: state.has("Estus Flask Shard", self.player, 12) and state.has("Sublime Bone Dust", self.player, 5))
+            if self.options.ivory_king_dlc:
+                self.add_connection_rule("Drangleic Castle", "Eleum Loyce", lambda state: state.has("Estus Flask Shard", self.player, 12) and state.has("Sublime Bone Dust", self.player, 5))
+        
+        if self.options.combat_logic == "medium":
+        
+            #Lost Sinner Route
+            self.add_connection_rule("FOFG - Soldier Key", "Lost Bastille - FOFG", lambda state: state.has("Estus Flask Shard", self.player, 1) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("No-man's Wharf", "Lost Bastille - Wharf", lambda state: state.has("Estus Flask Shard", self.player, 1) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("Late Lost Bastille", "Sinners' Rise", lambda state: state.has("Estus Flask Shard", self.player, 5) and state.has("Sublime Bone Dust", self.player, 2))
+            #Old Iron King Route
+            self.add_location_rule("Defeat the Skeleton Lords", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 2))
+            self.add_location_rule("[Chariot] Executioner's Chariot drop", lambda state: state.has("Estus Flask Shard", self.player, 2) and state.has("Sublime Bone Dust", self.player, 1))
+            if self.options.enable_ngp:
+                self.add_location_rule("[Chariot] Executioner's Chariot drop in NG+", lambda state: state.has("Estus Flask Shard", self.player, 2) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_location_rule("[Chariot] Above the stairs leading to the bonfire", lambda state: state.has("Estus Flask Shard", self.player, 2) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("Earthen Peak", "Iron Keep", lambda state: state.has("Estus Flask Shard", self.player, 5) and state.has("Sublime Bone Dust", self.player, 2))
+            #The Rotten Route
+            self.add_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Estus Flask Shard", self.player, 2) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("Grave of Saints", "The Gutter", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 2))
+            #Duke's Dear Freja Route(especially the Royal Rat Authority)
+            self.add_connection_rule("Shaded Woods", "Doors of Pharros", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("Doors of Pharros", "Brightstone Cove", lambda state: state.has("Estus Flask Shard", self.player, 5) and state.has("Sublime Bone Dust", self.player, 2))
+            #Late game
+            self.add_connection_rule("Shaded Woods", "Drangleic Castle", lambda state: state.has("Estus Flask Shard", self.player, 8) and state.has("Sublime Bone Dust", self.player, 3))
+            self.add_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("Estus Flask Shard", self.player, 8) and state.has("Sublime Bone Dust", self.player, 3))
+            if self.options.sunken_king_dlc:
+                self.add_connection_rule("The Gutter", "Shulva", lambda state: state.has("Estus Flask Shard", self.player, 9) and state.has("Sublime Bone Dust", self.player, 4))
+            if self.options.old_iron_king_dlc:
+                self.add_connection_rule("Iron Keep", "Brume Tower", lambda state: state.has("Estus Flask Shard", self.player, 9) and state.has("Sublime Bone Dust", self.player, 4))
+            if self.options.ivory_king_dlc:
+                self.add_connection_rule("Drangleic Castle", "Eleum Loyce", lambda state: state.has("Estus Flask Shard", self.player, 9) and state.has("Sublime Bone Dust", self.player, 4))
+        
+        if self.options.combat_logic == "hard":
+        
+            #Lost Sinner Route
+            self.add_connection_rule("FOFG - Soldier Key", "Lost Bastille - FOFG", lambda state: state.has("Estus Flask Shard", self.player, 1) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("No-man's Wharf", "Lost Bastille - Wharf", lambda state: state.has("Estus Flask Shard", self.player, 1) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("Late Lost Bastille", "Sinners' Rise", lambda state: state.has("Estus Flask Shard", self.player, 3))
+            #The Rotten Route
+            self.add_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 1))
+            if self.options.sunken_king_dlc:
+                self.add_connection_rule("The Gutter", "Shulva", lambda state: state.has("Estus Flask Shard", self.player, 6) and state.has("Sublime Bone Dust", self.player, 3))
+            if self.options.old_iron_king_dlc:
+                self.add_connection_rule("Iron Keep", "Brume Tower", lambda state: state.has("Estus Flask Shard", self.player, 6) and state.has("Sublime Bone Dust", self.player, 3))
+            if self.options.ivory_king_dlc:
+                self.add_connection_rule("Drangleic Castle", "Eleum Loyce", lambda state: state.has("Estus Flask Shard", self.player, 6) and state.has("Sublime Bone Dust", self.player, 3))
+        
+        if self.options.combat_logic == "disabled": return
+
     def fill_slot_data(self) -> dict:
         return self.options.as_dict("death_link","game_version","no_weapon_req","no_spell_req","no_equip_load","infinite_lifegems","randomize_starting_loadout", "starting_weapon_requirement", "autoequip")
