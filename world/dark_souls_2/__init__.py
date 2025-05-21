@@ -281,6 +281,10 @@ class DS2World(World):
         self.set_location_rule("[Majula] Corpse in Cale's house basement", lambda state: state.has("House Key", self.player))
         self.set_location_rule("[Majula] Metal chest in Cale's house basement", lambda state: state.has("House Key", self.player))
         self.set_location_rule("[Majula] Wooden chest on the attic of Majula mansion", lambda state: state.has("House Key", self.player))
+        self.set_location_rule("[Maughlin the Armourer - Lost Sinner] Penal Mask", lambda state: state.has("Defeat the Lost Sinner", self.player))
+        self.set_location_rule("[Maughlin the Armourer - Lost Sinner] Penal Straightjacket", lambda state: state.has("Defeat the Lost Sinner", self.player))
+        self.set_location_rule("[Maughlin the Armourer - Lost Sinner] Penal Handcuffs", lambda state: state.has("Defeat the Lost Sinner", self.player))
+        self.set_location_rule("[Maughlin the Armourer - Lost Sinner] Penal Skirt", lambda state: state.has("Defeat the Lost Sinner", self.player))
         ## PURSUER
         self.set_location_rule("[FOFG] Just before pursuer arena", lambda state: state.has("Soldier Key", self.player))
         self.set_location_rule("[FOFG] In a crevasse in floor near the eagles nest", lambda state: state.has("Soldier Key", self.player))
@@ -348,6 +352,10 @@ class DS2World(World):
             self.set_location_rule("[ShadedWoods] Drop from Petrified Lion Warrior next to Golden Lion Warrior", lambda state: state.has("Unpetrify Warlock Mask Statue in Shaded Ruins", self.player))
             self.set_location_rule("[AldiasKeep] Drop from Petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Left Cage Statue in Aldia's Keep", self.player))
             self.set_location_rule("[AldiasKeep] Drop from Centre petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Right Cage Statue in Aldia's Keep", self.player))
+            # Vengarl's Body shows up behind this statue in SOTFS only. Vanilla has no other requirements to get here.
+            self.set_location_rule("[Head of Vengarl] Red Rust Scimitar", lambda state: state.has("Unpetrify Statue near Manscorpion Tark"", self.player))
+            self.set_location_rule("[Head of Vengarl] Red Rust Shield", lambda state: state.has("Unpetrify Statue near Manscorpion Tark"", self.player))
+            self.set_location_rule("[Head of Vengarl] Red Rust Sword", lambda state: state.has("Unpetrify Statue near Manscorpion Tark"", self.player))
         self.set_location_rule("[ShadedWoods] Metal chest in room blocked by petrified statue", lambda state: state.has("Unpetrify Lion Mage Set Statue in Shaded Ruins", self.player))
         self.set_location_rule("[ShadedWoods] Drop from the petrified lion warrior by the tree bridge", lambda state: state.has("Unpetrify Fang Key Statue in Shaded Ruins", self.player))
         self.set_location_rule("[AldiasKeep] Drop from Petrified Ogre blocking stairway near Bone Dragon", lambda state: state.has("Unpetrify Cyclops Statue in Aldia's Keep", self.player))
