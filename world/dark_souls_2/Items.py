@@ -79,7 +79,8 @@ progression_items: list[str] = [
 useful_items: list[str] = [
     "Estus Flask Shard",
     "Sublime Bone Dust",
-    "Soul of a Giant"
+    "Soul of a Giant",
+    "Human Effigy"
 ]
 
 item_list: list[ItemData] = [
