@@ -239,7 +239,7 @@ class DS2World(World):
 
     def create_item(self, name: str, category=None) -> DS2Item:
         code = self.item_name_to_id[name]
-        classification = ItemClassification.progression if name in progression_items or name in useful_items or category==ItemCategory.STATUE else ItemClassification.filler
+        classification = ItemClassification.progression if name in progression_items or category==ItemCategory.STATUE else ItemClassification.progression_skip_balancing if name in useful_items else ItemClassification.filler
         return DS2Item(name, classification, code, self.player, category)
 
     def is_dlc_allowed(self, dlc):
@@ -528,5 +528,8 @@ class DS2World(World):
                 self.add_connection_rule("Iron Keep", "Brume Tower", lambda state: state.has("Estus Flask Shard", self.player, 6) and state.has("Sublime Bone Dust", self.player, 3))
             if self.options.ivory_king_dlc:
                 self.add_connection_rule("Drangleic Castle", "Eleum Loyce", lambda state: state.has("Estus Flask Shard", self.player, 6) and state.has("Sublime Bone Dust", self.player, 3))
+        
+        if self.options.combat_logic == "disabled": return
+
     def fill_slot_data(self) -> dict:
         return self.options.as_dict("death_link","game_version","no_weapon_req","no_spell_req","no_equip_load","infinite_lifegems","randomize_starting_loadout", "starting_weapon_requirement", "autoequip")
