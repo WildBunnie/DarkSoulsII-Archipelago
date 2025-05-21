@@ -48,6 +48,7 @@ progression_items: list[str] = [
     "Fragrant Branch of Yore",
     "King's Ring",
     "Rotunda Lockstone",
+    "Undead Lockaway Key",
     "Silvercat Ring",
     "Ashen Mist Heart",
     "Giant's Kinship",
