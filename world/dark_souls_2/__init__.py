@@ -324,10 +324,6 @@ class DS2World(World):
             self.set_location_rule("[ShadedWoods] Drop from Petrified Lion Warrior next to Golden Lion Warrior", lambda state: state.has("Unpetrify Warlock Mask Statue in Shaded Ruins", self.player))
             self.set_location_rule("[AldiasKeep] Drop from Petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Left Cage Statue in Aldia's Keep", self.player))
             self.set_location_rule("[AldiasKeep] Drop from Centre petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Right Cage Statue in Aldia's Keep", self.player))
-            # Vengarl's Body shows up behind this statue in SOTFS only. Vanilla has no other requirements to get here.
-            self.set_location_rule("[Head of Vengarl] Red Rust Scimitar", lambda state: state.has("Unpetrify Statue near Manscorpion Tark"", self.player))
-            self.set_location_rule("[Head of Vengarl] Red Rust Shield", lambda state: state.has("Unpetrify Statue near Manscorpion Tark"", self.player))
-            self.set_location_rule("[Head of Vengarl] Red Rust Sword", lambda state: state.has("Unpetrify Statue near Manscorpion Tark"", self.player))
         self.set_location_rule("[ShadedWoods] Metal chest in room blocked by petrified statue", lambda state: state.has("Unpetrify Lion Mage Set Statue in Shaded Ruins", self.player))
         self.set_location_rule("[ShadedWoods] Drop from the petrified lion warrior by the tree bridge", lambda state: state.has("Unpetrify Fang Key Statue in Shaded Ruins", self.player))
         self.set_location_rule("[AldiasKeep] Drop from Petrified Ogre blocking stairway near Bone Dragon", lambda state: state.has("Unpetrify Cyclops Statue in Aldia's Keep", self.player))
@@ -429,6 +425,9 @@ class DS2World(World):
                                state.has("Defeat the Royal Rat Authority", self.player) and state.has("Defeat the Royal Rat Vanguard", self.player))
         
         self.set_location_rule("[Lonesome Gavlan - Harvest Valley] Ring of Giants", lambda state: state.has("Speak with Lonesome Gavlan in No-man's Wharf", self.player))
+        self.set_location_rule("[Head of Vengarl] Red Rust Scimitar", lambda state: state.has("Unpetrify Statue near Manscorpion Tark"", self.player))
+        self.set_location_rule("[Head of Vengarl] Red Rust Shield", lambda state: state.has("Unpetrify Statue near Manscorpion Tark"", self.player))
+        self.set_location_rule("[Head of Vengarl] Red Rust Sword", lambda state: state.has("Unpetrify Statue near Manscorpion Tark"", self.player))
 
         for region in location_table:
             for location in location_table[region]:
