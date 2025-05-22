@@ -209,7 +209,7 @@ void run()
         handle_check_locations();
         handle_death_link();
 
-        // artifical delay between giving items
+        // artificial delay between giving items
         // to prevent items not giving
         if (loop_counter >= tps) {
             handle_give_items();
