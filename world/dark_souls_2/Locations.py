@@ -889,6 +889,7 @@ location_table = {
     "Heide's Tower of Flame": [
         LocationData(611000, "[Heides] Dragonrider boss drop", ['Dragonrider Soul']),
         LocationData(625000, "[Heides] Old Dragonslayer boss drop", ['Old Dragonslayer Soul', 'Old Leo Ring']),
+        LocationData(1310500, "[Heides] Second enemy after first bonfire", ['Sublime Bone Dust'], vanilla=True, skip=True),
         LocationData(10305010, "[Heides] Metal chest behind petrified hollow after Dragonrider", ['Knight Helm', 'Knight Armor', 'Knight Gauntlets', 'Knight Leggings']),
         LocationData(10305020, "[Heides] Metal chest guarded by syan soldier after dragonrider", ['Sublime Bone Dust'], sotfs=True),
         LocationData(10306000, "[Heides] In alcove", ['Soul of a Proud Knight']),

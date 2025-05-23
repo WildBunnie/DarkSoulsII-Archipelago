@@ -4,7 +4,7 @@ import random
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import set_rule, add_item_rule, add_rule
 from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType, Tutorial
-from .Items import item_list, progression_items, useful_items, repeatable_categories, group_table, ItemCategory, DLC
+from .Items import item_list, repeatable_categories, group_table, ItemCategory, DLC
 from .Locations import location_table, location_name_groups
 from .Options import DS2Options
 from typing import Optional
@@ -171,9 +171,9 @@ class DS2World(World):
         
         # these items are paperweights, the event is triggered by interacting with the check no matter the item
         # for that reason, for now, we just place the item in the default location to not confuse players
-        self.multiworld.get_location("[MemoryJeigh] Giant Lord drop", self.player).place_locked_item(self.create_item("Giant's Kinship"))
+        self.multiworld.get_location("[MemoryJeigh] Giant Lord drop", self.player).place_locked_item(self.create_item("Giant's Kinship", ItemClassification.progression))
         if self.options.ivory_king_dlc:
-            self.multiworld.get_location("[DLC3] On altar", self.player).place_locked_item(self.create_item("Eye of the Priestess"))
+            self.multiworld.get_location("[DLC3] On altar", self.player).place_locked_item(self.create_item("Eye of the Priestess", ItemClassification.progression))
 
         max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
 
@@ -185,19 +185,15 @@ class DS2World(World):
         items_in_pool = [item.name for item in pool]
         for location in self.multiworld.get_unfilled_locations(self.player):
             for item_name in location.default_items:
+                # swap names that get replaced by randomizer specific items
+                if item_name == "Pharros' Lockstone": item_name = "Master Lockstone"
+                if item_name == "Smelter Wedge": item_name = "Smelter Wedge x11"
+                # skip if it's in pool as we fill all five at once ourselves
+                if item_name == "Soul of a Giant" and item_name in items_in_pool: continue
 
                 if item_name == "Fragrant Branch of Yore":
                     if len(statues) == 0: continue
                     item_data = statues.pop()
-                elif item_name == "Pharros' Lockstone":
-                    if "Master Lockstone" in items_in_pool: continue
-                    item_data = next((item for item in item_list if item.name == "Master Lockstone"), None)
-                elif item_name == "Smelter Wedge":
-                    if "Smelter Wedge x11" in items_in_pool: continue
-                    item_data = next((item for item in item_list if item.name == "Smelter Wedge x11"), None)
-                elif item_name == "Soul of a Giant":
-                    if "Soul of a Giant" in items_in_pool: continue
-                    item_data = next((item for item in item_list if item.name == item_name), None)
                 else:
                     item_data = next((item for item in item_list if item.name == item_name), None)
                     assert item_data, f"location's default item not in item list '{item_name}'"
@@ -205,13 +201,9 @@ class DS2World(World):
                 # skip unwanted items
                 if item_data.skip: continue
                 # dont allow duplicates
-                if item_data.category not in repeatable_categories and item_data.name not in useful_items and item_data.name in items_in_pool: continue
-                # skip sotfs items if we are not in sotfs
-                if item_data.sotfs and not self.options.game_version == "sotfs": continue
-                # skip items from dlcs not turned on
-                if not self.is_dlc_allowed(item_data.dlc): continue
+                if item_data.category == ItemCategory.KEY_ITEM and item_data.name in items_in_pool: continue
 
-                item = self.create_item(item_data.name, item_data.category)
+                item = self.create_item(item_data.name, item_data.classification, item_data.category)
                 items_in_pool.append(item_data.name)
                 pool.append(item)
                 if item_data.name == "Soul of a Giant": pool.extend([item] * 4)
@@ -222,7 +214,7 @@ class DS2World(World):
         if diff > 0:
             while diff != 0:
                 item = random.choice(pool)
-                if item.category in repeatable_categories and item.name not in useful_items:
+                if item.category in repeatable_categories and item.classification == ItemClassification.filler:
                     pool.remove(item)
                     diff -= 1
         # fill pool with filler items
@@ -230,16 +222,15 @@ class DS2World(World):
             filler_items = [item for item in item_list if item.category in repeatable_categories and not item.skip and not item.sotfs and self.is_dlc_allowed(item.dlc)]
             for _ in range(abs(diff)):
                 item_data = random.choice(filler_items)
-                item = self.create_item(item_data.name, item_data.category)
+                item = self.create_item(item_data.name, item_data.classification, item_data.category)
                 pool.append(item)
 
         assert len(pool) == max_pool_size, "item pool is under-filled or over-filled"
 
         self.multiworld.itempool += pool
 
-    def create_item(self, name: str, category=None) -> DS2Item:
+    def create_item(self, name: str, classification=ItemClassification.filler, category=None) -> DS2Item:
         code = self.item_name_to_id[name]
-        classification = ItemClassification.progression if name in progression_items or category==ItemCategory.STATUE else ItemClassification.progression_skip_balancing if name in useful_items else ItemClassification.filler
         return DS2Item(name, classification, code, self.player, category)
 
     def is_dlc_allowed(self, dlc):
@@ -457,6 +448,7 @@ class DS2World(World):
                     self.set_location_rule(location.name, lambda state: state.has("Defeat Velstadt", self.player))
                 elif " - Smelter Demon]" in location.name:
                     self.set_location_rule(location.name, lambda state: state.has("Defeat the Smelter Demon", self.player))
+
     def add_combat_rules(self):
 
         if self.options.combat_logic == "easy":
