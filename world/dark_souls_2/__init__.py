@@ -203,10 +203,15 @@ class DS2World(World):
                 # dont allow duplicates
                 if item_data.category == ItemCategory.KEY_ITEM and item_data.name in items_in_pool: continue
 
-                item = self.create_item(item_data.name, item_data.classification, item_data.category)
-                items_in_pool.append(item_data.name)
-                pool.append(item)
-                if item_data.name == "Soul of a Giant": pool.extend([item] * 4)
+                if item_data.name == "Soul of a Giant": 
+                    amount = 5
+                else:
+                    amount = 1
+
+                for _ in range(amount):
+                    item = self.create_item(item_data.name, item_data.classification, item_data.category)
+                    items_in_pool.append(item_data.name)
+                    pool.append(item)
 
         diff = len(pool) - max_pool_size
 
