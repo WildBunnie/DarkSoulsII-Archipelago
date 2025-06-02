@@ -974,8 +974,6 @@ location_table = {
         LocationData(10326191, "[ShadedWoods] Corpse next to the big collapsing floor in NG+", ['Divine Blessing'], ngp=True),
         LocationData(10326200, "[ShadedWoods] On tree in Najka's arena", ['Flame Butterfly'], skip=True),
         LocationData(10326210, "[ShadedWoods] On lower floor of the building leading to Manscorpion Tark", ['Soul of a Brave Warrior', "Pharros' Lockstone"]),
-        LocationData(10326220, "[ShadedWoods] Behind the ruined gate", ['Repair', 'Large Soul of a Lost Undead'], vanilla=True),
-        LocationData(10326220, "[ShadedWoods] Behind the ruined gate", ['Soul of a Hero'], sotfs=True),
         LocationData(10326230, "[ShadedWoods] Next to Vengarl's body", ['Torch']),
         LocationData(10326240, "[ShadedWoods] Behind the stone circle by Head of Vengarl", ['Fire Seed']),
         LocationData(10326270, "[ShadedWoods] Corpse getting eaten by goblins just before Ruined Fork Road bonfire", ['Soul of a Proud Knight'], sotfs=True),
@@ -1134,6 +1132,8 @@ location_table = {
     ],
     "Drangleic Castle": [
         LocationData(309610, "[Drangleic] Twin Dragonriders drop", ['Dragonrider Soul']),
+        LocationData(10326220, "[ShadedWoods] Behind the ruined gate", ['Repair', 'Large Soul of a Lost Undead'], vanilla=True),
+        LocationData(10326220, "[ShadedWoods] Behind the ruined gate", ['Soul of a Hero'], sotfs=True),
         LocationData(10326250, "[ShadedWoods] On the path after Shrine of Winter", ['Divine Blessing']),
         LocationData(10326260, "[ShadedWoods] On a wall along the path after Shrine of Winter", ['Large Soul of a Nameless Soldier', 'Human Effigy']),
         LocationData(20215000, "[Drangleic] Metal chest one level down from the Forgotten Chamber bonfire", ["Hunter's Blackbow", 'Iron Arrow']),

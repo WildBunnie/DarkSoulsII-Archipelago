@@ -99,7 +99,6 @@ class DS2World(World):
         regions["Majula"].connect(regions["Grave of Saints"])
 
         regions["Grave of Saints"].connect(regions["The Gutter"])
-        regions["The Gutter"].connect(regions["Dark Chasm of Old"])
 
         regions["Forest of Fallen Giants"].connect(regions["Memory of Vammar"])
         regions["Forest of Fallen Giants"].connect(regions["FOFG - Soldier Key"])
@@ -127,7 +126,6 @@ class DS2World(World):
         regions["Shaded Woods"].connect(regions["Drangleic Castle"])
         regions["Shaded Woods"].connect(regions["Doors of Pharros"])
         regions["Shaded Woods"].connect(regions["Aldia's Keep"])
-        regions["Shaded Woods"].connect(regions["Dark Chasm of Old"])
 
         regions["Doors of Pharros"].connect(regions["Brightstone Cove"])
 
@@ -281,6 +279,8 @@ class DS2World(World):
         ## LOWER FIRE AREA
         self.set_location_rule("[FOFG] First corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
         self.set_location_rule("[FOFG] Second corpse in the lower fire area", lambda state: state.has("Iron Key", self.player))
+        ## FANG KEY
+        self.set_location_rule("[ShadedWoods] Room where Ornifex is locked", lambda state: state.has("Fang Key", self.player))
         ## TSELDORA DEN
         self.set_location_rule("[Tseldora] Metal chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
         self.set_location_rule("[Tseldora] Wooden chest in Tseldora den", lambda state: state.has("Tseldora Den Key", self.player))
@@ -318,6 +318,10 @@ class DS2World(World):
             self.set_location_rule("[Gulch] Urn next to the second bonfire", lambda state: state.has("Unpetrify Statue in Black Gulch", self.player))
             self.set_location_rule("[ShadedWoods] Metal chest blocked by petrified statue", lambda state: state.has("Unpetrify Statue Blocking the Chest in Shaded Ruins", self.player))
             self.set_location_rule("[ShadedWoods] Drop from Petrified Lion Warrior next to Golden Lion Warrior", lambda state: state.has("Unpetrify Warlock Mask Statue in Shaded Ruins", self.player))
+            self.set_location_rule("[ShadedWoods] Corpse next to chest in area behind two petrified statues and Vengarl's body", lambda state: state.has("Unpetrify Statue near Manscorpion Tark" or
+                                                                                                   "Unpetrify Statue near Black Knight Halberd", self.player))
+            self.set_location_rule("[ShadedWoods] Next to Vengarl's body", lambda state: state.has("Unpetrify Statue near Manscorpion Tark" or
+                                                                                                   "Unpetrify Statue near Black Knight Halberd", self.player))
             self.set_location_rule("[AldiasKeep] Drop from Petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Left Cage Statue in Aldia's Keep", self.player))
             self.set_location_rule("[AldiasKeep] Drop from Centre petrified Undead Traveller just before Giant Basilisk", lambda state: state.has("Unpetrify Right Cage Statue in Aldia's Keep", self.player))
         self.set_location_rule("[ShadedWoods] Metal chest in room blocked by petrified statue", lambda state: state.has("Unpetrify Lion Mage Set Statue in Shaded Ruins", self.player))
@@ -375,6 +379,7 @@ class DS2World(World):
         self.set_connection_rule("Forest of Fallen Giants", "FOFG - Soldier Key", lambda state: state.has("Soldier Key", self.player))
         self.set_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("King's Ring", self.player))
         self.set_connection_rule("Shaded Woods", "Drangleic Castle", lambda state: state.has("Open Shrine of Winter", self.player))
+        self.set_connection_rule("Drangleic Castle", "Dark Chasm of Old", lambda state: state.has("Forgotten Key", self.player))
         self.set_connection_rule("Drangleic Castle", "King's Passage", lambda state: state.has("Key to King's Passage", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "Memory of Vammar", lambda state: state.has("Ashen Mist Heart", self.player))
         self.set_connection_rule("FOFG - Soldier Key", "Memory of Orro", lambda state: state.has("Ashen Mist Heart", self.player))
