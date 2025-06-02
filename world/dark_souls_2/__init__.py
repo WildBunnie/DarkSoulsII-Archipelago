@@ -102,6 +102,7 @@ class DS2World(World):
 
         regions["Forest of Fallen Giants"].connect(regions["Memory of Vammar"])
         regions["Forest of Fallen Giants"].connect(regions["FOFG - Soldier Key"])
+        regions["Forest of Fallen Giants"].connect(regions["FOFG - Salamander Pit"])
         regions["FOFG - Soldier Key"].connect(regions["Memory of Orro"])
         regions["FOFG - Soldier Key"].connect(regions["Memory of Jeigh"])
         regions["FOFG - Soldier Key"].connect(regions["Lost Bastille - FOFG"])
@@ -377,6 +378,7 @@ class DS2World(World):
         self.set_connection_rule("Majula", "Grave of Saints", lambda state: state.has("Silvercat Ring", self.player) or state.has("Flying Feline Boots", self.player))
         self.set_connection_rule("Majula", "Shaded Woods", lambda state: state.has("Unpetrify Rosabeth of Melfia", self.player))
         self.set_connection_rule("Forest of Fallen Giants", "FOFG - Soldier Key", lambda state: state.has("Soldier Key", self.player))
+        self.set_connection_rule("Forest of Fallen Giants", "FOFG - Salamander Pit", lambda state: state.has("Iron Key", self.player))
         self.set_connection_rule("Shaded Woods", "Aldia's Keep", lambda state: state.has("King's Ring", self.player))
         self.set_connection_rule("Shaded Woods", "Drangleic Castle", lambda state: state.has("Open Shrine of Winter", self.player))
         self.set_connection_rule("Drangleic Castle", "Dark Chasm of Old", lambda state: state.has("Forgotten Key", self.player))
@@ -464,6 +466,7 @@ class DS2World(World):
         if self.options.combat_logic == "easy":
         
             #Lost Sinner Route
+            self.add_connection_rule("Forest of Fallen Giants", "FOFG - Salamander Pit", lambda state: state.has("Estus Flask Shard", self.player, 6) and state.has("Sublime Bone Dust", self.player, 3))
             self.add_connection_rule("FOFG - Soldier Key", "Lost Bastille - FOFG", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 1))
             self.add_connection_rule("No-man's Wharf", "Lost Bastille - Wharf", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 1))
             self.add_connection_rule("Late Lost Bastille", "Sinners' Rise", lambda state: state.has("Estus Flask Shard", self.player, 7) and state.has("Sublime Bone Dust", self.player, 3))
@@ -493,6 +496,7 @@ class DS2World(World):
         if self.options.combat_logic == "medium":
         
             #Lost Sinner Route
+            self.add_connection_rule("Forest of Fallen Giants", "FOFG - Salamander Pit", lambda state: state.has("Estus Flask Shard", self.player, 4) and state.has("Sublime Bone Dust", self.player, 2))
             self.add_connection_rule("FOFG - Soldier Key", "Lost Bastille - FOFG", lambda state: state.has("Estus Flask Shard", self.player, 1) and state.has("Sublime Bone Dust", self.player, 1))
             self.add_connection_rule("No-man's Wharf", "Lost Bastille - Wharf", lambda state: state.has("Estus Flask Shard", self.player, 1) and state.has("Sublime Bone Dust", self.player, 1))
             self.add_connection_rule("Late Lost Bastille", "Sinners' Rise", lambda state: state.has("Estus Flask Shard", self.player, 5) and state.has("Sublime Bone Dust", self.player, 2))
