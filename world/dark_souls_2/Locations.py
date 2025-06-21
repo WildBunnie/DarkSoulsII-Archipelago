@@ -357,6 +357,7 @@ location_table = {
         LocationData(10156180, "[AldiasKeep] In the water-feature in the middle of the stairs approaching Aslatiel", ['Radiant Lifegem']),
         LocationData(10156190, "[AldiasKeep] In the left side of the front door", ['Twilight Herb']),
         LocationData(10156200, "[AldiasKeep] Stuck in a mirror in the mirror room", ['Large Soul of a Brave Warrior'], sotfs=True),
+        LocationData(60050000, "[AldiasKeep] Drop from the Skeleton Dragon after defeating four Forlorns", ["Aldia Key"], sotfs=True),
     ],
     "Belfry Luna": [
         LocationData(324000, "[BelfryLuna] Belfry Gargoyles drop", ['Belfry Gargoyle Soul']),

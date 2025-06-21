@@ -270,6 +270,9 @@ class DS2World(World):
              state.has("Defeat the Duke's Dear Freja", self.player)))
 
         # LOCATIONS
+        ## ALDIA KEY
+        self.set_location_rule("[AldiasKeep] Inside a barrel in the corner in side room with caged Gargoyle", lambda state: state.has("Aldia Key", self.player))
+        self.set_location_rule("[AldiasKeep] On table in side room with caged Gargoyle", lambda state: state.has("Aldia Key", self.player))
         ## MAJULA
         self.set_location_rule("[Majula] Wooden chest in Lenigrast's workshop", lambda state: state.has("Lenigrast's Key", self.player))
         self.set_location_rule("[Majula] Library room in Cale's house", lambda state: state.has("House Key", self.player))
