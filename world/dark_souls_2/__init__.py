@@ -1,5 +1,4 @@
 import string
-import random
 
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import set_rule, add_item_rule, add_rule
@@ -217,7 +216,7 @@ class DS2World(World):
         # remove filler items so pool is not overfilled
         if diff > 0:
             while diff != 0:
-                item = random.choice(pool)
+                item = self.random.choice(pool)
                 if item.category in repeatable_categories and item.classification == ItemClassification.filler:
                     pool.remove(item)
                     diff -= 1
@@ -225,7 +224,7 @@ class DS2World(World):
         elif diff < 0:
             filler_items = [item for item in item_list if item.category in repeatable_categories and not item.skip and not item.sotfs and self.is_dlc_allowed(item.dlc)]
             for _ in range(abs(diff)):
-                item_data = random.choice(filler_items)
+                item_data = self.random.choice(filler_items)
                 item = self.create_item(item_data.name, item_data.classification, item_data.category)
                 pool.append(item)
 
