@@ -1163,7 +1163,7 @@ item_list: list[ItemData] = [
     ItemData(60530000, "Alluring Skull", ItemCategory.CONSUMABLE),
     ItemData(60531000, "Lloyd's Talisman", ItemCategory.CONSUMABLE),
     ItemData(60536000, "Master Lockstone", ItemCategory.KEY_ITEM, classification = ItemClassification.progression),
-    ItemData(60537000, "Fragrant Branch of Yore", ItemCategory.CONSUMABLE, skip=True),
+    # ItemData(60537000, "Fragrant Branch of Yore", ItemCategory.CONSUMABLE, skip=True),
     ItemData(60538000, "Fire Seed", ItemCategory.UPGRADE_MATERIAL),
     ItemData(60540000, "Throwing Knife", ItemCategory.CONSUMABLE),
     ItemData(60550000, "Witching Urn", ItemCategory.CONSUMABLE),
@@ -1325,12 +1325,6 @@ category_names = {
 group_table: Dict[str, Set[str]] = {
     "Pharros' Lockstone": {
         "Master Lockstone"
-    },
-    "fire_res_rings": {
-        "Flame Quartz Ring",
-        "Flame Quartz Ring +1",
-        "Flame Quartz Ring +2",
-        "Flame Quartz Ring +3"
     },
 }
 
