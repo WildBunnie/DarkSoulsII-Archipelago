@@ -109,8 +109,6 @@ namespace patches_offsets {
     const uintptr_t disappearing_chest_items = 0x259FDA;
     const uintptr_t equip_load = 0x376B87;
     const uintptr_t equip_load_menu = 0x14C83D;
-    const uintptr_t no_logos = 0x1146E96;
-    const uintptr_t no_press_start = 0x1949B1;
 #elif defined(_M_X64)
     const uintptr_t no_weapon_req = 0x34A980;
     const uintptr_t menu_weapon_req = 0x201EC0;
@@ -125,8 +123,6 @@ namespace patches_offsets {
     const uintptr_t disappearing_chest_items = 0x1E35E3;
     const uintptr_t equip_load = 0x34A79E;
     const uintptr_t equip_load_menu = 0x99D71;
-    const uintptr_t no_logos = 0x160DE1A;
-    const uintptr_t no_press_start = 0xFDB66;
 #endif
 };
 
