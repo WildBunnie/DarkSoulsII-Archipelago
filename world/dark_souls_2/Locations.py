@@ -126,7 +126,7 @@ location_table = {
     "Forest of Fallen Giants": [
         LocationData(None, "Defeat the Last Giant", None, event=True),
         LocationData(309600, "[FOFG] Last Giant drop", ['Soul of the Last Giant', 'Soldier Key']),
-        LocationData(1751000, "[FOFG] Gift from Cale when talking to him", ['House Key']),
+        LocationData(1751000, "[FOFG] Gift from Cale when talking to him", ['House Key'], skip=True),
         LocationData(10105010, "[FOFG] Wooden chest in upper floor of cardinal tower", ['Small Leather Shield', 'Repair Powder']),
         LocationData(10105020, "[FOFG] Wooden chest under the bridge after the drawgate", ['Human Effigy']),
         LocationData(10105021, "[FOFG] Wooden chest under the bridge after the drawgate in NG+", ['Human Effigy'], ngp=True),
@@ -808,7 +808,7 @@ location_table = {
         LocationData(10255020, "[Gutter] Wooden chest on the middle floor of an wooden building near where Melinda the Butcher invades", ['Twinkling Titanite', 'Small Smooth & Silky Stone'], vanilla=True),
         LocationData(10255030, "[Gutter] Wooden chest on ledge in multiple ladders area", ['Great Club']),
         LocationData(10255040, "[Gutter] Metal chest near where Melinda the Butcher invades", ['Ring of Soul Protection']),
-        LocationData(10255050, "[Gulch] Wooden chest in the side tunnel after the worms", ['Divine Blessing']),
+        LocationData(10255050, "[Gulch] Wooden chest in the side tunnel after the worms", ['Divine Blessing'], skip=True),
         LocationData(10255090, "[Gulch] Metal chest in side room next to Gulch Giants", ['Ring of Giants+1', 'Petrified Dragon Bone']),
         LocationData(10255100, "[Gutter] Metal chest in the cave with corrosive bugs", ['Wicked Eye Greatshield']),
         LocationData(10255110, "[Gutter] Metal chest in the base of the tower where the zip-line starts", ['Ring of the Evil Eye'], vanilla=True),
@@ -990,7 +990,7 @@ location_table = {
         # LocationData(30700600, "[Head of Vengarl] Gold Pine Resin", ["Gold Pine Resin"], shop=True),
         # LocationData(30700601, "[Head of Vengarl] Lightning Urn", ["Lightning Urn"], shop=True),
         # LocationData(30700602, "[Head of Vengarl] Destructive Greatarrow", ["Destructive Greatarrow"], shop=True),
-        LocationData(60009000, "[ShadedWoods] Drop from the petrified lion warrior by the tree bridge", ['Fang Key']),
+        LocationData(60009000, "[ShadedWoods] Drop from the petrified lion warrior by the tree bridge", ['Fang Key'], skip=True),
     ],
     "Doors of Pharros": [
         LocationData(None, "Defeat the Royal Rat Authority", None, event=True),
