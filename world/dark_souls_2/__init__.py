@@ -107,6 +107,7 @@ class DS2World(World):
         regions["FOFG - Soldier Key"].connect(regions["Lost Bastille - FOFG"])
 
         regions["Heide's Tower of Flame"].connect(regions["No-man's Wharf"])
+        regions["Heide's Tower of Flame"].connect(regions["Cathedral of Blue"])
         regions["No-man's Wharf"].connect(regions["Lost Bastille - Wharf"])
         
         regions["Lost Bastille - FOFG"].connect(regions["Early Lost Bastille"])
@@ -341,6 +342,7 @@ class DS2World(World):
         self.set_location_rule("[DragonShrine] Metal chest behind the Pharros contraption under the staircase", lambda state: state.has("Master Lockstone", self.player))
         self.set_location_rule("[Pharros] Wooden chest in room after using top Pharros contraption and dropping down near the toxic rats", lambda state: state.has("Master Lockstone", self.player))
         self.set_location_rule("[Pharros] Trapped wooden chest behind (floor) Pharros contraption in the upper level", lambda state: state.has("Master Lockstone", self.player))
+        self.set_location_rule("[Pharros] Corpse- behind three-part Pharros' door in the upper level", lambda state: state.has("Master Lockstone", self.player))
         if self.options.enable_ngp:
             self.set_location_rule("[Pharros] Trapped wooden chest behind (floor) Pharros contraption in the upper level in NG+", lambda state: state.has("Master Lockstone", self.player))
         self.set_location_rule("[Pharros] Metal chest behind three-part pharros door in the lower level", lambda state: state.has("Master Lockstone", self.player))
@@ -470,6 +472,7 @@ class DS2World(World):
             #Lost Sinner Route
             self.add_connection_rule("Forest of Fallen Giants", "FOFG - Salamander Pit", lambda state: state.has("Estus Flask Shard", self.player, 6) and state.has("Sublime Bone Dust", self.player, 3))
             self.add_connection_rule("FOFG - Soldier Key", "Lost Bastille - FOFG", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("Heide's Tower of Flame", "Cathedral of Blue", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 1))
             self.add_connection_rule("No-man's Wharf", "Lost Bastille - Wharf", lambda state: state.has("Estus Flask Shard", self.player, 3) and state.has("Sublime Bone Dust", self.player, 1))
             self.add_connection_rule("Late Lost Bastille", "Sinners' Rise", lambda state: state.has("Estus Flask Shard", self.player, 7) and state.has("Sublime Bone Dust", self.player, 3))
             #Old Iron King Route
@@ -500,6 +503,7 @@ class DS2World(World):
             #Lost Sinner Route
             self.add_connection_rule("Forest of Fallen Giants", "FOFG - Salamander Pit", lambda state: state.has("Estus Flask Shard", self.player, 4) and state.has("Sublime Bone Dust", self.player, 2))
             self.add_connection_rule("FOFG - Soldier Key", "Lost Bastille - FOFG", lambda state: state.has("Estus Flask Shard", self.player, 1) and state.has("Sublime Bone Dust", self.player, 1))
+            self.add_connection_rule("Heide's Tower of Flame", "Cathedral of Blue", lambda state: state.has("Estus Flask Shard", self.player, 2) and state.has("Sublime Bone Dust", self.player, 1))
             self.add_connection_rule("No-man's Wharf", "Lost Bastille - Wharf", lambda state: state.has("Estus Flask Shard", self.player, 1) and state.has("Sublime Bone Dust", self.player, 1))
             self.add_connection_rule("Late Lost Bastille", "Sinners' Rise", lambda state: state.has("Estus Flask Shard", self.player, 5) and state.has("Sublime Bone Dust", self.player, 2))
             #Old Iron King Route
