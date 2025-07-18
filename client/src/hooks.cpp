@@ -22,8 +22,7 @@ HOOKS
 bool hooks_enabled = false;
 bool _autoequip = false;
 std::map<int, std::wstring> item_names;
-std::map<int32_t, std::string> _reward_names;
-std::map<int32_t, int32_t> _custom_items;
+std::map<int32_t, APLocation> _location_map;
 std::list<int32_t> locations_to_check;
 
 std::wstring remove_special_characters(const std::wstring& input)
@@ -65,18 +64,19 @@ void write_binary_file_if_not_exists(const unsigned char* data, size_t size, con
 
 void handle_location_checked(int32_t location_id)
 {
-    // if the location has an item from other player
-    // set the item to have the correct name
-    if (_reward_names.contains(location_id)) {
-        std::string item_name = _reward_names[location_id];
-        std::wstring item_name_wide(item_name.begin(), item_name.end());
-        item_names[the_item_id] = remove_special_characters(item_name_wide);
-    }
-    // if its a custom item, do whatever we need to do
-    if (_custom_items.contains(location_id)) {
-        int32_t item_id = _custom_items[location_id];
-        if (is_statue(item_id)) {
-            unpetrify_statue(item_id);
+    if (!_location_map.contains(location_id)) return;
+
+    APLocation& location = _location_map[location_id];
+    for (int i = 0; i < location.reward_amount; i++) {
+        APLocationReward& reward = location.rewards[i];
+
+        if (!reward.item_name.empty()) {
+            std::string item_name = reward.item_name;
+            std::wstring item_name_wide(item_name.begin(), item_name.end());
+            item_names[reward.real_item_id] = remove_special_characters(item_name_wide);
+        }
+        if (is_statue(reward.item_id)) {
+            unpetrify_statue(reward.item_id);
         }
     }
     locations_to_check.push_back(location_id);
@@ -115,9 +115,9 @@ void __fastcall detour_give_items_on_reward(uintptr_t param_1, void* _edx, uintp
 void __cdecl detour_give_items_on_reward(uintptr_t param_1, uintptr_t param_2, int32_t param_3, int32_t param_4, int32_t param_5)
 #endif
 {
-    int32_t itemlot_id = read_value<int32_t>(param_2);
-    spdlog::debug("was rewarded: {}", itemlot_id);
-    handle_location_checked(itemlot_id);
+    int32_t param_id = read_value<int32_t>(param_2);
+    spdlog::debug("was rewarded: {}", param_id);
+    handle_location_checked(param_id + get_location_offset(ItemLotParam2_Other_Location));
     return original_give_items_on_reward(param_1, param_2, param_3, param_4, param_5);
 }
 
@@ -127,15 +127,11 @@ char __fastcall detour_give_items_on_pickup(uintptr_t param_1, void* _edx, uintp
 char __cdecl detour_give_items_on_pickup(uintptr_t param_1, uintptr_t param_2)
 #endif
 {
-    int32_t itemlot_id = get_pickup_id(param_2, get_base_address());
-    spdlog::debug("picked up: {}", itemlot_id);
-
-    // janky way to fix the problem that some pickups
-    // have the same id as some of the shop items
-    if (!shop_prices.contains(itemlot_id)) {
-        handle_location_checked(itemlot_id);
-    }
-
+    // we get the location id directly instead of the param id because
+    // i dont know how to do it without hardcoding it in the assembly code
+    int32_t location_id = get_pickup_id(param_2, get_base_address());
+    spdlog::debug("picked up: {}", location_id % 100000000);
+    handle_location_checked(location_id);
     return original_give_items_on_pickup(param_1, param_2);
 }
 
@@ -148,7 +144,7 @@ char __cdecl detour_give_shop_item(uintptr_t param_1, uintptr_t param_2, int32_t
     uint32_t offset = sizeof(uintptr_t) == 4 ? 0x8 : 0x10; // 0x8 in x32 and 0x10 in x64
     int32_t shop_lineup_id = read_value<int32_t>(param_2 + offset);
     spdlog::debug("just bought: {}", shop_lineup_id);
-    handle_location_checked(shop_lineup_id);
+    handle_location_checked(shop_lineup_id  + get_location_offset(ShopLineupParam_Location));
     return original_give_shop_item(param_1, param_2, param_3);
 }
 
@@ -185,11 +181,12 @@ uintptr_t __cdecl detour_get_hovering_item_info(uintptr_t param_1, uintptr_t par
     int offset = sizeof(uintptr_t) * 2; // 0x8 in x86 and 0x10 in x64
     uintptr_t ptr = read_value<uintptr_t>(param_1 + offset);
     if (ptr != 0) {
-        uint32_t itemlot_id = read_value<uint32_t>(ptr + offset);
-        if (_reward_names.contains(itemlot_id)) {
-            std::string item_name = _reward_names[itemlot_id];
+        uint32_t param_id = read_value<uint32_t>(ptr + offset);
+        uint32_t location_id = param_id + get_location_offset(ShopLineupParam_Location);
+        if (_location_map.contains(location_id)) {
+            std::string item_name = _location_map[location_id].rewards[0].item_name;
             std::wstring item_name_wide(item_name.begin(), item_name.end());
-            item_names[the_item_id] = remove_special_characters(item_name_wide);
+            item_names[custom_shop_item_id] = remove_special_characters(item_name_wide); // this hook is only for shop rn
         }
     }
     return original_get_hovering_item_info(param_1, param_2);
@@ -234,12 +231,11 @@ size_t __cdecl detour_virtual_to_archive_path(uintptr_t param_1, DLString* path)
     return original_virtual_to_archive_path(param_1, path);
 }
 
-void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, int32_t> custom_items, bool autoequip)
+void init_hooks(std::map<int32_t, APLocation> location_map, bool autoequip)
 {
     uintptr_t base_address = get_base_address();
 
-    _reward_names = reward_names;
-    _custom_items = custom_items;
+    _location_map = location_map;
     _autoequip = autoequip;
 
     if (hooks_enabled) return;

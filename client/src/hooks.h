@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game_functions.h"
+#include "archipelago.h"
 
 #include <windows.h>
 #include <ws2def.h>
@@ -20,7 +21,7 @@ typedef struct {
     UINT64 capacity;
 } DLString;
 
-void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, int32_t> custom_items, bool autoequip);
+void init_hooks(std::map<int32_t, APLocation> location_map, bool autoequip);
 void force_offline();
 std::list<int32_t> get_locations_to_check();
 void clear_locations_to_check();

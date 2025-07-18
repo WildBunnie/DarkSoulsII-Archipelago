@@ -76,6 +76,7 @@ map_item:
     jz chest_item
 
     mov eax, [rax+48h]
+    add eax, 200000000
     jmp done
 
 chest_item:
@@ -87,6 +88,7 @@ chest_item:
     jz done
 
     mov eax, [rax+70h]
+    add eax, 200000000
     jmp done
 
 enemy_drop:
@@ -99,6 +101,7 @@ enemy_drop:
 
     mov rax, [rax+68h]
     mov eax, [rax+90h]
+    add eax, 100000000
     jmp done
 
 done:

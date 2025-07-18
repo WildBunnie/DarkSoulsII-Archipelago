@@ -41,6 +41,8 @@ bool _died_by_deathlink = false;
 int last_received_index = -1;
 std::set<int32_t> locations_to_ignore;
 std::queue<APClient::NetworkItem> items_to_give;
+std::unordered_map<int32_t, int32_t> ap_to_game_id;
+std::unordered_map<int32_t, std::vector<int32_t>> game_to_ap_id;
 
 enum ItemsHandling {
 	NO_ITEMS = 0b000,
@@ -62,6 +64,22 @@ void reset_apclient()
 	while (!items_to_give.empty()) {
 		items_to_give.pop();
 	}
+}
+
+// retrieves the offset need to convert the param id to the archipelago location id
+// this is needed because there are overlapping param ids in the different tables
+int32_t get_location_offset(LocationType type)
+{
+	if (type == ItemLotParam2_Chr_Location) {
+		return 100000000;
+	}
+	else if (type == ItemLotParam2_Other_Location) {
+		return 200000000;
+	}
+	else if (type == ShopLineupParam_Location) {
+		return 300000000;
+	}
+	return 0;
 }
 
 void setup_apclient(std::string URI, std::string slot_name, std::string password)
@@ -117,6 +135,26 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		if (data.contains("autoequip") && data.at("autoequip") == 1) {
 			autoequip = true;
 		}
+		if (data.contains("ap_to_game_id")) {
+			for (auto& [key, val] : data.at("ap_to_game_id").items())
+			{
+				int32_t int_key = std::stoi(key);
+				int32_t int_val = val.get<int32_t>();
+				ap_to_game_id[int_key] = int_val;
+			}
+		}
+		if (data.contains("game_to_ap_id")) {
+			for (auto& [key, val] : data.at("game_to_ap_id").items()) {
+				int32_t int_key = std::stoi(key);
+
+				std::vector<int32_t> ids;
+				for (const auto& id : val) {
+					ids.push_back(id.get<int32_t>());
+				}
+
+				game_to_ap_id[int_key] = std::move(ids);
+			}
+		}
 
 		locations_to_ignore.insert(1700000); // estus flask from emerald herald
 		if (data.contains("infinite_lifegems") && data.at("infinite_lifegems") == 1) {
@@ -158,7 +196,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		else {
 			boost::uuids::uuid uuid = boost::uuids::random_generator()();
 			room_id_value = boost::uuids::to_string(uuid);
-			if (ap->Set(room_id_key, room_id_value, false, {})) {
+			if (ap->Set(room_id_key, room_id_value, false, {})) {	
 				spdlog::debug("new room id has been set {}", room_id_value);
 				write_save_file();
 			}
@@ -176,33 +214,55 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 	});
 
 	ap->set_location_info_handler([](const std::list<APClient::NetworkItem>& items) {
-		std::map<int32_t, int32_t> location_rewards;
-		std::map<int32_t, int32_t> custom_items;
-		std::map<int32_t, std::string> reward_names;
+		std::map<int32_t, APLocation> location_map;
+
 		for (const auto& item : items) {
+			int32_t item_location = ap_to_game_id[item.location];
+
+			APLocation& location = location_map[item_location]; // inserts if not present
+			assert(location.reward_amount < 10 && "location can't have more than 10 rewards");
+			location.location_id = item_location;
+
+			// index with reward_amount so that two custom
+			// items dont have the same real_item_id
+			int32_t custom_item_id = unused_item_ids[location.reward_amount];
+
+			// use a different custom item for shops
+			int32_t offset = get_location_offset(ShopLineupParam_Location);
+			if (location.location_id >= offset && location.location_id < offset + 100000000)
+			{
+				custom_item_id = custom_shop_item_id;
+			}
+
+			APLocationReward reward;
 			if (item.player == ap->get_player_number()) {
 				// if the id is less than 1000000 it's a custom item
 				if (item.item < 1000000) {
-					location_rewards[item.location] = the_item_id;
-					custom_items[item.location] = item.item;
+					reward.real_item_id = custom_item_id;
+					reward.item_id = item.item;
 
 					std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));
-					reward_names[item.location] = item_name;
+					reward.item_name = item_name;
 				}
 				else {
-					location_rewards[item.location] = item.item;
+					reward.item_id = item.item;
+					reward.real_item_id = item.item;
 				}
 			}
 			else {
-				location_rewards[item.location] = the_item_id;
+				reward.item_id = custom_item_id; // doesnt really matter for multiworld items
+				reward.real_item_id = custom_item_id;
 
 				std::string player_name = ap->get_player_alias(item.player);
 				std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));
-				reward_names[item.location] = player_name + "'s " + item_name;
+				reward.item_name = player_name + "'s " + item_name;
 			}
+
+			location.rewards[location.reward_amount++] = reward;
 		}
-		override_item_params(location_rewards, player_seed, locations_to_ignore);
-		init_hooks(reward_names, custom_items, autoequip);
+
+		override_item_params(location_map, player_seed, locations_to_ignore);
+		init_hooks(location_map, autoequip);
 	});
 
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& received_items) {
@@ -291,13 +351,14 @@ void confirm_items_given(int amount)
 void check_locations(std::list<int32_t> locations)
 {
 	std::list<int64_t> checks;
-	std::set<int64_t> missing_locations = ap->get_missing_locations();
 
 	for (auto& location : locations)
 	{
-		if (missing_locations.contains(location))
+		if (game_to_ap_id.contains(location))
 		{
-			checks.push_back(static_cast<int64_t>(location));
+			for (auto& ap_id : game_to_ap_id[location]) {
+				checks.push_back(static_cast<int64_t>(ap_id));
+			}
 		}
 	}
 	
