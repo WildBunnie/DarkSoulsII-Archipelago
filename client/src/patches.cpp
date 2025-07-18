@@ -48,12 +48,3 @@ void patch_no_equip_load(uintptr_t base_address)
     patch_memory(base_address + patches_offsets::equip_load_menu, patches::equip_load_menu);
 }
 
-void patch_qol(uintptr_t base_address)
-{
-    // ported from https://github.com/r3sus/Resouls/tree/main/ds2s/mods
-    // no logos
-    patch_memory(base_address + patches_offsets::no_logos, { 0x01 });
-    // no "press start button"
-    patch_memory(base_address + patches_offsets::no_press_start, { 0x02 });
-}
-

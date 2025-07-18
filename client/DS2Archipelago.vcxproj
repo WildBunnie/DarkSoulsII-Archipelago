@@ -72,7 +72,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>dinput8</TargetName>
+    <TargetName>archipelago</TargetName>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
@@ -80,7 +80,7 @@
     <IntDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>dinput8</TargetName>
+    <TargetName>archipelago</TargetName>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
@@ -88,10 +88,10 @@
     <IntDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>dinput8</TargetName>
+    <TargetName>archipelago</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>dinput8</TargetName>
+    <TargetName>archipelago</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -125,7 +125,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(SolutionDir)src\dinput8\dinput8.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <AdditionalDependencies>libcrypto_*.lib;libssl_*.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>subprojects\openssl\include\openssl;subprojects\openssl\include\crypto;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -151,7 +152,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(SolutionDir)src\dinput8\dinput8.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <AdditionalDependencies>libcrypto_*.lib;libssl_*.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>subprojects\openssl\include\openssl;subprojects\openssl\include\crypto;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
@@ -174,7 +176,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(SolutionDir)src\dinput8\dinput8.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <AdditionalDependencies>libcrypto_*.lib;libssl_*.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>subprojects\openssl\include\openssl;subprojects\openssl\include\crypto;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -200,7 +203,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>$(SolutionDir)src\dinput8\dinput8.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <AdditionalDependencies>libcrypto_*.lib;libssl_*.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>subprojects\openssl\include\openssl;subprojects\openssl\include\crypto;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -217,16 +221,10 @@
     <ClCompile Include="src\randomizer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\dinput8\dinput8_32.asm" />
-    <MASM Include="src\dinput8\dinput8_64.asm">
-      <FileType>Document</FileType>
-    </MASM>
     <MASM Include="src\assembly\functions_64.asm" />
-    <None Include="src\dinput8\dinput8.def" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\archipelago.h" />
-    <ClInclude Include="src\dinput8\dinput8.h" />
     <ClInclude Include="src\ds2.h" />
     <ClInclude Include="src\game_functions.h" />
     <ClInclude Include="src\hooks.h" />

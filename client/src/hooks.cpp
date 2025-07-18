@@ -13,8 +13,6 @@
 #include <fstream>
 #include <sys/stat.h>
 
-getaddrinfo_t original_getaddrinfo;
-
 #define HOOK(name) name##_t original_##name;
 HOOKS
 #undef HOOK
@@ -41,27 +39,6 @@ std::wstring remove_special_characters(const std::wstring& input)
     return output;
 }
 
-void write_binary_file_if_not_exists(const unsigned char* data, size_t size, const std::wstring& path)
-{
-    try {
-        // check if the file already exists
-        struct _stat buffer;
-        if (_wstat(path.c_str(), &buffer) == 0) {
-            return;
-        }
-
-        std::ofstream file(path, std::ios::binary);
-        file.write(reinterpret_cast<const char*>(data), size);
-        file.close();
-
-        std::wstring log_msg = L"Successfully wrote binary data to " + path;
-        spdlog::debug(std::string(log_msg.begin(), log_msg.end()));
-    }
-    catch (const std::exception& e) {
-        spdlog::debug("Error writing binary file: {}", e.what());
-    }
-}
-
 void handle_location_checked(int32_t location_id)
 {
     if (!_location_map.contains(location_id)) return;
@@ -80,21 +57,6 @@ void handle_location_checked(int32_t location_id)
         }
     }
     locations_to_check.push_back(location_id);
-}
-
-INT __stdcall detour_getaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHints, PADDRINFOA* ppResult)
-{
-#ifdef _M_IX86
-    const char* address_to_block = "frpg2-steam-ope.fromsoftware.jp";
-#elif defined(_M_X64)
-    const char* address_to_block = "frpg2-steam64-ope-login.fromsoftware-game.net";
-#endif
-
-    if (address && strcmp(address, address_to_block) == 0) {
-        return EAI_FAIL;
-    }
-
-    return original_getaddrinfo(address, port, pHints, ppResult);
 }
 
 #ifdef _M_IX86
@@ -212,25 +174,6 @@ int32_t __cdecl detour_remove_item_from_inventory(uintptr_t param_1, uintptr_t p
     return original_remove_item_from_inventory(param_1, param_2, inventory_item_ptr, amount_to_remove);
 }
 
-#ifdef _M_IX86
-size_t __fastcall detour_virtual_to_archive_path(uintptr_t param_1, void* _edx, DLString* path)
-#elif defined(_M_X64)
-size_t __cdecl detour_virtual_to_archive_path(uintptr_t param_1, DLString* path)
-#endif
-{
-    if (path != nullptr && is_player_ingame())
-    {
-        const wchar_t* target = L"gamedata:/menu/tex/Icon/IC_0060375000.tpf";
-        const wchar_t* new_path = L"./archipelago/textures/IC_0060375000.tpf";
-        if (wcsncmp(path->string, target, wcslen(target)) == 0)
-        {
-            wcscpy_s(path->string, path->capacity, new_path);
-            path->length = wcslen(new_path);
-        }
-    }
-    return original_virtual_to_archive_path(param_1, path);
-}
-
 void init_hooks(std::map<int32_t, APLocation> location_map, bool autoequip)
 {
     uintptr_t base_address = get_base_address();
@@ -239,9 +182,6 @@ void init_hooks(std::map<int32_t, APLocation> location_map, bool autoequip)
     _autoequip = autoequip;
 
     if (hooks_enabled) return;
-
-    // create the file with the archipelago texture
-    write_binary_file_if_not_exists(ap_texture_tpf, sizeof(ap_texture_tpf), L"archipelago/textures/IC_0060375000.tpf");
 
     MH_Initialize();
 
@@ -256,16 +196,6 @@ void init_hooks(std::map<int32_t, APLocation> location_map, bool autoequip)
     #undef HOOK
 
     hooks_enabled = true;
-}
-
-void force_offline()
-{
-    uintptr_t base_address = get_base_address();
-
-    MH_Initialize();
-    LPVOID target = nullptr;
-    MH_CreateHookApiEx(L"ws2_32", "getaddrinfo", &detour_getaddrinfo, (LPVOID*)&original_getaddrinfo, &target);
-    MH_EnableHook(target);
 }
 
 std::list<int32_t> get_locations_to_check()

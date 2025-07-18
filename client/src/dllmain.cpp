@@ -1,6 +1,5 @@
 #pragma comment(lib, "Crypt32.lib")
 
-#include "dinput8/dinput8.h"
 #include "archipelago.h"
 #include "hooks.h"
 #include "game_functions.h"
@@ -189,13 +188,8 @@ void run()
     // make sure the folders we need exist
     std::filesystem::create_directory("archipelago");
     std::filesystem::create_directory("archipelago/save_data");
-    std::filesystem::create_directory("archipelago/textures");
 
     setup_logging();
-    force_offline();
-
-    uintptr_t base_address = get_base_address();
-    patch_qol(base_address);
 
     const int tps = 60; // ticks per second
     int loop_counter = 0;
@@ -210,7 +204,6 @@ void run()
         handle_death_link();
 
         // artificial delay between giving items
-        // to prevent items not giving
         if (loop_counter >= tps) {
             handle_give_items();
             loop_counter = 0;
@@ -224,11 +217,7 @@ void run()
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
-        LoadOriginalDll();
         CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)run, NULL, NULL, NULL);
-    }
-    else if (ul_reason_for_call == DLL_PROCESS_DETACH) {
-        FreeOriginalDll();
     }
     return TRUE;
 }
