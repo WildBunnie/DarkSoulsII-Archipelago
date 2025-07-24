@@ -22,6 +22,10 @@ typedef struct {
 
 #ifdef _M_IX86
 typedef struct {
+    uint8_t unk01[10];
+    uint16_t row_amount;
+    char header_text[52];
+    ParamRow rows[];
 } ParamTable;
 #elif defined(_M_X64)
 typedef struct {

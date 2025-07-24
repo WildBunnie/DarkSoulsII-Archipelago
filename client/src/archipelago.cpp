@@ -43,6 +43,7 @@ std::set<int32_t> locations_to_ignore;
 std::queue<APClient::NetworkItem> items_to_give;
 std::unordered_map<int32_t, int32_t> ap_to_game_id;
 std::unordered_map<int32_t, std::vector<int32_t>> game_to_ap_id;
+std::set<int32_t> item_bundles;
 
 enum ItemsHandling {
 	NO_ITEMS = 0b000,
@@ -153,6 +154,11 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 				}
 
 				game_to_ap_id[int_key] = std::move(ids);
+			}
+		}
+		if (data.contains("item_bundles")) {
+			for (const auto& id : data.at("item_bundles")) {
+				item_bundles.insert(id.get<int32_t>());
 			}
 		}
 
@@ -438,4 +444,9 @@ void read_save_file()
 	catch (const std::exception& e) {
 		spdlog::debug("Error reading save file");
 	}
+}
+
+std::set<int32_t> get_item_bundles()
+{
+	return item_bundles;
 }

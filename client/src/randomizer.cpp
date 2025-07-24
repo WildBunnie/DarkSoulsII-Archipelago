@@ -98,7 +98,15 @@ void override_itemlot_param(std::map<int32_t, APLocation> location_map, std::str
             for (int j = 0; j < location.reward_amount && j < 10; j++) {
                 APLocationReward& reward = location.rewards[j];
                 items[j] = reward.real_item_id;
-                amounts[j] = 1; // TODO: Check for bundles
+                amounts[j] = 1;
+
+                // convert bundle item id to the item with the amount
+                if (get_item_bundles().contains(reward.real_item_id)) {
+                    int bundle_amount = reward.real_item_id % 1000;
+                    items[j] = reward.real_item_id - bundle_amount;
+                    amounts[j] = bundle_amount;
+                }
+                
                 chances[j] = 100.0f;
             }
         }

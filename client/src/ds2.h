@@ -9,8 +9,6 @@ const int32_t custom_shop_item_id = 60375000;
 // list of unused item ids that can be given to the player without consequences
 const std::vector<int32_t> unused_item_ids = { 60155010, 60155020, 60155030, 65240000, 65250000, 65260000, 65270000, 65280000, 65290000, 900008182, 900008183 };
 
-const std::set<int64_t> item_bundles = { 53200011 };
-
 // i just use these for randomizing the classes
 // these are not very reliable at telling the item's category
 // since thing i dont want in the starter classes are in misc and skip for example

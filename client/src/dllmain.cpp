@@ -138,7 +138,7 @@ void handle_give_items()
         item.upgrade = 0;
         item.infusion = 0;
 
-        if (item_bundles.contains(item_id)) {
+        if (get_item_bundles().contains(item_id)) {
             int bundle_amount = item_id % 1000;
             item_id = item_id - bundle_amount;
             item.amount = bundle_amount;

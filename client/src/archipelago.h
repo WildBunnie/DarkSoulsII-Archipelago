@@ -40,3 +40,4 @@ void write_save_file();
 void read_save_file();
 
 int32_t get_location_offset(LocationType type);
+std::set<int32_t> get_item_bundles();
