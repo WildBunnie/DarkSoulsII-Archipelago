@@ -53,6 +53,7 @@ void override_itemlot_param(std::map<int32_t, APLocation> location_map, std::str
         ITEM_LOT_PARAM2* param = (ITEM_LOT_PARAM2*)(table_ptr + row->reward_offset);
     
         int32_t location_id = row->param_id + get_location_offset(type);
+        if (ignore.contains(location_id)) continue;
         if (location_map.contains(location_id)) continue; // we deal with predefined items in the next for loop
 
         if (param->chance_lot_0 == 100.0) {
@@ -79,6 +80,8 @@ void override_itemlot_param(std::map<int32_t, APLocation> location_map, std::str
         ITEM_LOT_PARAM2* param = (ITEM_LOT_PARAM2*)(table_ptr + row->reward_offset);
 
         int32_t location_id = param_id + get_location_offset(type);
+        if (ignore.contains(location_id)) continue;
+
         if (location_map.contains(location_id)) {
             APLocation& location = location_map[location_id];
 
@@ -180,6 +183,7 @@ void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::
 
         if (!is_valid_shop(row->param_id)) continue;
         int32_t location_id = row->param_id + get_location_offset(ShopLineupParam_Location);
+        if (ignore.contains(location_id)) continue;
         if (location_map.contains(location_id)) continue; // we deal with predefined items in the next for loop
         
         if (param->quantity == 1) {
@@ -216,6 +220,8 @@ void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::
         if (!is_valid_shop(row->param_id)) continue;
 
         int32_t location_id = param_id + get_location_offset(ShopLineupParam_Location);
+        if (ignore.contains(location_id)) continue;
+
         if (location_map.contains(location_id)) {
             APLocation& location = location_map[location_id];
             assert(location.reward_amount == 1 && "shop location must contain exactly 1 reward");

@@ -161,10 +161,10 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 				item_bundles.insert(id.get<int32_t>());
 			}
 		}
-
-		locations_to_ignore.insert(1700000); // estus flask from emerald herald
-		if (data.contains("infinite_lifegems") && data.at("infinite_lifegems") == 1) {
-			locations_to_ignore.insert(75400601);
+		if (data.contains("keep_unrandomized")) {
+			for (const auto& id : data.at("keep_unrandomized")) {
+				locations_to_ignore.insert(id.get<int32_t>());
+			}
 		}
 
 		if (data.contains("randomize_starting_loadout") && data.at("randomize_starting_loadout") == 1) {
