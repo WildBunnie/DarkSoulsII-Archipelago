@@ -59,70 +59,21 @@ namespace pointer_offsets {
 
 namespace patches {
 #ifdef _M_IX86
-    const std::vector<uint8_t> no_weapon_req_patch = { 0xC2, 0x04, 0x00 };
-    const std::vector<uint8_t> menu_weapon_req_patch = {
-        0xC7, 0x46, 0x70, 0x01, 0x00, 0x00, 0x00, 0x90,
-        0xC7, 0x46, 0x72, 0x01, 0x00, 0x00, 0x00, 0x90,
-        0xC7, 0x46, 0x74, 0x01, 0x00, 0x00, 0x00, 0x90,
-        0xC7, 0x46, 0x76, 0x01, 0x00, 0x00, 0x00, 0x90
-    };
-    const std::vector<uint8_t> no_power_stance_req = { 0x66, 0x0F, 0xEF, 0xC9 };
-    const std::vector<uint8_t> no_spell_cast_req = { 0xEB };
-    const std::vector<uint8_t> no_spell_menu_int_req = { 0x66, 0xBE, 0x00, 0x00 };
-    const std::vector<uint8_t> no_spell_menu_fth_req = { 0x66, 0xBA, 0x00, 0x00 };
     const std::vector<uint8_t> infinite_torch = { 0x90, 0x90, 0x90, 0x90 };
     const std::vector<uint8_t> unbreakable_chests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE6 };
-    const std::vector<uint8_t> disappearing_chest_items = { 0x90, 0x90 };
-    const std::vector<uint8_t> equip_load = { 0xD9, 0xEE, 0x90, 0x90, 0x90 };
-    const std::vector<uint8_t> equip_load_menu = { 0x31, 0xD2, 0x90 };
 #elif defined(_M_X64)
-    const std::vector<uint8_t> no_weapon_req_patch = { 0xC3, 0x90, 0x90, 0x90, 0x90 };
-    const std::vector<uint8_t> menu_weapon_req_patch = {
-        0x90, 0x90, 0x90, 0x90, 0xB0, 0x01, 0x66, 0x89, 0x4B, 0x70,
-        0x90, 0x90, 0x90, 0x90, 0x66, 0x89, 0x4B, 0x72, 0x90, 0x90,
-        0x90, 0x90, 0x66, 0x89, 0x4B, 0x74, 0x90, 0x90, 0x90, 0x90
-    };
-    const std::vector<uint8_t> no_power_stance_req = { 0x66, 0x0F, 0xEF, 0xC0, 0x90, 0x90, 0x90, 0x90 };
-    const std::vector<uint8_t> no_spell_cast_req = { 0xEB };
-    const std::vector<uint8_t> no_spell_menu_int_req = { 0x31, 0xC9, 0x90, 0x90 };
-    const std::vector<uint8_t> no_spell_menu_fth_req = { 0x31, 0xC9, 0x90, 0x90 };
     const std::vector<uint8_t> infinite_torch = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
     const std::vector<uint8_t> unbreakable_chests = { 0x80, 0x78, 0x14, 0x78, 0x74, 0xE3 };
-    const std::vector<uint8_t> disappearing_chest_items = { 0x90, 0x90 };
-    const std::vector<uint8_t> equip_load = { 0x31, 0xC9, 0x89, 0x4B, 0x44 };
-    const std::vector<uint8_t> equip_load_menu = { 0x89, 0x81, 0x9C, 0xA2, 0x00, 0x00, 0x90 };
 #endif
 };
 
 namespace patches_offsets {
 #ifdef _M_IX86
-    const uintptr_t no_weapon_req = 0x372ff0;
-    const uintptr_t menu_weapon_req = 0x14E50A2;
-    const uintptr_t no_power_stance_str_req = 0x378398;
-    const uintptr_t no_power_stance_dex_req = 0x3783D7;
-    const uintptr_t no_spell_cast_int_req = 0x3C02CF;
-    const uintptr_t no_spell_cast_fth_req = 0x3C02E7;
-    const uintptr_t no_spell_menu_int_req = 0x236E72;
-    const uintptr_t no_spell_menu_fth_req = 0x236E7A;
     const uintptr_t infinite_torch = 0x23950E;
     const uintptr_t unbreakable_chests = 0x24EDFC;
-    const uintptr_t disappearing_chest_items = 0x259FDA;
-    const uintptr_t equip_load = 0x376B87;
-    const uintptr_t equip_load_menu = 0x14C83D;
 #elif defined(_M_X64)
-    const uintptr_t no_weapon_req = 0x34A980;
-    const uintptr_t menu_weapon_req = 0x201EC0;
-    const uintptr_t no_power_stance_str_req = 0x35025C;
-    const uintptr_t no_power_stance_dex_req = 0x35028B;
-    const uintptr_t no_spell_cast_int_req = 0x397915;
-    const uintptr_t no_spell_cast_fth_req = 0x39792C;
-    const uintptr_t no_spell_menu_int_req = 0x1B8E7C;
-    const uintptr_t no_spell_menu_fth_req = 0x1B8E87;
     const uintptr_t infinite_torch = 0x1BBD1C;
     const uintptr_t unbreakable_chests = 0x1D3C29;
-    const uintptr_t disappearing_chest_items = 0x1E35E3;
-    const uintptr_t equip_load = 0x34A79E;
-    const uintptr_t equip_load_menu = 0x99D71;
 #endif
 };
 
