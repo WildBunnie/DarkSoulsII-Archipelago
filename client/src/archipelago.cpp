@@ -1,6 +1,7 @@
 #include "archipelago.h"
 
 #include "patches.h"
+#include "params.h"
 #include "memory.h"
 #include "randomizer.h"
 #include "hooks.h"
@@ -125,13 +126,16 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		patch_infinite_torch(base_address);
 		patch_unbreakable_chests(base_address);
 		if (data.contains("no_weapon_req") && data.at("no_weapon_req") == 1) {
-			patch_weapon_requirements(base_address);
+			remove_weapon_requirements();
 		}
 		if (data.contains("no_spell_req") && data.at("no_spell_req") == 1) {
-			patch_spell_requirements(base_address);
+			remove_spell_requirements();
+		}
+		if (data.contains("no_armor_req") && data.at("no_armor_req") == 1) {
+			remove_armor_requirements();
 		}
 		if (data.contains("no_equip_load") && data.at("no_equip_load") == 1) {
-			patch_no_equip_load(base_address);
+			remove_weight_from_params();
 		}
 		if (data.contains("autoequip") && data.at("autoequip") == 1) {
 			autoequip = true;

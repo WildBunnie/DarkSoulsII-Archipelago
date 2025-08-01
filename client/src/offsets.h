@@ -134,6 +134,9 @@ namespace param_offsets {
     const std::vector<uintptr_t> item_lot_param2_chr = { 0x60, 0x28, 0x94, 0x0 };
     const std::vector<uintptr_t> player_status_param = { 0x18, 0x398, 0x94, 0x0 };
     const std::vector<uintptr_t> weapon_param = { 0x18, 0x210, 0x94, 0x0 };
+    const std::vector<uintptr_t> spell_param = { 0x18, 0x2A0, 0x94, 0x0 };
+    const std::vector<uintptr_t> armor_param = { 0x18, 0x250, 0x94, 0x0 };
+    const std::vector<uintptr_t> ring_param = { 0x18, 0x298, 0x94, 0x0 };
 #elif defined(_M_X64)
     const std::vector<uintptr_t> shop_lineup_param = { 0xA8, 0xB0, 0xD8, 0x0 };
     const std::vector<uintptr_t> item_param = { 0xA8, 0x20, 0xD8, 0x0 };
@@ -141,5 +144,8 @@ namespace param_offsets {
     const std::vector<uintptr_t> item_lot_param2_chr = { 0xA8, 0x50, 0xD8, 0x0 };
     const std::vector<uintptr_t> player_status_param = { 0x18, 0x730, 0xD8, 0x0 };
     const std::vector<uintptr_t> weapon_param = { 0x18, 0x420, 0xD8, 0x0 };
+    const std::vector<uintptr_t> spell_param = { 0x18, 0x540, 0xD8, 0x0 };
+    const std::vector<uintptr_t> armor_param = { 0x18, 0x4A0, 0xD8, 0x0 };
+    const std::vector<uintptr_t> ring_param = { 0x18, 0x530, 0xD8, 0x0 };
 #endif
 }

@@ -47,3 +47,86 @@ std::map<int32_t, int8_t> get_item_categories()
 
     return categories;
 }
+
+void remove_weapon_requirements()
+{
+    uintptr_t table_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::weapon_param);
+    ParamTable* table = (ParamTable*)table_ptr;
+
+    for (int i = 0; i < table->row_amount; ++i) {
+        ParamRow* row = &table->rows[i];
+        WEAPON_PARAM* param = (WEAPON_PARAM*)(table_ptr + row->reward_offset);
+
+        if (row->param_id < 1000000) continue; // ignore npc weapons
+
+        param->str_requirement = 0;
+        param->dex_requirement = 0;
+        param->int_requirement = 0;
+        param->fth_requirement = 0;
+    }
+}
+
+void remove_spell_requirements()
+{
+    uintptr_t table_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::spell_param);
+    ParamTable* table = (ParamTable*)table_ptr;
+
+    for (int i = 0; i < table->row_amount; ++i) {
+        ParamRow* row = &table->rows[i];
+        SPELL_PARAM* param = (SPELL_PARAM*)(table_ptr + row->reward_offset);
+
+        param->int_requirement = 0;
+        param->fth_requirement = 0;
+    }
+}
+
+void remove_armor_requirements()
+{
+    uintptr_t table_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::armor_param);
+    ParamTable* table = (ParamTable*)table_ptr;
+
+    for (int i = 0; i < table->row_amount; ++i) {
+        ParamRow* row = &table->rows[i];
+        ARMOR_PARAM* param = (ARMOR_PARAM*)(table_ptr + row->reward_offset);
+
+        param->strength_requirement = 0;
+        param->dexterity_requirement = 0;
+        param->intelligence_requirement = 0;
+        param->faith_requirement = 0;
+    }
+}
+
+void remove_weight_from_params()
+{
+    uintptr_t table_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::weapon_param);
+    ParamTable* table = (ParamTable*)table_ptr;
+
+    for (int i = 0; i < table->row_amount; ++i) {
+        ParamRow* row = &table->rows[i];
+        WEAPON_PARAM* param = (WEAPON_PARAM*)(table_ptr + row->reward_offset);
+
+        if (row->param_id < 1000000) continue; // ignore npc weapons
+
+        param->weight = 0.0f;
+    }
+
+    table_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::ring_param);
+    table = (ParamTable*)table_ptr;
+
+    for (int i = 0; i < table->row_amount; ++i) {
+        ParamRow* row = &table->rows[i];
+        RING_PARAM* param = (RING_PARAM*)(table_ptr + row->reward_offset);
+
+        param->weight = 0.0f;
+    }
+
+    table_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::armor_param);
+    table = (ParamTable*)table_ptr;
+
+    for (int i = 0; i < table->row_amount; ++i) {
+        ParamRow* row = &table->rows[i];
+        ARMOR_PARAM* param = (ARMOR_PARAM*)(table_ptr + row->reward_offset);
+
+        param->weight = 0.0f;
+    }
+}
