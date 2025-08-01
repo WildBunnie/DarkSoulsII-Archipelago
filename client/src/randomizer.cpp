@@ -151,14 +151,6 @@ void override_item_prices()
     }
 }
 
-bool is_valid_shop(int32_t param_id)
-{
-    if (param_id == 0) return false;
-    if (param_id >= 76801000 && param_id <= 76801306) return false; // skip straid trades
-    if (param_id >= 77601000 && param_id <= 77602121) return false; // skip ornifex trades
-    return true;
-}
-
 void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::string seed_str, std::set<int32_t> ignore)
 {
     // set all items base prices to 1 so that we can
@@ -177,11 +169,10 @@ void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::
     uintptr_t table_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::shop_lineup_param);
     ParamTable* table = (ParamTable*)table_ptr;
 
-    for (int i = 0; i < table->row_amount; ++i) {
+    for (int i = 1; i < table->row_amount; ++i) {
         ParamRow* row = &table->rows[i];
         SHOP_LINEUP_PARAM* param = (SHOP_LINEUP_PARAM*)(table_ptr + row->reward_offset);
 
-        if (!is_valid_shop(row->param_id)) continue;
         int32_t location_id = row->param_id + get_location_offset(ShopLineupParam_Location);
         if (ignore.contains(location_id)) continue;
         if (location_map.contains(location_id)) continue; // we deal with predefined items in the next for loop
@@ -206,7 +197,7 @@ void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::
     std::ranges::shuffle(non_unique_items, rng);
     std::ranges::shuffle(infinite_items, rng);
 
-    for (int i = 0; i < table->row_amount; ++i) {
+    for (int i = 1; i < table->row_amount; ++i) {
         ParamRow* row = &table->rows[i];
 
         int32_t param_id = row->param_id;
@@ -216,8 +207,6 @@ void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::
         if (shop_prices.contains(param_id)) {
             param->price_rate = shop_prices.at(param_id); 
         }
-
-        if (!is_valid_shop(row->param_id)) continue;
 
         int32_t location_id = param_id + get_location_offset(ShopLineupParam_Location);
         if (ignore.contains(location_id)) continue;
