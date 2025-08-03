@@ -9,6 +9,10 @@ class NoSpellRequirements(Toggle):
     """Remove the requirements to cast spells"""
     display_name = "No Spell Requirements"
 
+class NoArmorRequirements(Toggle):
+    """Remove the requirements to wear armor"""
+    display_name = "No Armor Requirements"
+
 class NoEquipLoad(Toggle):
     """Disable the equip load constraint from the game."""
     display_name = "No Equip Load"
@@ -99,6 +103,7 @@ class DS2Options(PerGameCommonOptions):
     death_link: DeathLink
     no_weapon_req: NoWeaponRequirements
     no_spell_req: NoSpellRequirements
+    no_armor_req: NoArmorRequirements
     no_equip_load: NoEquipLoad
     autoequip: AutoEquip
     randomize_starting_loadout: RandomizeStartingLoadout
