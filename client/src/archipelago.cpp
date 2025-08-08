@@ -124,7 +124,6 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		uintptr_t base_address = get_base_address();
 
 		patch_infinite_torch(base_address);
-		patch_unbreakable_chests(base_address);
 		if (data.contains("no_weapon_req") && data.at("no_weapon_req") == 1) {
 			remove_weapon_requirements();
 		}
