@@ -9,6 +9,7 @@ struct APLocationReward {
 	int32_t item_id;        // id of the item in archipelago
 	int32_t real_item_id;   // id of the item to be given to the player
 	std::string item_name;
+	int32_t amount;
 };
 
 struct APLocation {

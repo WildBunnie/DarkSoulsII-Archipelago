@@ -42,8 +42,8 @@ bool _died_by_deathlink = false;
 int last_received_index = -1;
 std::set<int32_t> locations_to_ignore;
 std::queue<APClient::NetworkItem> items_to_give;
-std::unordered_map<int32_t, int32_t> ap_to_game_id;
-std::unordered_map<int32_t, std::vector<int32_t>> game_to_ap_id;
+std::unordered_map<int32_t, int32_t> ap_to_location_id;
+std::unordered_map<int32_t, std::vector<int32_t>> location_to_ap_id;
 std::set<int32_t> item_bundles;
 
 enum ItemsHandling {
@@ -139,16 +139,16 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		if (data.contains("autoequip") && data.at("autoequip") == 1) {
 			autoequip = true;
 		}
-		if (data.contains("ap_to_game_id")) {
-			for (auto& [key, val] : data.at("ap_to_game_id").items())
+		if (data.contains("ap_to_location_id")) {
+			for (auto& [key, val] : data.at("ap_to_location_id").items())
 			{
 				int32_t int_key = std::stoi(key);
 				int32_t int_val = val.get<int32_t>();
-				ap_to_game_id[int_key] = int_val;
+				ap_to_location_id[int_key] = int_val;
 			}
 		}
-		if (data.contains("game_to_ap_id")) {
-			for (auto& [key, val] : data.at("game_to_ap_id").items()) {
+		if (data.contains("location_to_ap_id")) {
+			for (auto& [key, val] : data.at("location_to_ap_id").items()) {
 				int32_t int_key = std::stoi(key);
 
 				std::vector<int32_t> ids;
@@ -156,7 +156,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 					ids.push_back(id.get<int32_t>());
 				}
 
-				game_to_ap_id[int_key] = std::move(ids);
+				location_to_ap_id[int_key] = std::move(ids);
 			}
 		}
 		if (data.contains("item_bundles")) {
@@ -226,7 +226,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		std::map<int32_t, APLocation> location_map;
 
 		for (const auto& item : items) {
-			int32_t item_location = ap_to_game_id[item.location];
+			int32_t item_location = ap_to_location_id[item.location];
 
 			APLocation& location = location_map[item_location]; // inserts if not present
 			assert(location.reward_amount < 10 && "location can't have more than 10 rewards");
@@ -265,6 +265,16 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 				std::string player_name = ap->get_player_alias(item.player);
 				std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));
 				reward.item_name = player_name + "'s " + item_name;
+			}
+
+			// convert bundle item id to the item with the amount
+			if (item_bundles.contains(reward.real_item_id)) {
+				int bundle_amount = reward.real_item_id % 1000;
+				reward.real_item_id -= bundle_amount;
+				reward.amount = bundle_amount;
+			}
+			else {
+				reward.amount = 1;
 			}
 
 			location.rewards[location.reward_amount++] = reward;
@@ -363,9 +373,9 @@ void check_locations(std::list<int32_t> locations)
 
 	for (auto& location : locations)
 	{
-		if (game_to_ap_id.contains(location))
+		if (location_to_ap_id.contains(location))
 		{
-			for (auto& ap_id : game_to_ap_id[location]) {
+			for (auto& ap_id : location_to_ap_id[location]) {
 				checks.push_back(static_cast<int64_t>(ap_id));
 			}
 		}
