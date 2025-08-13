@@ -1,111 +1,120 @@
-from .Regions import region_connections
-
-from typing import ClassVar, Dict, Optional, List
+from typing import ClassVar, Dict, Optional, List, Set
 from dataclasses import dataclass
 import re
 
+from BaseClasses import ItemClassification
+from .Enums import ItemCategory
+from .Items import item_list
+
 @dataclass
 class LocationData:
+    location_id: int
+    """
+    A unique identifier for each pickup, reward, or shop in the game.
 
-    param_id: int
-    """The id for this location in the game params
-    
-    This is not exactly the id of the param but is actually
-    the id of the param + an offset. This offset is required
-    because there are different params in different tables
-    with the same id, causing overlap problems.
+    Multiple Archipelago locations may share the same locaton ID because a single 
+    pickup or reward can contain multiple items. For example, a pickup with 5 items will 
+    correspond to 5 different Archipelago locations, all sharing the same location ID.
 
-    The offsets for the different tables are the following:
+    This is the ID of the param in the game plus an offset. The offset is necessary 
+    to avoid collisions because different param tables can contain overlapping IDs.
 
-    - ItemLotParam2_Chr     100000000
-    - ItemLotParam2_Other   200000000
-    - ShopLineupParam       300000000
+    The offsets for the different param tables are:
+    - ItemLotParam2_Chr     : 100,000,000  (drops)
+    - ItemLotParam2_Other   : 200,000,000  (rewards and map pickups)
+    - ShopLineupParam       : 300,000,000  (shops)
 
-    For example, the shop param with id 72500304 will become:
-    72500304 + 300000000 = 372500304
+    For instance, a shop param with an ID of 77,700,400 becomes:  
+    77,700,400 + 300,000,000 = 377,700,400
     """
 
     name: str
-    """The Archipelago name for this location
-    
-    The format for the location names is the following:
-    <region>: <original item> - <description>
+    """
+    The Archipelago name for this location.
+
+    Location names follow one of these formats:
+    - `<region>: <original item> - <description>`
+    - `<region>: <original item>` (if the item name clearly indicates the location, the description may be omitted)
     """
 
-    __next_address: ClassVar[int] = 100000
+    __next_address: ClassVar[int] = 1000
     """The next address to be used when creating a new location."""
 
     address: Optional[int] = None
-    """The Archipelago address for this location"""
+    """The Archipelago address for this location."""
 
-    original_item: Optional[str] = None
-    """The item that is found at this location in the non randomized game"""
+    original_item_name: Optional[str] = None
+    """The name of the item that is found at this location in the non randomized game."""
 
     sotfs: bool = False
-    """Whether this location is only in the SOTFS version of the game"""
+    """Whether this location is only in the Scholar of the First Sin version of the game."""
 
     vanilla: bool = False
-    """Whether this location is only in the Vanilla version of the game"""
+    """Whether this location is only in the Vanilla version of the game."""
 
     shop: bool = False
-    """Whether this location is part of a shop"""
+    """Whether this location is part of a shop."""
 
     event: bool = False
-    """Whether this location is an Archipelago event"""
+    """Whether this location is an Archipelago event."""
 
     missable: bool = False
-    """Whether this location can become in some way unreachable by the player.
-    
-    By default all pickups and shop locations are marked as missable. Pickups are marked
-    as missable since they disappear if the player dies before picking them up. Shop
-    locations are marked as missable since the player can kill the npcs causing problems.
-    """
+    """Whether this location can become in some way unreachable by the player."""
 
     keep_original_item: bool = False
-    """Whether this location will have it's original item"""
+    """Whether this location will have it's original item."""
+
+    remaining_statues = [item for item in item_list if item.category == ItemCategory.STATUE]
+    def normalize_item_name(item_name, vanilla_only):
+        replacements = {
+            "Pharros' Lockstone": "Master Lockstone",
+            "Smelter Wedge": "Smelter Wedge x11",
+            "Smelter Wedge x4": "Smelter Wedge x11",
+            "Smelter Wedge x6": "Smelter Wedge x11",
+        }
+        if item_name in replacements:
+            return replacements[item_name]
+        
+        if item_name == "Fragrant Branch of Yore":
+            for i, statue in enumerate(LocationData.remaining_statues):
+                if not statue.sotfs or not vanilla_only:
+                    return LocationData.remaining_statues.pop(i).name
+
+        return item_name
 
     def __post_init__(self):
-        if self.param_id == None:
+
+        assert 100000000 <= self.location_id < 400000000, f"Invalid location_id: {self.location_id}"
+
+        if self.location_id == None:
             self.event = True
             self.address = None
             return
 
-        assert 100000000 <= self.param_id < 400000000, f"Invalid param id: {self.param_id}"
-
-        # ShopLineupParam (shops)
-        if self.param_id >= 300000000:
+        # enemy drops
+        if 100000000 <= self.location_id < 200000000:
+            self.missable = True
+        # shops
+        elif 300000000 <= self.location_id < 400000000:
             self.shop = True
-            self.missable = True
-        # ItemLotParam2_Other (map items and rewards)
-        elif self.param_id >= 200000000:
-            pass
-        # ItemLotParam2_Chr (enemy drops)
-        elif self.param_id >= 100000000:
-            self.missable = True
-        
-        match = re.match(r'^(.*?): (.*?) - (.*)$', self.name)
 
-        if match != None:
-            _, item_name, _ = match.groups()
-        else:
-            # some locations dont need the descrition
-            # like `AK: Guardian Dragon Soul`
-            match = re.match(r'^(.*?): (.*?)$', self.name)
-            assert match is not None, f"Invalid location name format: {self.name}"
-            _, item_name = match.groups()
-        
-        self.original_item = item_name
+        match = re.match(r'^(.*?): (.*?)(?: - .*?)?$', self.name)
+        assert match, f"Invalid location name format: {self.name}"
+
+        _, item_name = match.groups()
+        self.original_item_name = LocationData.normalize_item_name(item_name, self.vanilla)
 
         self.address = LocationData.__next_address
         LocationData.__next_address += 1
 
-location_table: Dict[str, List[LocationData]] = {
+locations_by_region: Dict[str, List[LocationData]] = {
     "Aldias Keep": [
         LocationData(200212000, 'AK: Guardian Dragon Soul'),
-        LocationData(210155000, 'AK: Great Magic Barrier - right of mirror room'),
-        LocationData(210155010, 'AK: Bonfire Ascetic x2 - right side after Skeleton Dragon staircase'),
+        LocationData(210155000, 'AK: Great Magic Barrier - mirror room, right side corridor'),
+        LocationData(210155010, 'AK: Bonfire Ascetic x2 - after big staircase, right side'),
+        LocationData(210155020, 'AK: Malformed Shell - behind breakable chained door'),
         LocationData(210155030, 'AK: Brightbug - mirror room, chest', sotfs=True),
-        LocationData(210156000, 'AK: Fading Soul - by Skeleton Dragon'),
+        LocationData(210156000, 'AK: Fading Soul - by skeleton dragon'),
         LocationData(210156010, 'AK: Northern Ritual Band+2 - mirror room'),
         LocationData(210156010, 'AK: Petrified Dragon Bone - mirror room'),
         LocationData(210156020, 'AK: Alluring Skull x3 - courtyard'),
@@ -113,7 +122,7 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210156040, 'AK: Large Soul of a Brave Warrior - locked side room, behind barrel'),
         LocationData(210156050, "AK: Simpleton's Spice - room before boss"),
         LocationData(210156050, 'AK: Twilight Herb - room before boss'),
-        LocationData(210156060, 'AK: Crimson Water - after Skeleton Dragon staircase'),
+        LocationData(210156060, 'AK: Crimson Water - after big staircase'),
         LocationData(210156070, 'AK: Soul Geyser - acid pool'),
         LocationData(210156070, 'AK: Petrified Dragon Bone - acid pool'),
         LocationData(210156080, 'AK: Poison Throwing Knife x10 - courtyard'),
@@ -129,37 +138,42 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210156170, 'AK: Petrified Dragon Bone - courtyard'),
         LocationData(210156180, 'AK: Radiant Lifegem - courtyard, water fountain'),
         LocationData(210156190, 'AK: Twilight Herb - courtyard, left side after stairs'),
-        LocationData(210156200, 'AK: Large Soul of a Brave Warrior - mirror room', sotfs=True),
-        LocationData(260050000, 'AK: Aldia Key - Skeleton Dragon after four invaders', sotfs=True),
+        LocationData(210156200, 'AK: Large Soul of a Brave Warrior - mirror room, stuck in mirror', sotfs=True),
+        LocationData(260050000, 'AK: Aldia Key - skeleton dragon after four invaders', sotfs=True),
     ],
     "Belfry Luna": [
         LocationData(200324000, 'BL: Belfry Gargoyle Soul'),
         LocationData(210165200, 'BL: Radiant Lifegem x2 - topmost floor, chest'),
         LocationData(210165200, 'BL: Twilight Herb x2 - topmost floor, chest'),
-        LocationData(210165220, 'BL: Blue Tearstone Ring - second floor, drop from hole, chest'),
+        LocationData(210165220, 'BL: Blue Tearstone Ring - drop from second floor hole, chest'),
         LocationData(210165230, 'BL: Southern Ritual Band - after boss'),
         LocationData(210166140, "BL: Skeptic's Spice - second floor"),
-        LocationData(210166160, "BL: Skeptic's Spice - second floor, drop from hole"),
+        LocationData(210166160, "BL: Skeptic's Spice - drop from second floor hole"),
         LocationData(210166170, "BL: Skeptic's Spice - topmost floor, behind pillar"),
         LocationData(210166250, 'BL: Bastille Key - pit after boss, lower level', vanilla=True),
-        LocationData(210166250, 'BL: Dragon Tooth - pit after boss, lower level', sotfs=True),
+        LocationData(210166250, 'BL: Dragon Tooth - pit after boss, lower level', sotfs=True, keep_original_item=True),
         LocationData(210166250, 'BL: Petrified Something - pit after boss, lower level', sotfs=True),
         LocationData(210166250, 'BL: Brightbug - pit after boss, lower level', sotfs=True),
         LocationData(210166390, 'BL: Falchion - pit after boss, upper level'),
         LocationData(210166400, 'BL: Soul of a Proud Knight - boss arena'),
     ],
     "Belfry Sol": [
+        LocationData(210195050, 'BS: Black Knight Greatsword - after exit, illusory wall'),
+        LocationData(210195060, 'BS: Protective Chime - after exit, illusory wall'),
+        LocationData(210195060, 'BS: Grand Spirit Tree Shield - after exit, illusory wall'),
         LocationData(210195120, 'BS: Immolation - by exit, chest'),
-        LocationData(210195130, 'BS: Thunder Quartz Ring+1 - by bonfire, chest'),
+        LocationData(210195130, 'BS: Thunder Quartz Ring+1 - before bonfire, chest'),
         LocationData(210196000, "BS: Simpleton's Spice - right of bell ladder"),
-        LocationData(210196010, "BS: Simpleton's Spice - right side of sloped roof"),
-        LocationData(210196020, "BS: Simpleton's Spice - by ladder near the exit"),
-        LocationData(210196200, 'BS: Human Effigy - bottom of stairs after exit'),
-        LocationData(210196200, 'BS: Triclops Snake Troches - bottom of stairs after exit'),
+        LocationData(210196010, "BS: Simpleton's Spice - sloped roof"),
+        LocationData(210196020, "BS: Simpleton's Spice - by ladder near exit"),
+        LocationData(210196200, 'BS: Human Effigy - after exit, bottom of stairs '),
+        LocationData(210196200, 'BS: Triclops Snake Troches - after exit, bottom of stairs '),
     ],
     "Black Gulch": [
         LocationData(200326000, 'BG: Soul of the Rotten'),
-        LocationData(210255050, 'BG: Divine Blessing - second side tunnel', missable=True),
+        LocationData(210255050, 'BG: Divine Blessing - second side tunnel'),
+        LocationData(210255090, 'BG: Ring of Giants+1 - side room in cave below, chest'),
+        LocationData(210255090, 'BG: Petrified Dragon Bone - side room in cave below, chest'),
         LocationData(210255120, 'BG: Sublime Bone Dust - after boss', vanilla=True),
         LocationData(210255120, 'BG: Petrified Something - after boss', sotfs=True),
         LocationData(210255120, "BG: Simpleton's Spice - after boss", sotfs=True),
@@ -167,16 +181,108 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210255130, 'BG: Shotel - first side tunnel'),
         LocationData(210255130, 'BG: Great Magic Weapon - first side tunnel'),
         LocationData(210256210, 'BG: Fire Seed - boss arena'),
+        LocationData(210256350, 'BG: Silver Talisman x4 - cave below, behind elevator'),
         LocationData(210256360, "BG: Pharros' Lockstone - by second bonfire"),
         LocationData(210256370, 'BG: Large Soul of a Nameless Soldier - first urn'),
         LocationData(210256380, 'BG: Scraps of Life - second urn'),
         LocationData(210256380, 'BG: Torch - second urn'),
         LocationData(210256390, 'BG: Radiant Lifegem - third urn'),
+        LocationData(260001000, 'BG: Forgotten Key - cave below, enemy drop'),
+        LocationData(260001000, 'BG: Soul of a Giant - cave below, enemy drop'),
     ],
     "Brume Tower": [
-        LocationData(200305010, 'BT: Smelter Demon Soul'),
+        LocationData(250365000, 'BT: Bonfire Ascetic - above second Ashen Idol, chest'),
+        LocationData(250365000, 'BT: Human Effigy x2 - above second Ashen Idol, chest'),
+        LocationData(250365010, 'BT: Caestus - before second bonfire, chest'),
+        LocationData(250365030, 'BT: Old Radiant Lifegem x3 - cursed area, chest on left'),
+        LocationData(250365090, 'BT: Twinkling Titanite x3 - corridor by second bonfire, chest'),
+        LocationData(250365500, 'BT: Old Radiant Lifegem x4 - after second Ashen Idol, illusory wall'),
+        LocationData(250365500, 'BT: Wilted Dusk Herb x4 - after second Ashen Idol, illusory wall'),
+        LocationData(250365510, 'BT: Soul Vessel x2 - after second Ashen Idol, illusory wall'),
+        LocationData(250365540, 'BT: Catarina Gauntlets - moving heads room, explodable wall'),
+        LocationData(250365540, 'BT: Catarina Leggings - moving heads room, explodable wall'),
+        LocationData(250365560, 'BT: Titanite Slab - second Ashen Idol, chest up the ladder'),
+        LocationData(250365570, 'BT: Fire Snake - cursed area, chest on right'),
+        LocationData(250365590, 'BT: Petrified Dragon Bone x8 - moving heads room, explodable wall'),
+        LocationData(250365700, 'BT: Bonfire Ascetic x2 - top of first side tower, chest'),
+        LocationData(250366000, 'BT: Dance of Fire - room by second Ashen Idol'),
+        LocationData(250366020, 'BT: Old Growth Balm x2 - topmost platform of central pillar'),
+        LocationData(250366030, 'BT: Twilight Herb x2 - first ash field, on corpse'),
+        LocationData(250366170, 'BT: Spell Quartz Ring+3 - by third bonfire'),
+        LocationData(250366260, 'BT: Flame Quartz Ring+3 - lever room'),
+        LocationData(250366280, 'BT: Dried Root - after lever room'),
+        LocationData(250366300, 'BT: Large Titanite Shard x5 - after lever room'),
+        LocationData(250366310, 'BT: Human Effigy - after lever room'),
+        LocationData(250366320, 'BT: Twinkling Titanite x2 - after lever room'),
+        LocationData(250366340, 'BT: Dexterity Ring - stairs behind first Ashen Idol'),
+        LocationData(250366350, 'BT: Rouge Water - first ash field, by iron bars'),
+        LocationData(250366360, 'BT: Scythe - after first ash field, on platform'),
+        LocationData(250366370, 'BT: Prism Stone x10 - second Ashen Idol, up the ladder'),
+        LocationData(250366380, 'BT: Blackweed Balm - after first ash field, on platform'),
+        LocationData(250366390, "BT: Lloyd's Talisman x5 - after second Ashen Idol, on corpse "),
+        LocationData(250366440, 'BT: Radiant Lifegem x3 - lever room, up the ladder'),
+        LocationData(250366480, 'BT: Human Effigy - above big ash field'),
+        LocationData(250366510, 'BT: Raw Stone - before bridge to first side tower'),
+        LocationData(250366520, 'BT: Large Titanite Shard x5 - cursed area, on altar'),
+        LocationData(250366570, 'BT: Dried Root - in shortcut to second side tower'),
+        LocationData(250366580, 'BT: Magic Stone x2 - after third bonfire'),
+        LocationData(250366800, 'BT: Majestic Greatsword - bottom of first side tower, chest'),
+        LocationData(250366810, 'BT: Alonne Greatbow - first side tower, center platform'),
+        LocationData(250366820, 'BT: Silver Talisman x5 - first side tower, on stairs'),
+        LocationData(250366900, 'BT: Goldenfruit Balm x2 - first area with fiery bulls'),
+        LocationData(250367090, 'BT: Dried Root - second side tower, besides ladder'),
+        LocationData(250367100, 'BT: Petrified Dragon Bone x2 - second side tower, first corridor'),
+        LocationData(250367110, 'BT: Twinkling Titanite x2 - second side tower, behind door'),
+        LocationData(250367120, 'BT: Recollection - second side tower, behind door'),
+        LocationData(250368000, 'BT: Large Soul of a Proud Knight - first ash field, ash statue'),
+        LocationData(250368020, 'BT: Old Mundane Stone x2 - after second Ashen Idol, ash statue'),
+        LocationData(250368030, 'BT: Soul of a Great Hero - big ash field, ash statue'),
+        LocationData(250368040, 'BT: Large Soul of a Proud Knight - big ash field, ash statue'),
+        LocationData(250368050, 'BT: Soul of a Hero - big ash field, ash statue'),
+        LocationData(250368060, 'BT: Palestone x2 - first side tower, ash statue'),
+        LocationData(260012000, 'BT: Soul of Nadalia, Bride of Ash - second Ashen Idol'),
+        LocationData(260012050, 'BT: Soul of Nadalia, Bride of Ash - lever room, Ashen Idol'),
+        LocationData(260012070, 'BT: Soul of Nadalia, Bride of Ash - cursed area, Ashen Idol'),
+        LocationData(260012080, 'BT: Soul of Nadalia, Bride of Ash - first side tower, Ashen Idol'),
+        LocationData(260012100, 'BT: Soul of Nadalia, Bride of Ash - by first bonfire, Ashen Idol'),
+        LocationData(260014000, 'BT: Scorching Iron Scepter - bottom of second side tower'),
+        LocationData(260019000, 'BT: Smelter Wedge x6 - before first bridge'),
+    ],
+    "Brume Tower - Scepter": [
         LocationData(200675000, 'BT: Soul of the Fume Knight'),
-        LocationData(200680000, 'BT: Soul of Sir Alonne'),
+        LocationData(200675000, 'BT: Soul of Nadalia, Bride of Ash - end boss drop'),
+        LocationData(250365020, 'BT: Life Ring+3 - room opposite of second bonfire, chest'),
+        LocationData(250365080, 'BT: Sorcery Clutch Ring - before end boss elevator, chest'),
+        LocationData(250365550, "BT: Pilgrim's Spontoon - jump from elevator by second bonfire"),
+        LocationData(250365580, 'BT: Brightbug x2 - jump from elevator going up from third bonfire'),
+        LocationData(250365690, 'BT: Hollow Skin - elevator towards MoOIK, illusory wall'),
+        LocationData(250366070, "BT: Simpleton's Ring - room by second bonfire, outside"),
+        LocationData(250366210, 'BT: Tower Key - ash field below third bonfire'),
+        LocationData(250366240, 'BT: Titanite Shard x10 - doors room'),
+        LocationData(250366250, 'BT: Titanite Slab - doors room'),
+        LocationData(250366250, 'BT: Titanite Chunk x3 - doors room'),
+        LocationData(250366530, 'BT: Old Radiant Lifegem x4 - room by second bonfire, under fiery bull'),
+        LocationData(250366710, 'BT: Human Effigy x2 - ash field below third bonfire'),
+        LocationData(250366720, "BT: Skeptic's Spice - ash field below third bonfire"),
+        LocationData(250366760, 'BT: Partizan - towards end boss, above lever room'),
+        LocationData(250366830, 'BT: Wilted Dusk Herb x2 - ash field below third bonfire'),
+        LocationData(250366850, 'BT: Titanite Chunk x2 - ash field below third bonfire'),
+        LocationData(250366860, 'BT: Twinkling Titanite x2 - ash field below third bonfire'),
+        LocationData(250366870, 'BT: Charcoal Pine Resin x5 - ash field below third bonfire'),
+        LocationData(250366880, 'BT: Broadsword - doors room'),
+        LocationData(250366890, 'BT: Petrified Something - doors room'),
+        LocationData(250367130, 'BT: Flame Butterfly x5 - doors room'),
+        LocationData(250367140, 'BT: Baneful Bird Ring - by first bonfire, on railing'),
+        LocationData(250368010, 'BT: Soul of a Brave Warrior - left side before end boss, ash statue'),
+        LocationData(250368070, 'BT: Large Soul of a Nameless Soldier - ash field below third bonfire, ash statue'),
+        LocationData(250368080, 'BT: Titanite Chunk x3 - right side before end boss, ash statue'),
+        LocationData(260012010, 'BT: Soul of Nadalia, Bride of Ash - left side before end boss, Ashen Idol #1'),
+        LocationData(260012020, 'BT: Soul of Nadalia, Bride of Ash - left side before end boss, Ashen Idol #2'),
+        LocationData(260012030, 'BT: Soul of Nadalia, Bride of Ash - right side before end boss, Ashen Idol #1'),
+        LocationData(260012040, 'BT: Soul of Nadalia, Bride of Ash - right side before end boss, Ashen Idol #2'),
+        LocationData(260012060, 'BT: Soul of Nadalia, Bride of Ash - towards MoOIK, Ashen Idol'),
+        LocationData(260012090, 'BT: Soul of Nadalia, Bride of Ash - doors room, Ashen Idol'),
+        LocationData(260016000, 'BT: Crown of the Old Iron King - after end boss'),
     ],
     "Cathedral of Blue": [
         LocationData(200625000, 'CoB: Old Dragonslayer Soul'),
@@ -193,57 +299,55 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(200862000, 'CotD: Twinkling Titanite x3 - boss drop'),
         LocationData(200862000, 'CotD: Petrified Dragon Bone x3 - boss drop'),
         LocationData(200862000, 'CotD: Titanite Slab - boss drop'),
+        LocationData(250355140, 'CotD: Dark Greatsword - middle of elevator, chest'),
+        LocationData(250355150, 'CotD: Petrified Something x3 - second room, chest'),
+        LocationData(250355180, 'CotD: Flower Skirt - after boss, chest'),
+        LocationData(250356210, 'CotD: Blackweed Balm x3 - after boss, on corpse'),
+        LocationData(250356390, 'CotD: Torch x5 - middle of elevator, on ledge'),
+        LocationData(250356610, 'CotD: Brightbug x2 - second room'),
+        LocationData(250356620, 'CotD: Bonfire Ascetic x3 - second room'),
+        LocationData(250356670, 'CotD: Alluring Skull x3 - before boss, right side'),
     ],
     "Doors of Pharros": [
         LocationData(200223500, 'DoP: Royal Rat Authority Soul'),
         LocationData(200223500, 'DoP: Rat Tail - boss drop'),
+        LocationData(210335030, 'DoP: Dragon Charm - left after first stairs, chest'),
+        LocationData(210336000, 'DoP: Prism Stone x10 - in water before bonfire'),
     ],
     "Drangleic Castle": [
         LocationData(200309610, 'DC: Dragonrider Soul'),
         LocationData(200504000, 'DC: Looking Glass Knight Soul'),
-        LocationData(372110000, 'DC: Flamberge - Wellager shop'),
-        LocationData(372110001, 'DC: Lucerne - Wellager shop'),
-        LocationData(372110303, 'DC: Great Magic Barrier - Wellager shop'),
-        LocationData(372110400, 'DC: Bracing Knuckle Ring+1 - Wellager shop'),
-        LocationData(372110602, 'DC: Divine Blessing - Wellager shop'),
-        LocationData(376100239, 'MAJ: Looking Glass Mask - Maughlin shop after killing second DC boss'),
-        LocationData(376100240, 'MAJ: Looking Glass Armor - Maughlin shop after killing second DC boss'),
-        LocationData(376100241, 'MAJ: Looking Glass Gauntlets - Maughlin shop after killing second DC boss'),
-        LocationData(376100242, 'MAJ: Looking Glass Leggings - Maughlin shop after killing second DC boss'),
-    ],
-    "Throne of Want": [
-        LocationData(200332000, 'TW: Throne Defender Soul'),
-        LocationData(200332000, 'TW: Throne Watcher Soul'),
-        LocationData(200627000, 'TW: Soul of Nashandra'),
-        LocationData(376100251, 'MAJ: Throne Defender Helm - Maughlin shop after killing first TW boss'),
-        LocationData(376100252, 'MAJ: Throne Defender Armor - Maughlin shop after killing first TW boss'),
-        LocationData(376100253, 'MAJ: Throne Defender Gauntlets - Maughlin shop after killing first TW boss'),
-        LocationData(376100254, 'MAJ: Throne Defender Leggings - Maughlin shop after killing first TW boss'),
-        LocationData(376100255, 'MAJ: Throne Watcher Helm - Maughlin shop after killing first TW boss'),
-        LocationData(376100256, 'MAJ: Throne Watcher Armor - Maughlin shop after killing first TW boss'),
-        LocationData(376100257, 'MAJ: Throne Watcher Gauntlets - Maughlin shop after killing first TW boss'),
-        LocationData(376100258, 'MAJ: Throne Watcher Leggings - Maughlin shop after killing first TW boss'),
+        LocationData(372110000, 'DC: Flamberge - Wellager shop', missable=True),
+        LocationData(372110001, 'DC: Lucerne - Wellager shop', missable=True),
+        LocationData(372110303, 'DC: Great Magic Barrier - Wellager shop', missable=True),
+        LocationData(372110400, 'DC: Bracing Knuckle Ring+1 - Wellager shop', missable=True),
+        LocationData(372110602, 'DC: Divine Blessing - Wellager shop', missable=True),
+        LocationData(376100239, 'MAJ: Looking Glass Mask - Maughlin shop after killing second DC boss', missable=True),
+        LocationData(376100240, 'MAJ: Looking Glass Armor - Maughlin shop after killing second DC boss', missable=True),
+        LocationData(376100241, 'MAJ: Looking Glass Gauntlets - Maughlin shop after killing second DC boss', missable=True),
+        LocationData(376100242, 'MAJ: Looking Glass Leggings - Maughlin shop after killing second DC boss', missable=True),
     ],
     "Forest of Fallen Giants": [
         LocationData(200309600, 'FOFG: Soul of the Last Giant'),
         LocationData(200309600, 'FOFG: Soldier Key - first boss drop'),
-        LocationData(200318000, 'FOFG: Soul of the Pursuer', missable=True),
-        LocationData(200318000, 'FOFG: Ring of Blades - second boss drop', missable=True),
-        LocationData(201744020, 'FOFG: White Sign Soapstone - Pate after escaping gate trap', missable=True),
+        LocationData(200318000, 'FOFG: Soul of the Pursuer'),
+        LocationData(200318000, 'FOFG: Ring of Blades - second boss drop'),
+        LocationData(201744020, 'FOFG: White Sign Soapstone - Pate after escaping gate trap'),
         LocationData(201751000, 'FOFG: House Key - Cale', missable=True),
-        LocationData(210105010, 'FOFG: Small Leather Shield - above cardinal tower, wooden chest'),
-        LocationData(210105010, 'FOFG: Repair Powder - above cardinal tower, wooden chest'),
+        LocationData(210105010, 'FOFG: Small Leather Shield - above Cardinal Tower, wooden chest'),
+        LocationData(210105010, 'FOFG: Repair Powder - above Cardinal Tower, wooden chest'),
         LocationData(210105020, 'FOFG: Human Effigy - from MAJ, under bridge'),
         LocationData(210105030, 'FOFG: Life Ring - side room under ballista room'),
         LocationData(210105030, 'FOFG: Large Titanite Shard - side room under ballista room'),
         LocationData(210105040, 'FOFG: Titanite Shard - under ballista room, chest'),
         LocationData(210105050, "FOFG: Ring of Restoration - side corridor towards king's door, chest"),
         LocationData(210105050, "FOFG: Torch x3 - side corridor towards king's door, chest"),
-        LocationData(210105070, 'FOFG: Estus Flask Shard - above cardinal tower, metal chest', vanilla=True),
-        LocationData(210105070, 'FOFG: Small White Sign Soapstone - above cardinal tower, metal chest'),
-        LocationData(210105070, 'FOFG: Radiant Lifegem x2 - above cardinal tower, metal chest', sotfs=True),
+        LocationData(210105070, 'FOFG: Estus Flask Shard - above Cardinal Tower, metal chest', vanilla=True),
+        LocationData(210105070, 'FOFG: Small White Sign Soapstone - above Cardinal Tower, metal chest'),
+        LocationData(210105070, 'FOFG: Radiant Lifegem x2 - above Cardinal Tower, metal chest', sotfs=True),
         LocationData(210105080, "FOFG: Chloranthy Ring - under ballista room, Pharros' contraption"),
         LocationData(210105090, "FOFG: Titanite Slab - under ballista room, Pharros' contraption"),
+        LocationData(210105110, 'FOFG: Flame Quartz Ring+1 - fire pit, upper level, chest'),
         LocationData(210105120, "FOFG: Large Soul of a Proud Knight - by Soldier's Rest bonfire, chest"),
         LocationData(210105120, "FOFG: Hunter's Hat - by Soldier's Rest bonfire, chest"),
         LocationData(210105120, "FOFG: Leather Armor - by Soldier's Rest bonfire, chest"),
@@ -254,7 +358,7 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210105150, "FOFG: Amber Herb x2 - by king's door, chest", sotfs=True),
         LocationData(210106000, 'FOFG: Soul of a Lost Undead - end of water stream'),
         LocationData(210106020, 'FOFG: Lifegem - by first bonfire', vanilla=True),
-        LocationData(210106050, 'FOFG: Divine Blessing - above cardinal tower, tree branch'),
+        LocationData(210106050, 'FOFG: Divine Blessing - above Cardinal Tower, tree branch'),
         LocationData(210106090, 'FOFG: Lifegem - above door leading to second boss'),
         LocationData(210106090, 'FOFG: Homeward Bone - above door leading to second boss'),
         LocationData(210106100, 'FOFG: Halberd - on huge sword'),
@@ -272,8 +376,8 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210106440, 'FOFG: Great Soul Arrow - middle of ballista room'),
         LocationData(210106450, 'FOFG: Large Soul of a Lost Undead - middle of ballista room'),
         LocationData(210106450, 'FOFG: Blue Wooden Shield - middle of ballista room'),
-        LocationData(210106490, 'FOFG: Hand Axe - above cardinal tower, behind wagon'),
-        LocationData(210106490, 'FOFG: Radiant Lifegem - above cardinal tower, behind wagon'),
+        LocationData(210106490, 'FOFG: Hand Axe - above Cardinal Tower, behind wagon'),
+        LocationData(210106490, 'FOFG: Radiant Lifegem - above Cardinal Tower, behind wagon'),
         LocationData(210106510, "FOFG: Grand Lance - by king's door", sotfs=True),
         LocationData(260002000, "FOFG: Seed of a Tree of Giants - by Solider's Rest bonfire, on tree"),
         LocationData(375400000, 'FOFG: Broken Straight Sword - Melentia shop'),
@@ -341,9 +445,9 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210176600, 'HV: Washing Pole - poison area before EP', sotfs=True),
         LocationData(210176610, 'HV: Dragon Charm - poison area before EP', sotfs=True),
         LocationData(210176620, 'HV: Titanite Shard - poison area before EP #3', sotfs=True),
-        LocationData(376200300, 'HV: Soul Appease - Chloanne shop'),
-        LocationData(376200301, 'HV: Dead Again - Chloanne shop'),
-        LocationData(376200618, 'HV: Bonfire Ascetic - Chloanne shop'),
+        LocationData(376200300, 'HV: Soul Appease - Chloanne shop', missable=True),
+        LocationData(376200301, 'HV: Dead Again - Chloanne shop', missable=True),
+        LocationData(376200618, 'HV: Bonfire Ascetic - Chloanne shop', missable=True),
     ],
     "Heides Tower of Flame": [
         LocationData(200611000, 'HToF: Dragonrider Soul'),
@@ -380,39 +484,43 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210195140, 'IK: Flame Butterfly x5 - after first boss'),
         LocationData(210195150, 'IK: Sublime Bone Dust - after second boss', vanilla=True),
         LocationData(210195150, 'IK: Petrified Something - after second boss', sotfs=True),
-        LocationData(376100235, 'MAJ: Smelter Demon Helm - Maughlin shop after killing first IK boss'),
-        LocationData(376100236, 'MAJ: Smelter Demon Armor - Maughlin shop after killing first IK boss'),
-        LocationData(376100237, 'MAJ: Smelter Demon Gauntlets - Maughlin shop after killing first IK boss'),
-        LocationData(376100238, 'MAJ: Smelter Demon Leggings - Maughlin shop after killing first IK boss'),
-        LocationData(377200200, 'IK: Spiked Bandit Helm - Magerold shop'),
-        LocationData(377200201, 'IK: Bandit Armor - Magerold shop'),
-        LocationData(377200202, 'IK: Bandit Gauntlets - Magerold shop'),
-        LocationData(377200203, 'IK: Bandit Boots - Magerold shop'),
-        LocationData(377200204, "IK: Jester's Cap - Magerold shop"),
-        LocationData(377200205, "IK: Jester's Robes - Magerold shop"),
-        LocationData(377200206, "IK: Jester's Gloves - Magerold shop"),
-        LocationData(377200207, "IK: Jester's Tights - Magerold shop"),
-        LocationData(377200300, 'IK: Soul Arrow - Magerold shop'),
-        LocationData(377200301, 'IK: Great Soul Arrow - Magerold shop'),
-        LocationData(377200302, 'IK: Heavy Soul Arrow - Magerold shop'),
-        LocationData(377200303, 'IK: Great Heavy Soul Arrow - Magerold shop'),
-        LocationData(377200304, 'IK: Dark Hail - Magerold shop'),
-        LocationData(377200305, 'IK: Darkstorm - Magerold shop'),
-        LocationData(377200306, 'IK: Fall Control - Magerold shop'),
-        LocationData(377200400, 'IK: Cursebite Ring - Magerold shop'),
-        LocationData(377200500, 'IK: Hello Carving - Magerold shop'),
-        LocationData(377200501, 'IK: Thank You Carving - Magerold shop'),
-        LocationData(377200502, "IK: I'm Sorry Carving - Magerold shop"),
-        LocationData(377200503, 'IK: Very Good! Carving - Magerold shop'),
-        LocationData(377200601, 'IK: Charcoal Pine Resin - Magerold shop'),
-        LocationData(377200602, 'IK: Black Firebomb - Magerold shop'),
-        LocationData(377200604, 'IK: Repair Powder - Magerold shop'),
-        LocationData(377200605, 'IK: Human Effigy - Magerold shop'),
-        LocationData(377200606, 'IK: Fragrant Branch of Yore - Magerold shop'),
+        LocationData(376100235, 'MAJ: Smelter Demon Helm - Maughlin shop after killing first IK boss', missable=True),
+        LocationData(376100236, 'MAJ: Smelter Demon Armor - Maughlin shop after killing first IK boss', missable=True),
+        LocationData(376100237, 'MAJ: Smelter Demon Gauntlets - Maughlin shop after killing first IK boss', missable=True),
+        LocationData(376100238, 'MAJ: Smelter Demon Leggings - Maughlin shop after killing first IK boss', missable=True),
+        LocationData(377200200, 'IK: Spiked Bandit Helm - Magerold shop', missable=True),
+        LocationData(377200201, 'IK: Bandit Armor - Magerold shop', missable=True),
+        LocationData(377200202, 'IK: Bandit Gauntlets - Magerold shop', missable=True),
+        LocationData(377200203, 'IK: Bandit Boots - Magerold shop', missable=True),
+        LocationData(377200204, "IK: Jester's Cap - Magerold shop", missable=True),
+        LocationData(377200205, "IK: Jester's Robes - Magerold shop", missable=True),
+        LocationData(377200206, "IK: Jester's Gloves - Magerold shop", missable=True),
+        LocationData(377200207, "IK: Jester's Tights - Magerold shop", missable=True),
+        LocationData(377200300, 'IK: Soul Arrow - Magerold shop', missable=True),
+        LocationData(377200301, 'IK: Great Soul Arrow - Magerold shop', missable=True),
+        LocationData(377200302, 'IK: Heavy Soul Arrow - Magerold shop', missable=True),
+        LocationData(377200303, 'IK: Great Heavy Soul Arrow - Magerold shop', missable=True),
+        LocationData(377200304, 'IK: Dark Hail - Magerold shop', missable=True),
+        LocationData(377200305, 'IK: Darkstorm - Magerold shop', missable=True),
+        LocationData(377200306, 'IK: Fall Control - Magerold shop', missable=True),
+        LocationData(377200400, 'IK: Cursebite Ring - Magerold shop', missable=True),
+        LocationData(377200500, 'IK: Hello Carving - Magerold shop', missable=True),
+        LocationData(377200501, 'IK: Thank You Carving - Magerold shop', missable=True),
+        LocationData(377200502, "IK: I'm Sorry Carving - Magerold shop", missable=True),
+        LocationData(377200503, 'IK: Very Good! Carving - Magerold shop', missable=True),
+        LocationData(377200601, 'IK: Charcoal Pine Resin - Magerold shop', missable=True),
+        LocationData(377200602, 'IK: Black Firebomb - Magerold shop', missable=True),
+        LocationData(377200604, 'IK: Repair Powder - Magerold shop', missable=True),
+        LocationData(377200605, 'IK: Human Effigy - Magerold shop', missable=True),
+        LocationData(377200606, 'IK: Fragrant Branch of Yore - Magerold shop', missable=True),
+    ],
+    "Iron Passage": [
+        LocationData(200305010, 'IP: Smelter Demon Soul'),
+        LocationData(250366740, 'IP: Twilight Herb x2 - elevator up from bonfire'),
     ],
     "Majula": [
-        LocationData(201700000, 'MAJ: Estus Flask - Emerald Herald', missable=True),
-        LocationData(201763000, 'MAJ: Prism Stone - Rosabeth after unpetrifying her', missable=True),
+        LocationData(201700000, 'MAJ: Estus Flask - Emerald Herald', keep_original_item=True),
+        LocationData(201763000, 'MAJ: Prism Stone - Rosabeth after unpetrifying her'),
         LocationData(210045000, 'MAJ: Titanite Shard - Maughlin attic'),
         LocationData(210045010, 'MAJ: Titanite Shard x3 - mansion attic'),
         LocationData(210045010, 'MAJ: Torch x3 - mansion attic'),
@@ -422,6 +530,9 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210045600, 'MAJ: Soul Vessel - mansion basement'),
         LocationData(210046000, 'MAJ: Estus Flask Shard - water well'),
         LocationData(210046010, 'MAJ: Divine Blessing - towards SW, under tree'),
+        LocationData(210046020, 'MAJ: Morning Star - from TB, drop from cliff'),
+        LocationData(210046020, "MAJ: Cleric's Sacred Chime - from TB, drop from cliff"),
+        LocationData(210046030, 'MAJ: Binoculars - from TB, drop from cliff, end of path'),
         LocationData(210046040, 'MAJ: Soul of a Nameless Soldier - by Lenigrast workshop'),
         LocationData(210046040, 'MAJ: Lifegem x3 - by Lenigrast workshop'),
         LocationData(210046070, 'MAJ: Estus Flask Shard - mansion basement'),
@@ -445,18 +556,18 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(376100208, 'MAJ: Infantry Armor - Maughlin shop'),
         LocationData(376100209, 'MAJ: Infantry Gloves - Maughlin shop'),
         LocationData(376100210, 'MAJ: Infantry Boots - Maughlin shop'),
-        LocationData(376100211, 'MAJ: Royal Soldier Helm - Maughlin shop after 1000 Souls'),
-        LocationData(376100212, 'MAJ: Royal Soldier Armor - Maughlin shop after 1000 Souls'),
-        LocationData(376100213, 'MAJ: Royal Soldier Gauntlets - Maughlin shop after 1000 Souls'),
-        LocationData(376100214, 'MAJ: Royal Soldier Leggings - Maughlin shop after 1000 Souls'),
-        LocationData(376100215, 'MAJ: Elite Knight Helm - Maughlin shop after 1000 Souls'),
-        LocationData(376100216, 'MAJ: Elite Knight Armor - Maughlin shop after 1000 Souls'),
-        LocationData(376100217, 'MAJ: Elite Knight Gloves - Maughlin shop after 1000 Souls'),
-        LocationData(376100218, 'MAJ: Elite Knight Leggings - Maughlin shop after 1000 Souls'),
-        LocationData(376100227, 'MAJ: Alva Helm - Maughlin shop after 15000 Souls'),
-        LocationData(376100228, 'MAJ: Alva Armor - Maughlin shop after 15000 Souls'),
-        LocationData(376100229, 'MAJ: Alva Gauntlets - Maughlin shop after 15000 Souls'),
-        LocationData(376100230, 'MAJ: Alva Leggings - Maughlin shop after 15000 Souls'),
+        LocationData(376100211, 'MAJ: Royal Soldier Helm - Maughlin shop after 1000 Souls', missable=True),
+        LocationData(376100212, 'MAJ: Royal Soldier Armor - Maughlin shop after 1000 Souls', missable=True),
+        LocationData(376100213, 'MAJ: Royal Soldier Gauntlets - Maughlin shop after 1000 Souls', missable=True),
+        LocationData(376100214, 'MAJ: Royal Soldier Leggings - Maughlin shop after 1000 Souls', missable=True),
+        LocationData(376100215, 'MAJ: Elite Knight Helm - Maughlin shop after 1000 Souls', missable=True),
+        LocationData(376100216, 'MAJ: Elite Knight Armor - Maughlin shop after 1000 Souls', missable=True),
+        LocationData(376100217, 'MAJ: Elite Knight Gloves - Maughlin shop after 1000 Souls', missable=True),
+        LocationData(376100218, 'MAJ: Elite Knight Leggings - Maughlin shop after 1000 Souls', missable=True),
+        LocationData(376100227, 'MAJ: Alva Helm - Maughlin shop after 15000 Souls', missable=True),
+        LocationData(376100228, 'MAJ: Alva Armor - Maughlin shop after 15000 Souls', missable=True),
+        LocationData(376100229, 'MAJ: Alva Gauntlets - Maughlin shop after 15000 Souls', missable=True),
+        LocationData(376100230, 'MAJ: Alva Leggings - Maughlin shop after 15000 Souls', missable=True),
         LocationData(376300300, 'MAJ: Fireball - Rosabeth shop'),
         LocationData(376300301, 'MAJ: Fire Orb - Rosabeth shop'),
         LocationData(376300302, 'MAJ: Combustion - Rosabeth shop'),
@@ -475,6 +586,7 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(376400006, 'MAJ: Mace - Lenigrast shop'),
         LocationData(376400007, 'MAJ: Spear - Lenigrast shop'),
         LocationData(376400605, 'MAJ: Repair Powder - Lenigrast shop'),
+        LocationData(377700200, 'MAJ: Flying Feline Boots - Shalquoir shop after killing DoP and GoS bosses'),
         LocationData(377700400, 'MAJ: Silvercat Ring - Shalquoir shop'),
         LocationData(377700401, 'MAJ: Redeye Ring - Shalquoir shop'),
         LocationData(377700402, 'MAJ: Name-engraved Ring - Shalquoir shop'),
@@ -498,10 +610,23 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210166350, 'SR: Smooth & Silky Stone - before boss, right side locked room'),
         LocationData(210166360, 'SR: Radiant Lifegem - before boss, left side'),
         LocationData(210166450, 'SR: Human Effigy - before elevator, ledge outside'),
-        LocationData(376100243, 'MAJ: Penal Mask - Maughlin shop after killing SR boss'),
-        LocationData(376100244, 'MAJ: Penal Straightjacket - Maughlin shop after killing SR boss'),
-        LocationData(376100245, 'MAJ: Penal Handcuffs - Maughlin shop after killing SR boss'),
-        LocationData(376100246, 'MAJ: Penal Skirt - Maughlin shop after killing SR boss'),
+        LocationData(376100243, 'MAJ: Penal Mask - Maughlin shop after killing SR boss', missable=True),
+        LocationData(376100244, 'MAJ: Penal Straightjacket - Maughlin shop after killing SR boss', missable=True),
+        LocationData(376100245, 'MAJ: Penal Handcuffs - Maughlin shop after killing SR boss', missable=True),
+        LocationData(376100246, 'MAJ: Penal Skirt - Maughlin shop after killing SR boss', missable=True),
+    ],
+    "Throne of Want": [
+        LocationData(200332000, 'TW: Throne Defender Soul'),
+        LocationData(200332000, 'TW: Throne Watcher Soul'),
+        LocationData(200627000, 'TW: Soul of Nashandra'),
+        LocationData(376100251, 'MAJ: Throne Defender Helm - Maughlin shop after killing first TW boss', missable=True),
+        LocationData(376100252, 'MAJ: Throne Defender Armor - Maughlin shop after killing first TW boss', missable=True),
+        LocationData(376100253, 'MAJ: Throne Defender Gauntlets - Maughlin shop after killing first TW boss', missable=True),
+        LocationData(376100254, 'MAJ: Throne Defender Leggings - Maughlin shop after killing first TW boss', missable=True),
+        LocationData(376100255, 'MAJ: Throne Watcher Helm - Maughlin shop after killing first TW boss', missable=True),
+        LocationData(376100256, 'MAJ: Throne Watcher Armor - Maughlin shop after killing first TW boss', missable=True),
+        LocationData(376100257, 'MAJ: Throne Watcher Gauntlets - Maughlin shop after killing first TW boss', missable=True),
+        LocationData(376100258, 'MAJ: Throne Watcher Leggings - Maughlin shop after killing first TW boss', missable=True),
     ],
     "Undead Crypt": [
         LocationData(200333000, 'UC: Soul of Velstadt'),
@@ -539,18 +664,18 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(220246200, 'UC: Smooth & Silky Stone - first graveyard #2', sotfs=True),
         LocationData(220246210, 'UC: Smooth & Silky Stone - first graveyard #3', sotfs=True),
         LocationData(220246220, 'UC: Soul of a Hero - first graveyard', sotfs=True),
-        LocationData(350600300, 'UC: Soul Spear - Agdayne shop'),
-        LocationData(350600301, 'UC: Soul Vortex - Agdayne shop'),
-        LocationData(350600302, 'UC: Soul Appease - Agdayne shop'),
-        LocationData(350600303, 'UC: Warmth - Agdayne shop'),
-        LocationData(350600401, 'UC: Ring of Thorns+1 - Agdayne shop'),
-        LocationData(376100247, "MAJ: Velstadt's Helm - Maughlin shop after killing first UC boss"),
-        LocationData(376100248, "MAJ: Velstadt's Armor - Maughlin shop after killing first UC boss"),
-        LocationData(376100249, "MAJ: Velstadt's Gauntlets - Maughlin shop after killing first UC boss"),
-        LocationData(376100250, "MAJ: Velstadt's Leggings - Maughlin shop after killing first UC boss"),
+        LocationData(350600300, 'UC: Soul Spear - Agdayne shop', missable=True),
+        LocationData(350600301, 'UC: Soul Vortex - Agdayne shop', missable=True),
+        LocationData(350600302, 'UC: Soul Appease - Agdayne shop', missable=True),
+        LocationData(350600303, 'UC: Warmth - Agdayne shop', missable=True),
+        LocationData(350600401, 'UC: Ring of Thorns+1 - Agdayne shop', missable=True),
+        LocationData(376100247, "MAJ: Velstadt's Helm - Maughlin shop after killing first UC boss", missable=True),
+        LocationData(376100248, "MAJ: Velstadt's Armor - Maughlin shop after killing first UC boss", missable=True),
+        LocationData(376100249, "MAJ: Velstadt's Gauntlets - Maughlin shop after killing first UC boss", missable=True),
+        LocationData(376100250, "MAJ: Velstadt's Leggings - Maughlin shop after killing first UC boss", missable=True),
     ],
     "Memory of Jeigh": [
-        LocationData(200309700, 'MoJ: Giant Lord Soul'),
+        LocationData(200309700, 'MoJ: Giant Lord Soul', keep_original_item=True),
         LocationData(200309700, "MoJ: Giant's Kinship - boss drop"),
         LocationData(220106100, 'MoJ: Bonfire Ascetic - up first stairs'),
         LocationData(220106110, 'MoJ: Old Radiant Lifegem - right side before boss'),
@@ -576,6 +701,7 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(220106140, 'MoO: Soul of a Proud Knight - scaffolding left of cortyard'),
     ],
     "Memory of The Old Iron King": [
+        LocationData(200680000, 'MoOIK: Soul of Sir Alonne'),
         LocationData(250366910, "MoOIK: Skeptic's Spice - middle of first hall"),
         LocationData(250366920, 'MoOIK: Smooth & Silky Stone x5 - middle of first hall'),
         LocationData(250366930, 'MoOIK: Human Effigy x3 - middle of first hall'),
@@ -604,29 +730,29 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(200303300, 'NMW: Flexile Sentry Soul'),
     ],
     "The Lost Bastille": [
-        LocationData(376430000, 'LB: Uchigatana - McDuff shop'),
-        LocationData(376430001, 'LB: Bastard Sword - McDuff shop'),
-        LocationData(376430002, 'LB: Greataxe - McDuff shop'),
-        LocationData(376430003, 'LB: Winged Spear - McDuff shop'),
-        LocationData(376430004, 'LB: Scythe - McDuff shop'),
-        LocationData(376430005, 'LB: Long Bow - McDuff shop'),
-        LocationData(376430006, 'LB: Light Crossbow - McDuff shop'),
-        LocationData(376430100, 'LB: Royal Kite Shield - McDuff shop'),
-        LocationData(376430606, 'LB: Repair Powder - McDuff shop'),
-        LocationData(376800300, 'LB: Homing Soul Arrow - Straid shop'),
-        LocationData(376800301, 'LB: Resplendent Life - Straid shop'),
-        LocationData(376800303, 'LB: Unveil - Straid shop'),
-        LocationData(376800305, 'LB: Lingering Flame - Straid shop'),
-        LocationData(376800306, 'LB: Flame Swathe - Straid shop'),
-        LocationData(376800307, 'LB: Dark Orb - Straid shop'),
-        LocationData(376800308, 'LB: Dark Hail - Straid shop'),
-        LocationData(376800309, 'LB: Dark Fog - Straid shop'),
-        LocationData(376800310, 'LB: Affinity - Straid shop'),
-        LocationData(376800311, 'LB: Strong Magic Shield - Straid shop'),
-        LocationData(376800312, 'LB: Cast Light - Straid shop'),
-        LocationData(376800400, 'LB: Ring of Knowledge - Straid shop'),
-        LocationData(376800401, 'LB: Lingering Dragoncrest Ring - Straid shop'),
-        LocationData(376800402, 'LB: Agape Ring - Straid shop'),
+        LocationData(376430000, 'LB: Uchigatana - McDuff shop', missable=True),
+        LocationData(376430001, 'LB: Bastard Sword - McDuff shop', missable=True),
+        LocationData(376430002, 'LB: Greataxe - McDuff shop', missable=True),
+        LocationData(376430003, 'LB: Winged Spear - McDuff shop', missable=True),
+        LocationData(376430004, 'LB: Scythe - McDuff shop', missable=True),
+        LocationData(376430005, 'LB: Long Bow - McDuff shop', missable=True),
+        LocationData(376430006, 'LB: Light Crossbow - McDuff shop', missable=True),
+        LocationData(376430100, 'LB: Royal Kite Shield - McDuff shop', missable=True),
+        LocationData(376430606, 'LB: Repair Powder - McDuff shop', missable=True),
+        LocationData(376800300, 'LB: Homing Soul Arrow - Straid shop', missable=True),
+        LocationData(376800301, 'LB: Resplendent Life - Straid shop', missable=True),
+        LocationData(376800303, 'LB: Unveil - Straid shop', missable=True),
+        LocationData(376800305, 'LB: Lingering Flame - Straid shop', missable=True),
+        LocationData(376800306, 'LB: Flame Swathe - Straid shop', missable=True),
+        LocationData(376800307, 'LB: Dark Orb - Straid shop', missable=True),
+        LocationData(376800308, 'LB: Dark Hail - Straid shop', missable=True),
+        LocationData(376800309, 'LB: Dark Fog - Straid shop', missable=True),
+        LocationData(376800310, 'LB: Affinity - Straid shop', missable=True),
+        LocationData(376800311, 'LB: Strong Magic Shield - Straid shop', missable=True),
+        LocationData(376800312, 'LB: Cast Light - Straid shop', missable=True),
+        LocationData(376800400, 'LB: Ring of Knowledge - Straid shop', missable=True),
+        LocationData(376800401, 'LB: Lingering Dragoncrest Ring - Straid shop', missable=True),
+        LocationData(376800402, 'LB: Agape Ring - Straid shop', missable=True),
     ],
     "The Pit": [
         LocationData(210045020, 'PIT: Soul Vortex - forgotten door, chest'),
@@ -640,8 +766,6 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210046140, 'PIT: Dragon Talon - forgotten door', sotfs=True),
     ],
     "Things Betwixt": [
-        LocationData(201705000, "TB: Human Effigy x6 - Strowen after King's Ring", missable=True),
-        LocationData(201723000, "TB: Handmaid's Ladle - Milibeth after killing beach minibosses", missable=True),
         LocationData(210025010, 'TB: Human Effigy - attic'),
         LocationData(210026000, 'TB: Rusted Coin - right of grass field before bridge'),
         LocationData(210026020, 'TB: Gold Pine Resin - left path before bridge'),
@@ -662,29 +786,29 @@ location_table: Dict[str, List[LocationData]] = {
         LocationData(210146250, "Tseldora: Skeptic's Spice - by Cromwell"),
         LocationData(210146260, 'Tseldora: Bonfire Ascetic - by Cromwell'),
         LocationData(210146270, 'Tseldora: Fading Soul - by Cromwell #2'),
-        LocationData(377600000, 'Tseldora: Murakumo - Ornifex shop'),
-        LocationData(377600001, 'Tseldora: Twinblade - Ornifex shop'),
-        LocationData(377600002, 'Tseldora: Partizan - Ornifex shop'),
-        LocationData(377600003, 'Tseldora: Composite Bow - Ornifex shop'),
-        LocationData(377600004, 'Tseldora: Heavy Crossbow - Ornifex shop'),
-        LocationData(377600300, 'Tseldora: Homing Soul Arrow - Ornifex shop'),
-        LocationData(377600301, 'Tseldora: Homing Soulmass - Ornifex shop'),
-        LocationData(377600302, 'Tseldora: Fall Control - Ornifex shop'),
-        LocationData(378400200, 'Tseldora: White Priest Headpiece - Cromwell shop'),
-        LocationData(378400201, 'Tseldora: White Priest Robe - Cromwell shop'),
-        LocationData(378400202, 'Tseldora: White Priest Gloves - Cromwell shop'),
-        LocationData(378400203, 'Tseldora: White Priest Skirt - Cromwell shop'),
-        LocationData(378400300, 'Tseldora: Great Heal - Cromwell shop'),
-        LocationData(378400301, 'Tseldora: Replenishment - Cromwell shop'),
-        LocationData(378400302, 'Tseldora: Caressing Prayer - Cromwell shop'),
-        LocationData(378400303, 'Tseldora: Force - Cromwell shop'),
-        LocationData(378400304, 'Tseldora: Emit Force - Cromwell shop'),
-        LocationData(378400305, 'Tseldora: Heavenly Thunder - Cromwell shop'),
-        LocationData(378400306, 'Tseldora: Perseverance - Cromwell shop'),
-        LocationData(378400307, 'Tseldora: Scraps of Life - Cromwell shop'),
-        LocationData(378400400, 'Tseldora: Poisonbite Ring - Cromwell shop'),
-        LocationData(378400401, 'Tseldora: Bloodbite Ring - Cromwell shop'),
-        LocationData(378400402, 'Tseldora: Cursebite Ring - Cromwell shop'),
+        LocationData(377600000, 'Tseldora: Murakumo - Ornifex shop', missable=True),
+        LocationData(377600001, 'Tseldora: Twinblade - Ornifex shop', missable=True),
+        LocationData(377600002, 'Tseldora: Partizan - Ornifex shop', missable=True),
+        LocationData(377600003, 'Tseldora: Composite Bow - Ornifex shop', missable=True),
+        LocationData(377600004, 'Tseldora: Heavy Crossbow - Ornifex shop', missable=True),
+        LocationData(377600300, 'Tseldora: Homing Soul Arrow - Ornifex shop', missable=True),
+        LocationData(377600301, 'Tseldora: Homing Soulmass - Ornifex shop', missable=True),
+        LocationData(377600302, 'Tseldora: Fall Control - Ornifex shop', missable=True),
+        LocationData(378400200, 'Tseldora: White Priest Headpiece - Cromwell shop', missable=True),
+        LocationData(378400201, 'Tseldora: White Priest Robe - Cromwell shop', missable=True),
+        LocationData(378400202, 'Tseldora: White Priest Gloves - Cromwell shop', missable=True),
+        LocationData(378400203, 'Tseldora: White Priest Skirt - Cromwell shop', missable=True),
+        LocationData(378400300, 'Tseldora: Great Heal - Cromwell shop', missable=True),
+        LocationData(378400301, 'Tseldora: Replenishment - Cromwell shop', missable=True),
+        LocationData(378400302, 'Tseldora: Caressing Prayer - Cromwell shop', missable=True),
+        LocationData(378400303, 'Tseldora: Force - Cromwell shop', missable=True),
+        LocationData(378400304, 'Tseldora: Emit Force - Cromwell shop', missable=True),
+        LocationData(378400305, 'Tseldora: Heavenly Thunder - Cromwell shop', missable=True),
+        LocationData(378400306, 'Tseldora: Perseverance - Cromwell shop', missable=True),
+        LocationData(378400307, 'Tseldora: Scraps of Life - Cromwell shop', missable=True),
+        LocationData(378400400, 'Tseldora: Poisonbite Ring - Cromwell shop', missable=True),
+        LocationData(378400401, 'Tseldora: Bloodbite Ring - Cromwell shop', missable=True),
+        LocationData(378400402, 'Tseldora: Cursebite Ring - Cromwell shop', missable=True),
     ],
     "Undead Purgatory": [
         LocationData(200619100, "UP: Executioner's Chariot Soul"),
@@ -697,5 +821,12 @@ location_table: Dict[str, List[LocationData]] = {
     ],
 }
 
-for region_name in location_table:
-    assert region_name in region_connections.keys(), f"Region not in region list: {region_name}"
+location_name_groups: Dict[str, Set[str]] = {}
+
+for region in locations_by_region:
+    for location in locations_by_region[region]:
+        if location.event: continue
+        if region not in location_name_groups:
+            location_name_groups[region] = {location.name}
+        else:
+            location_name_groups[region].add(location.name)

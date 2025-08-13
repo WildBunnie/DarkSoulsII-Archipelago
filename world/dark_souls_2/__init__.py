@@ -1,14 +1,14 @@
-from .Items import item_list, ItemData, item_dictionary, repeatable_categories
-from .Locations import location_table, LocationData
+from .Items import item_list, ItemData, item_dictionary, item_name_groups
+from .Locations import locations_by_region, LocationData, location_name_groups
 from .Options import DS2Options
-from .Regions import region_connections
+from .Regions import region_map, region_list
 from .Enums import DLC, ItemCategory
 
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import set_rule, add_item_rule, add_rule
-from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType, Tutorial
+from BaseClasses import Item, ItemClassification, Location, Region, LocationProgressType, Tutorial, MultiWorld
 
-from typing import List, Optional
+from typing import List, Optional, Set
 
 class DS2Location(Location):
     game: str = "Dark Souls II"
@@ -44,7 +44,6 @@ class DarkSouls2Web(WebWorld):
     tutorials = [setup_en]
 
 class DS2World(World):
-
     game = "Dark Souls II"
 
     options_dataclass = DS2Options
@@ -54,12 +53,12 @@ class DS2World(World):
                        for item_data in item_list}
 
     location_name_to_id = {location_data.name: location_data.address 
-                           for locations in location_table.values() 
+                           for locations in locations_by_region.values() 
                            for location_data in locations 
                            if location_data.address != None}
-    
-    # item_name_groups = group_table
-    # location_name_groups = location_name_groups
+
+    item_name_groups = item_name_groups
+    location_name_groups = location_name_groups
 
     def generate_early(self):
         if self.options.early_blacksmith == "early_global":
@@ -83,8 +82,11 @@ class DS2World(World):
         regions["Menu"] = menu_region
 
         # create regions and locations
-        for region_name in region_connections:
-            region_data = region_connections[region_name]
+        for region_name in locations_by_region:
+            
+            assert region_name in region_map, f"Region data not found for region {region_name}"
+            region_data = region_map[region_name]
+
             if region_data.dlc == DLC.SUNKEN_KING and not self.options.sunken_king_dlc: continue
             if region_data.dlc == DLC.OLD_IRON_KING and not self.options.old_iron_king_dlc: continue
             if region_data.dlc == DLC.IVORY_KING and not self.options.ivory_king_dlc: continue
@@ -93,95 +95,111 @@ class DS2World(World):
             regions[region_name] = region
             self.multiworld.regions.append(region)
             
-            if region_name not in location_table.keys(): continue
-
-            for location_data in location_table[region_name]:
+            for location_data in locations_by_region[region_name]:
                 if location_data.sotfs and not self.options.game_version == "sotfs": continue
                 if location_data.vanilla and not self.options.game_version == "vanilla": continue
 
                 if location_data.event:
                     location = DS2Location(self.player, location_data.name, None, region, None)
-                else:
-                    location = self.create_location(location_data.name, region, location_data)
+                    region.locations.append(location)
+                    continue
 
+                is_excluded = location_data.name in self.options.exclude_locations.value
+                excluded_behavior = self.options.excluded_location_behavior
+
+                if is_excluded and excluded_behavior == "do_not_create":
+                    item_classification = item_dictionary[location_data.original_item_name].classification
+                    is_progression = item_classification in [
+                        ItemClassification.progression,
+                        ItemClassification.progression_skip_balancing,
+                    ]
+                    
+                    if not is_progression: continue
+
+                location = self.create_location(location_data.name, region, location_data)
                 region.locations.append(location)
         
         # connect regions
         for region_name, region in regions.items():
-            region_data = region_connections[region_name]
+            region_data = region_map[region_name]
             if not region_data.connections: continue
             for connection in region_data.connections:
-                if connection in regions:
-                    region.connect(regions[connection])
+                if not connection in regions.keys(): continue
+                region.connect(regions[connection])
     
     def create_item(self, name: str) -> DS2Item:
         assert name in item_dictionary, f"Tried to create an item that doesn't exist {name}"
         item_data: ItemData = item_dictionary[name]
+
+        if item_data.max_reinforcement > 0 and self.random.randint(0, 99) < self.options.randomize_weapon_level_percentage:
+            if item_data.max_reinforcement == 5:
+                item_data.reinforcement = self.random.randint(self.options.min_weapon_reinforcement_in_5, self.options.max_weapon_reinforcement_in_5)
+            if item_data.max_reinforcement == 10:
+                item_data.reinforcement = self.random.randint(self.options.min_weapon_reinforcement_in_10, self.options.max_weapon_reinforcement_in_10)
+
         return DS2Item(name, item_data.classification, self.item_name_to_id[name], self.player, item_data)
 
     def create_items(self):
-        pool : list[DS2Item] = []
-        max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
-
-        # place events in pool
-        events = [location_data for locations in location_table.values() for location_data in locations if location_data.event]
+        # place events in their locations
+        events = [location_data for locations in locations_by_region.values() for location_data in locations if location_data.event]
         for event in events:
             event_item = DS2Item(event.name, ItemClassification.progression, None, self.player, None)
             self.multiworld.get_location(event.name, self.player).place_locked_item(event_item)
 
-        # replace original items with our new ones
-        replacements = {
-            "Pharros' Lockstone": ["Master Lockstone"],
-            "Smelter Wedge": ["Smelter Wedge x11"],
-            "Fragrant Branch of Yore" : [item.name for item in item_list if item.category == ItemCategory.STATUE and (self.options.game_version != "vanilla" or not item.sotfs)]
-        }
-        for replacement_list in replacements.values():
-            for replacement in replacement_list:
-                item = self.create_item(replacement)
-                pool.append(item)
-        
+        pool : list[DS2Item] = []
+        max_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
+
         # fill pool with all the original items from each location
         items_in_pool = [item.name for item in pool]
         locations: List[DS2Location] = self.multiworld.get_unfilled_locations(self.player)
         for location in locations:
-
             if location.data.keep_original_item:
-                location.place_locked_item(self.create_item(location.data.original_item))
+                location.place_locked_item(self.create_item(location.data.original_item_name))
+                max_pool_size -= 1
                 continue
             
-            item_name = location.data.original_item
-            if item_name in replacements: continue
-
+            item_name = location.data.original_item_name
             assert item_name in item_dictionary, f"item '{item_name}' from location '{location.data.name}' doesn't exist"
-            item_data = item_dictionary[item_name]
 
-            if item_data.skip or len(pool) >= max_pool_size: continue # REMOVE THIS
-            if item_data.category == ItemCategory.KEY_ITEM and item_data.name in items_in_pool: continue
+            item_data = item_dictionary[item_name]
+            if item_data.skip: continue
+            if item_data.category == ItemCategory.UNIQUE and item_data.name in items_in_pool: continue
 
             item = self.create_item(item_data.name)
             items_in_pool.append(item_data.name)
             pool.append(item)
 
-        assert len(pool) <= max_pool_size, f"item pool is over-filled by {len(pool) - max_pool_size}"
+        assert len(pool) <= max_pool_size, f"item pool is over-filled by {abs(len(pool) - max_pool_size)}"
 
         # fill the rest of the pool
-        filler_items = [item for item in item_list if item.category in repeatable_categories and not item.skip and not item.sotfs and not item.dlc]
+        filler_items = [item.name for item in item_list if item.category == ItemCategory.GOOD and not item.skip and not item.sotfs and not item.dlc]
         for _ in range(max_pool_size - len(pool)):
-            item_data = self.random.choice(filler_items)
-            item = self.create_item(item_data.name)
+            item_name = self.random.choice(filler_items)
+            item = self.create_item(item_name)
             pool.append(item)
 
-        assert len(pool) == max_pool_size, "item pool is under-filled"
-
+        assert len(pool) == max_pool_size, f"item pool is under-filled by {abs(len(pool) - max_pool_size)}"
         self.multiworld.itempool += pool
 
     def set_rules(self):
         
+        # dont allow certain stuff in shops
         for location in self.multiworld.get_locations(self.player):
             if location.data and location.data.shop:
                 add_item_rule(location, lambda item: 
                               (item.player != self.player or
                               item.data.bundle == False))
+
+        # allow anything but progression items in excluded locations if using "allow_useful"
+        if self.options.excluded_location_behavior == "allow_useful":
+            locations: List[DS2Location] = self.multiworld.get_locations(self.player)
+            for location in locations:
+                if location.data.keep_original_item == True: continue
+                if location.name in self.options.exclude_locations.value:
+                    add_item_rule(location, lambda item: not item.advancement)
+            
+            self.options.exclude_locations.value.clear()
+
 
     # set_rule(self.multiworld.get_location("Defeat Nashandra", self.player), lambda state: state.has("Giant's Kinship", self.player))
     # self.multiworld.completion_condition[self.player] = lambda state: state.has("Defeat Nashandra", self.player)
@@ -355,8 +373,8 @@ class DS2World(World):
     #         self.set_location_rule("[Head of Vengarl] Red Rust Shield", lambda state: state.has("Unpetrify Statue near Manscorpion Tark", self.player))
     #         self.set_location_rule("[Head of Vengarl] Red Rust Sword", lambda state: state.has("Unpetrify Statue near Manscorpion Tark", self.player))
 
-    #     for region in location_table:
-    #         for location in location_table[region]:
+    #     for region in locations_by_region:
+    #         for location in locations_by_region[region]:
     #             if "[Laddersmith Gilligan - Majula]" in location.name:
     #                 self.set_location_rule(location.name, lambda state: state.has("Defeat Mytha, the Baneful Queen", self.player))
     #             elif "[Rosabeth of Melfia]" in location.name:
@@ -365,7 +383,7 @@ class DS2World(World):
     #                 self.set_location_rule(location.name, lambda state: state.has("Lenigrast's Key", self.player))
     #             elif "[Steady Hand McDuff]" in location.name:
     #                 self.set_location_rule(location.name, lambda state: state.has("Dull Ember", self.player))
-    #             elif "[Lonesome Gavlan - Doors of Pharros]" in location_table:
+    #             elif "[Lonesome Gavlan - Doors of Pharros]" in locations_by_region:
     #                 self.set_location_rule(location.name, lambda state: state.has("Speak with Lonesome Gavlan in Harvest Valley", self.player))
     #             elif "Straid of Olaphis" in location.name:
     #                 self.set_location_rule(location.name, lambda state: state.has("Unpetrify Straid of Olaphis", self.player))
@@ -467,9 +485,8 @@ class DS2World(World):
 
     def fill_slot_data(self) -> dict:
         slot_data = self.options.as_dict("death_link","game_version","no_weapon_req","no_spell_req","no_armor_req","no_equip_load","randomize_starting_loadout", "starting_weapon_requirement", "autoequip")
-        
-        # non archipelago locations that should not be 
-        # randomized by the static randomizer
+
+        # non archipelago locations that should not be randomized by the static randomizer
         keep_unrandomized = set()
 
         # [Event - Giant Memories] Soul of a Giant
@@ -518,28 +535,54 @@ class DS2World(World):
             250000101, 250000102, 250000202, 250000303
         ])
 
-        ap_to_game_id = {}
-        game_to_ap_id = {}
-        for locations in location_table.values():
+        # new game plus
+        keep_unrandomized.update([
+            101040500, 101190001, 101193000, 102210501, 102210601, 102210602, 102213001, 184700000, 
+            184710000, 200154001, 200309701, 200324001, 200326001, 200332001, 200333001, 200501001, 
+            200503001, 200504001, 200603001, 200607001, 200619101, 200626001, 200675010, 200862001, 
+            210026001, 210026031, 210045001, 210045002, 210105021, 210105041, 210106061, 210106321, 
+            210106371, 210145061, 210146051, 210146181, 210146381, 210156031, 210156161, 210165041, 
+            210166191, 210166421, 210166441, 210175021, 210176171, 210176221, 210176231, 210176461, 
+            210185001, 210185071, 210185081, 210186021, 210186071, 210195001, 210196111, 210196211, 
+            210236021, 210236071, 210236131, 210275021, 210276041, 210276061, 210315001, 210316041, 
+            210316101, 210325001, 210326081, 210326101, 210326141, 210326191, 210335021, 210335031, 
+            210336011, 210336041, 210346031, 210346091, 220105001, 220106011, 220106061, 220106111, 
+            220106141, 220115051, 220116011, 220116171, 220215011, 220215021, 220215041, 220216021, 
+            220216061, 220246011, 220246111, 220246121, 220246151, 260008110, 260044001, 372110007, 
+            372110008, 372110105, 372110300, 372110301, 372110302, 376100259, 376100260, 376100261, 
+            376100262, 377200208, 377200209, 377200210, 377200211, 378300603, 378500603
+        ])
+
+        # maughlin restocks
+        keep_unrandomized.update([376100219, 376100220, 376100221, 376100222, 376100223, 376100224, 376100225, 376100226])
+
+        ap_to_location_id = {}
+        location_to_ap_id = {}
+        for locations in locations_by_region.values():
             for location_data in locations:
-                # archipelago to game id
                 if not isinstance(location_data.address, int): continue # skip events
-                ap_to_game_id[location_data.address] = location_data.param_id
                 
-                # game to archipelago id
-                if location_data.param_id not in game_to_ap_id:
-                    game_to_ap_id[location_data.param_id] = [location_data.address]
+                # archipelago to location id
+                ap_to_location_id[location_data.address] = location_data.location_id
+                
+                # location to archipelago id
+                if location_data.location_id not in location_to_ap_id:
+                    location_to_ap_id[location_data.location_id] = [location_data.address]
                 else:
-                    game_to_ap_id[location_data.param_id].append(location_data.address)
+                    location_to_ap_id[location_data.location_id].append(location_data.address)
         
         item_bundles = set()
+        reinforcements = {}
         for item in item_list:
             if item.bundle: 
                 item_bundles.add(item.code)
-        
+            if item.reinforcement != 0:
+                reinforcements[item.code] = item.reinforcement
+
         slot_data["keep_unrandomized"] = keep_unrandomized
-        slot_data["ap_to_game_id"] = ap_to_game_id
-        slot_data["game_to_ap_id"] = game_to_ap_id
+        slot_data["ap_to_location_id"] = ap_to_location_id
+        slot_data["location_to_ap_id"] = location_to_ap_id
         slot_data["item_bundles"] = item_bundles
+        slot_data["reinforcements"] = reinforcements
 
         return slot_data

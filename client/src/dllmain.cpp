@@ -110,7 +110,7 @@ void handle_check_locations()
 
     for (int32_t location : locations_to_check) {
         // check if we get reward from nashandra
-        if (location == 627000) {
+        if (location == 200627000) {
             announce_goal_reached();
         }
     }
@@ -131,30 +131,20 @@ void handle_give_items()
         int64_t item_id = get_next_item();
         if (item_id == -1) break;
 
+        APItem ap_item = get_archipelago_item(item_id, unused_item_ids[i]);
+
         Item item;
+        item.item_id = ap_item.real_item_id;
         item.idk = 0;
         item.durability = -1;
-        item.amount = 1;
-        item.upgrade = 0;
+        item.amount = ap_item.amount;
+        item.upgrade = ap_item.reinforcement;
         item.infusion = 0;
 
-        if (get_item_bundles().contains(item_id)) {
-            int bundle_amount = item_id % 1000;
-            item_id = item_id - bundle_amount;
-            item.amount = bundle_amount;
-        }
-
         // item_id < 1000000 means custom item
-        if (item_id < 1000000) {
-            if (is_statue(item_id)) unpetrify_statue(item_id);
-
-            item.item_id = unused_item_ids[i];
-            std::string item_name = get_local_item_name(item_id);
-            std::wstring item_name_wide(item_name.begin(), item_name.end());
-            set_item_name(item.item_id, item_name_wide);
-        }
-        else {
-            item.item_id = static_cast<int32_t>(item_id);
+        if (ap_item.item_id < 1000000) {
+            if (is_statue(ap_item.item_id)) unpetrify_statue(ap_item.item_id);
+            set_item_name(ap_item.real_item_id, ap_item.item_name);
         }
 
         item_struct.items[i] = item;

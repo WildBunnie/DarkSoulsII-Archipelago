@@ -84,10 +84,11 @@ void override_itemlot_param(std::map<int32_t, APLocation> location_map, std::str
             std::memset(chances, 0, sizeof(float_t) * 10);
 
             for (int j = 0; j < location.reward_amount && j < 10; j++) {
-                APLocationReward& reward = location.rewards[j];
+                APItem& reward = location.rewards[j];
                 items[j] = reward.real_item_id;
                 amounts[j] = reward.amount;
                 chances[j] = 100.0f;
+                reinforcements[j] = reward.reinforcement;
             }
         }
         else {

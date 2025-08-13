@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import PerGameCommonOptions, DeathLink, Toggle, Choice, ExcludeLocations, StartInventory, DefaultOnToggle
+from Options import PerGameCommonOptions, DeathLink, Toggle, Choice, ExcludeLocations, StartInventory, DefaultOnToggle, Range
 
 class NoWeaponRequirements(Toggle):
     """Remove the requirements to wield weapons"""
@@ -90,11 +90,69 @@ class KeepInfiniteLifegems(Toggle):
 
 class DS2ExcludeLocations(ExcludeLocations):
     """Prevent these locations from having an important item."""
-    default = frozenset({"Dark Chasm of Old"})
+    default = frozenset({})
+
+class ExcludedLocationBehaviorOption(Choice):
+    """How to choose items for excluded locations in DS2.
+
+    - **Allow Useful:** Excluded locations can't have progression items, but they
+    can have useful items.
+
+    - **Forbid Useful:** Neither progression items nor useful items can be placed
+    in excluded locations.
+
+    - **Do Not Create:** Excluded locations that don't originally contain progression
+    items will not be added to the multiworld and will instead be shuffled between 
+    each other by the game's static randomizer.
+
+    A "progression item" is anything that's required to unlock another location in some game. A
+    "useful item" is something each game defines individually, usually items that are quite
+    desirable but not strictly necessary.
+    """
+    display_name = "Excluded Locations Behavior"
+    option_allow_useful = 1
+    option_forbid_useful = 2
+    option_do_not_create = 3
+    default = 2
 
 class DS2StartInventory(StartInventory):
     """Start with these items."""
     default = dict({"Torch":1})
+
+class RandomizeWeaponLevelPercentageOption(Range):
+    """The percentage of weapons in the pool to be reinforced."""
+    display_name = "Percentage of Randomized Weapons"
+    range_start = 0
+    range_end = 100
+    default = 33
+
+class MinWeaponReinforcementIn5Option(Range):
+    """The minimum reinforcement level for weapons that can only reach +5."""
+    display_name = "Minimum Reinforcement of +5 Weapons"
+    range_start = 1
+    range_end = 5
+    default = 1
+
+class MaxWeaponReinforcementIn5Option(Range):
+    """The maximum reinforcement level for weapons that can only reach +5."""
+    display_name = "Maximum Reinforcement of +5 Weapons"
+    range_start = 1
+    range_end = 5
+    default = 5
+
+class MinWeaponReinforcementIn10Option(Range):
+    """The minimum reinforcement level for weapons that can only reach +10."""
+    display_name = "Minimum Reinforcement of +10 Weapons"
+    range_start = 1
+    range_end = 10
+    default = 1
+
+class MaxWeaponReinforcementIn10Option(Range):
+    """The maximum reinforcement level for weapons that can only reach +10."""
+    display_name = "Maximum Reinforcement of +10 Weapons"
+    range_start = 1
+    range_end = 10
+    default = 10
 
 @dataclass
 class DS2Options(PerGameCommonOptions):
@@ -112,7 +170,13 @@ class DS2Options(PerGameCommonOptions):
     early_blacksmith: EarlyBlacksmith
     infinite_lifegems: KeepInfiniteLifegems
     exclude_locations: DS2ExcludeLocations
+    excluded_location_behavior: ExcludedLocationBehaviorOption
     start_inventory: DS2StartInventory
     old_iron_king_dlc: OldIronKingDLC
     ivory_king_dlc: IvoryKingDLC
     sunken_king_dlc: SunkenKingDLC
+    randomize_weapon_level_percentage: RandomizeWeaponLevelPercentageOption
+    min_weapon_reinforcement_in_5: MinWeaponReinforcementIn5Option
+    max_weapon_reinforcement_in_5: MaxWeaponReinforcementIn5Option
+    min_weapon_reinforcement_in_10: MinWeaponReinforcementIn10Option
+    max_weapon_reinforcement_in_10: MaxWeaponReinforcementIn10Option

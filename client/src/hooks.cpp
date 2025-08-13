@@ -45,12 +45,11 @@ void handle_location_checked(int32_t location_id)
 
     APLocation& location = _location_map[location_id];
     for (int i = 0; i < location.reward_amount; i++) {
-        APLocationReward& reward = location.rewards[i];
+        APItem& reward = location.rewards[i];
 
         if (!reward.item_name.empty()) {
-            std::string item_name = reward.item_name;
-            std::wstring item_name_wide(item_name.begin(), item_name.end());
-            item_names[reward.real_item_id] = remove_special_characters(item_name_wide);
+            std::wstring item_name = reward.item_name;
+            item_names[reward.real_item_id] = remove_special_characters(item_name);
         }
         if (is_statue(reward.item_id)) {
             unpetrify_statue(reward.item_id);
@@ -146,9 +145,8 @@ uintptr_t __cdecl detour_get_hovering_item_info(uintptr_t param_1, uintptr_t par
         uint32_t param_id = read_value<uint32_t>(ptr + offset);
         uint32_t location_id = param_id + get_location_offset(ShopLineupParam_Location);
         if (_location_map.contains(location_id)) {
-            std::string item_name = _location_map[location_id].rewards[0].item_name;
-            std::wstring item_name_wide(item_name.begin(), item_name.end());
-            item_names[custom_shop_item_id] = remove_special_characters(item_name_wide); // this hook is only for shop rn
+            std::wstring item_name = _location_map[location_id].rewards[0].item_name;
+            item_names[custom_shop_item_id] = remove_special_characters(item_name); // this hook is only for shop rn
         }
     }
     return original_get_hovering_item_info(param_1, param_2);

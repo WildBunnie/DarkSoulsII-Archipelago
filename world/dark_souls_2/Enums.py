@@ -1,20 +1,29 @@
 from enum import Enum
 
+from enum import Enum
+
 class ItemCategory(Enum):
-    ARMOR = 1
-    CONSUMABLE = 2
-    USABLE_ITEM = 3
-    UPGRADE_MATERIAL = 4
-    GESTURE = 5
-    KEY_ITEM = 6
-    WEAPON = 7
-    AMMO = 8
-    RING = 9
-    SHIELD = 10
-    SPELL = 11
-    STAFF_OR_CHIME = 12
-    STATUE = 13 
-    HEALING = 14
+    MELEE_WEAPON = 1
+    RANGED_WEAPON = 2
+    MISC_WEAPON = 3
+    STAFF = 4
+    CHIME = 5
+    SHIELD = 6
+    HEAD_ARMOR = 7
+    CHEST_ARMOR = 8
+    HANDS_ARMOR = 9
+    LEGS_ARMOR = 10
+    RING = 11
+    ARROW = 12
+    GREAT_ARROW = 13
+    BOLT = 14
+    SPELL = 15
+    UNIQUE = 16
+    GOOD = 17
+    FLASK_UPGRADE = 18
+    BOSS_SOUL = 19
+    GESTURE = 20
+    STATUE = 21
 
 class DLC(Enum):
     SUNKEN_KING = 1

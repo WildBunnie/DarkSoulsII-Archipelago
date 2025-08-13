@@ -42,6 +42,7 @@ bool _died_by_deathlink = false;
 int last_received_index = -1;
 std::set<int32_t> locations_to_ignore;
 std::queue<APClient::NetworkItem> items_to_give;
+std::unordered_map<int32_t, int8_t> reinforcements;
 std::unordered_map<int32_t, int32_t> ap_to_location_id;
 std::unordered_map<int32_t, std::vector<int32_t>> location_to_ap_id;
 std::set<int32_t> item_bundles;
@@ -159,6 +160,14 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 				location_to_ap_id[int_key] = std::move(ids);
 			}
 		}
+		if (data.contains("reinforcements")) {
+			for (auto& [key, val] : data.at("reinforcements").items())
+			{
+				int32_t item_id = std::stoi(key);
+				int8_t reinforcement = val.get<int8_t>();
+				reinforcements[item_id] = reinforcement;
+			}
+		}
 		if (data.contains("item_bundles")) {
 			for (const auto& id : data.at("item_bundles")) {
 				item_bundles.insert(id.get<int32_t>());
@@ -226,11 +235,12 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 		std::map<int32_t, APLocation> location_map;
 
 		for (const auto& item : items) {
-			int32_t item_location = ap_to_location_id[item.location];
+			int32_t _archipelago_address = item.location;
+			int32_t _location_id = ap_to_location_id[_archipelago_address];
 
-			APLocation& location = location_map[item_location]; // inserts if not present
+			APLocation& location = location_map[_location_id]; // inserts if not present
 			assert(location.reward_amount < 10 && "location can't have more than 10 rewards");
-			location.location_id = item_location;
+			location.location_id = _location_id;
 
 			// index with reward_amount so that two custom
 			// items dont have the same real_item_id
@@ -243,40 +253,7 @@ void setup_apclient(std::string URI, std::string slot_name, std::string password
 				custom_item_id = custom_shop_item_id;
 			}
 
-			APLocationReward reward;
-			if (item.player == ap->get_player_number()) {
-				// if the id is less than 1000000 it's a custom item
-				if (item.item < 1000000) {
-					reward.real_item_id = custom_item_id;
-					reward.item_id = item.item;
-
-					std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));
-					reward.item_name = item_name;
-				}
-				else {
-					reward.item_id = item.item;
-					reward.real_item_id = item.item;
-				}
-			}
-			else {
-				reward.item_id = custom_item_id; // doesnt really matter for multiworld items
-				reward.real_item_id = custom_item_id;
-
-				std::string player_name = ap->get_player_alias(item.player);
-				std::string item_name = ap->get_item_name(item.item, ap->get_player_game(item.player));
-				reward.item_name = player_name + "'s " + item_name;
-			}
-
-			// convert bundle item id to the item with the amount
-			if (item_bundles.contains(reward.real_item_id)) {
-				int bundle_amount = reward.real_item_id % 1000;
-				reward.real_item_id -= bundle_amount;
-				reward.amount = bundle_amount;
-			}
-			else {
-				reward.amount = 1;
-			}
-
+			APItem reward = get_archipelago_item(item.item, custom_item_id, item.player);
 			location.rewards[location.reward_amount++] = reward;
 		}
 
@@ -459,7 +436,58 @@ void read_save_file()
 	}
 }
 
-std::set<int32_t> get_item_bundles()
+APItem get_archipelago_item(int32_t item_id, int custom_item_id, int player)
 {
-	return item_bundles;
+	if (player == -1) {
+		player = ap->get_player_number();
+	}
+	if (custom_item_id == -1) {
+		custom_item_id = unused_item_ids[0];
+	}
+
+	APItem reward;
+	if (player == ap->get_player_number()) {
+		// if the id is less than 1000000 it's a custom item
+		if (item_id < 1000000) {
+			reward.real_item_id = custom_item_id;
+			reward.item_id = item_id;
+
+			std::string item_name = ap->get_item_name(item_id, ap->get_player_game(player));
+			std::wstring item_name_wide(item_name.begin(), item_name.end());
+			reward.item_name = item_name_wide;
+		}
+		else {
+			reward.item_id = item_id;
+			reward.real_item_id = item_id;
+		}
+	}
+	else {
+		reward.item_id = custom_item_id;
+		reward.real_item_id = custom_item_id;
+
+		std::string player_name = ap->get_player_alias(player);
+		std::string item_name = ap->get_item_name(item_id, ap->get_player_game(player));
+		std::string full_name = player_name + "'s " + item_name;
+		std::wstring full_name_wide(full_name.begin(), full_name.end());
+		reward.item_name = full_name_wide;
+	}
+
+	// convert bundle item id to the item with the amount
+	if (item_bundles.contains(reward.item_id)) {
+		int bundle_amount = reward.item_id % 1000;
+		reward.real_item_id -= bundle_amount;
+		reward.amount = bundle_amount;
+	}
+	else {
+		reward.amount = 1;
+	}
+
+	if (reinforcements.contains(reward.real_item_id)) {
+		reward.reinforcement = reinforcements[reward.real_item_id];
+	}
+	else {
+		reward.reinforcement = 0;
+	}
+
+	return reward;
 }

@@ -5,17 +5,18 @@
 #include <list>
 #include <vector>
 
-struct APLocationReward {
+struct APItem {
 	int32_t item_id;        // id of the item in archipelago
 	int32_t real_item_id;   // id of the item to be given to the player
-	std::string item_name;
+	std::wstring item_name;
 	int32_t amount;
+	int8_t reinforcement;
 };
 
 struct APLocation {
 	int64_t location_id;
 	int32_t reward_amount;
-	APLocationReward rewards[10];
+	APItem rewards[10];
 };
 
 enum LocationType {
@@ -41,4 +42,4 @@ void write_save_file();
 void read_save_file();
 
 int32_t get_location_offset(LocationType type);
-std::set<int32_t> get_item_bundles();
+APItem get_archipelago_item(int32_t item_id, int custom_item_id = -1, int player = -1);

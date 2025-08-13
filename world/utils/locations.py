@@ -16,6 +16,7 @@ def parse_csv_to_location_table(csv_path):
             loc_id = int(row["id"])
             description = row["final name"]
             missable = row["missable"].strip().upper() == "TRUE"
+            keep_original = row["keep original item"].strip().upper() == "TRUE"
 
             # Track all instances of the same name
             name_counts[description] += 1
@@ -23,12 +24,14 @@ def parse_csv_to_location_table(csv_path):
 
             # Build LocationData as a tuple
             data = [loc_id, description]
-            if 200000000 <= loc_id < 300000000 and missable:
+            if missable:
                 data.append("missable=True")
             if row["version"] == "sotfs":
                 data.append("sotfs=True")
             elif row["version"] == "vanilla":
                 data.append("vanilla=True")
+            if keep_original:
+                data.append("keep_original_item=True")
 
             location_table[region].append(data)
 
@@ -47,7 +50,7 @@ def parse_csv_to_location_table(csv_path):
     return location_table
 
 def print_location_table(location_table):
-    print("location_table: Dict[str, List[LocationData]] = {")
+    print("locations_by_region: Dict[str, List[LocationData]] = {")
 
     # First print regions in the specified order
     for region in location_table:

@@ -5,169 +5,85 @@ from typing import Optional, List, Dict
 
 @dataclass
 class RegionData:
-    connections: Optional[List[str]]
+    name: str
+    """The Archipelago name for this region."""
+
+    connections: List[str]
+    """The names of all the regions directly connected to this region."""
+
     dlc: Optional[DLC] = None
+    """The DLC this region belongs to, if applicable."""
 
-region_connections: Dict[str, RegionData] = {
-    "Menu": 
-        RegionData(["Things Betwixt"]),
+region_list: List[RegionData] = [
+    RegionData("Menu", ["Things Betwixt"]),
+    RegionData("Things Betwixt", ["Majula"]),
+    RegionData("Majula", ["Forest of Fallen Giants", "Heides Tower of Flame", "Huntsmans Copse", "The Pit", "Shaded Woods"]),
 
-    "Things Betwixt": 
-        RegionData(["Majula"]),
+    RegionData("Forest of Fallen Giants", ["Forest of Fallen Giants - Soldier Key", "Forest of Fallen Giants - Salamander Pit", "Memory of Vammar"]),
+    RegionData("Forest of Fallen Giants - Soldier Key", ["Memory of Orro", "Memory of Jeigh", "The Lost Bastille - FOFG"]),
+    RegionData("Forest of Fallen Giants - Salamander Pit", []),
 
-    "Majula": 
-        RegionData([
-            "Forest of Fallen Giants",
-            "Heides Tower of Flame",
-            "The Pit",
-            "Huntsmans Copse",
-            "Shaded Woods",
-        ]),
+    RegionData("Memory of Vammar", []),
+    RegionData("Memory of Orro", []),
+    RegionData("Memory of Jeigh", []),
 
-    "Forest of Fallen Giants": 
-        RegionData([
-            "Memory of Vammar",
-            "Memory of Orro",
-            "Memory of Jeigh",
-            "The Lost Bastille",
-        ]),
+    RegionData("Heides Tower of Flame", ["No Mans Wharf"]),
+    RegionData("Heides Tower of Flame", ["Cathedral of Blue"]),
+    RegionData("Cathedral of Blue", []),
+    RegionData("No Mans Wharf", ["The Lost Bastille - Wharf"]),
 
-    "Memory of Vammar": 
-        RegionData(None),
+    RegionData("The Lost Bastille - FOFG", ["The Lost Bastille"]),
+    RegionData("The Lost Bastille - Wharf", ["The Lost Bastille", "The Lost Bastille - After Key"]),
+    RegionData("The Lost Bastille", ["The Lost Bastille - After Statue"]),
+    RegionData("The Lost Bastille - After Key", ["The Lost Bastille - Late"]),
+    RegionData("The Lost Bastille - After Statue", ["Belfry Luna", "The Lost Bastille - After Key", "The Lost Bastille - Late"]),
+    RegionData("The Lost Bastille - Late", ["Sinners Rise"]),
+    RegionData("Belfry Luna", []),
+    RegionData("Sinners Rise", []),
 
-    "Memory of Orro": 
-        RegionData(None),
+    RegionData("Huntsmans Copse", ["Harvest Valley", "Undead Purgatory"]),
+    RegionData("Undead Purgatory", []),
+    RegionData("Harvest Valley", ["Earthen Peak"]),
+    RegionData("Earthen Peak", ["Iron Keep"]),
+    RegionData("Iron Keep", ["Belfry Sol", "Brume Tower"]),
+    RegionData("Belfry Sol", []),
 
-    "Memory of Jeigh": 
-        RegionData(None),
+    RegionData("The Pit", ["Grave of Saints", "The Gutter"]),
+    RegionData("Grave of Saints", []),
+    RegionData("The Gutter", ["Black Gulch"]),
+    RegionData("Black Gulch", ["Shulva Sanctum City"]),
 
-    "Heides Tower of Flame": 
-        RegionData([
-            "No Mans Wharf",
-            "Cathedral of Blue",
-        ]),
+    RegionData("Shaded Woods", ["Drangleic Castle", "Doors of Pharros", "Aldias Keep"]),
+    RegionData("Doors of Pharros", ["Tseldora"]),
+    RegionData("Tseldora", []),
 
-    "Cathedral of Blue": 
-        RegionData(None),
+    RegionData("Drangleic Castle", ["Shrine of Amana", "Throne of Want", "Eleum Loyce"]),
+    RegionData("Shrine of Amana", ["Undead Crypt"]),
+    RegionData("Undead Crypt", []),
+    RegionData("Throne of Want", []),
 
-    "No Mans Wharf": 
-        RegionData(["The Lost Bastille"]),
+    RegionData("Aldias Keep", ["Dragon Aerie"]),
+    RegionData("Dragon Aerie", ["Dragon Shrine"]),
+    RegionData("Dragon Shrine", []),
 
-    "The Lost Bastille": 
-        RegionData([
-            "Sinners Rise",
-            "Belfry Luna",
-        ]),
+    RegionData("Shulva Sanctum City", [], dlc=DLC.SUNKEN_KING),
+    RegionData("Dragons Sanctum", [], dlc=DLC.SUNKEN_KING),
+    RegionData("Cave of The Dead", [], dlc=DLC.SUNKEN_KING),
 
-    "Sinners Rise": 
-        RegionData(None),
+    RegionData("Brume Tower", [], dlc=DLC.OLD_IRON_KING),
+    RegionData("Brume Tower - Scepter", [], dlc=DLC.OLD_IRON_KING),
+    RegionData("Iron Passage", [], dlc=DLC.OLD_IRON_KING),
+    RegionData("Memory of The Old Iron King", [], dlc=DLC.OLD_IRON_KING),
 
-    "Belfry Luna": 
-        RegionData(None),
+    RegionData("Eleum Loyce", ["Frigid Outskirts"], dlc=DLC.IVORY_KING),
+    RegionData("Frigid Outskirts", [], dlc=DLC.IVORY_KING),
+]
 
-    "The Pit": 
-        RegionData([
-            "Grave of Saints",
-            "The Gutter",
-        ]),
+region_map: Dict[str, RegionData] = {}
+for region_data in region_list:
+    region_map[region_data.name] = region_data
 
-    "Grave of Saints": 
-        RegionData(None),
-
-    "The Gutter": 
-        RegionData(["Black Gulch"]),
-
-    "Black Gulch": 
-        RegionData(["Shulva Sanctum City"]),
-
-    "Shulva Sanctum City": 
-        RegionData(["Cave of The Dead"], dlc=DLC.SUNKEN_KING),
-
-    "Cave of The Dead": 
-        RegionData(None, dlc=DLC.SUNKEN_KING),
-
-    "Huntsmans Copse": 
-        RegionData([
-            "Undead Purgatory",
-            "Harvest Valley",
-        ]),
-
-    "Undead Purgatory": 
-        RegionData(None),
-
-    "Harvest Valley": 
-        RegionData(["Earthen Peak"]),
-
-    "Earthen Peak": 
-        RegionData(["Iron Keep"]),
-
-    "Iron Keep": 
-        RegionData([
-            "Belfry Sol",
-            "Brume Tower",
-        ]),
-
-    "Belfry Sol": 
-        RegionData(None),
-
-    "Brume Tower": 
-        RegionData([
-            "Iron Passage",
-            "Memory of The Old Iron King",
-        ], dlc=DLC.OLD_IRON_KING),
-
-    "Iron Passage": 
-        RegionData(None, dlc=DLC.OLD_IRON_KING),
-
-    "Memory of The Old Iron King": 
-        RegionData(None, dlc=DLC.OLD_IRON_KING),
-
-    "Shaded Woods": 
-        RegionData([
-            "Doors of Pharros",
-            "Aldias Keep",
-            "Drangleic Castle",
-        ]),
-
-    "Doors of Pharros": 
-        RegionData(["Tseldora"]),
-
-    "Tseldora": 
-        RegionData(None),
-
-    "Aldias Keep": 
-        RegionData(["Dragon Aerie"]),
-
-    "Dragon Aerie": 
-        RegionData(["Dragon Shrine"]),
-
-    "Dragon Shrine": 
-        RegionData(None),
-
-    "Drangleic Castle": 
-        RegionData([
-            "Shrine of Amana",
-            "Eleum Loyce",
-            "Throne of Want"
-        ]),
-
-    "Shrine of Amana": 
-        RegionData(["Undead Crypt"]),
-
-    "Undead Crypt": 
-        RegionData(None),
-
-    "Throne of Want": 
-        RegionData(None),
-
-    "Eleum Loyce": 
-        RegionData(["Frigid Outskirts"], dlc=DLC.IVORY_KING),
-
-    "Frigid Outskirts": 
-        RegionData(None, dlc=DLC.IVORY_KING),
-}
-
-for region_name, region_data in region_connections.items():
+for region_data in region_map.values():
     if not region_data.connections: continue
     for connection in region_data.connections:
-        assert connection in region_connections.keys(), f"Invalid region: {connection} ({region_name} -> {connection})"
+        assert connection in region_map.keys(), f"Invalid region: {connection} ({region_data.name} -> {connection})"
