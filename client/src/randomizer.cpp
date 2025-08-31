@@ -12,7 +12,7 @@
 #include <random>
 #include <chrono>
 
-void override_itemlot_param(std::map<int32_t, APLocation> location_map, std::string seed_str, std::set<int32_t> ignore, std::vector<uintptr_t> param_offsets)
+void override_itemlot_param(APState& state, std::vector<uintptr_t> param_offsets)
 {
     std::vector<int32_t> guaranteed_items_offsets;
     std::vector<int32_t> random_items_offsets;
@@ -22,12 +22,12 @@ void override_itemlot_param(std::map<int32_t, APLocation> location_map, std::str
     uintptr_t table_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets);
     ParamTable* table = (ParamTable*)table_ptr;
     
-    LocationType type;
+    int offset;
     if (param_offsets == param_offsets::item_lot_param2_other) {
-        type = ItemLotParam2_Other_Location;
+        offset = 200'000'000;
     }
     else if (param_offsets == param_offsets::item_lot_param2_chr) {
-        type = ItemLotParam2_Chr_Location;
+        offset = 100'000'000;
     }
     else {
         assert(false && "could not find proper location type");
@@ -37,9 +37,9 @@ void override_itemlot_param(std::map<int32_t, APLocation> location_map, std::str
         ParamRow* row = &table->rows[i];
         ITEM_LOT_PARAM2* param = (ITEM_LOT_PARAM2*)(table_ptr + row->reward_offset);
     
-        int32_t location_id = row->param_id + get_location_offset(type);
-        if (ignore.contains(location_id)) continue;
-        if (location_map.contains(location_id)) continue; // we deal with predefined items in the next for loop
+        int32_t location_id = row->param_id + offset;
+        if (state.slot_data.locations_to_ignore.contains(location_id)) continue;
+        if (state.location_map.contains(location_id)) continue; // we deal with predefined items in the next for loop
 
         if (param->chance_lot_0 == 100.0) {
             guaranteed_items_offsets.push_back(row->reward_offset);
@@ -52,7 +52,7 @@ void override_itemlot_param(std::map<int32_t, APLocation> location_map, std::str
     }
     
     std::hash<std::string> hasher;
-    size_t seed = hasher(seed_str);
+    size_t seed = hasher(state.player_seed);
     
     std::default_random_engine rng(static_cast<unsigned int>(seed));
     std::ranges::shuffle(guaranteed_items_offsets, rng);
@@ -64,11 +64,11 @@ void override_itemlot_param(std::map<int32_t, APLocation> location_map, std::str
         int32_t param_id = row->param_id;
         ITEM_LOT_PARAM2* param = (ITEM_LOT_PARAM2*)(table_ptr + row->reward_offset);
 
-        int32_t location_id = param_id + get_location_offset(type);
-        if (ignore.contains(location_id)) continue;
+        int32_t location_id = param_id + offset;
+        if (state.slot_data.locations_to_ignore.contains(location_id)) continue;
 
-        if (location_map.contains(location_id)) {
-            APLocation& location = location_map[location_id];
+        if (state.location_map.contains(location_id)) {
+            APLocation& location = state.location_map[location_id];
 
             int32_t* items = &param->item_lot_0;
             uint8_t* reinforcements = &param->reinforcement_lot_0;
@@ -129,7 +129,7 @@ void override_item_prices()
     }
 }
 
-void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::string seed_str, std::set<int32_t> ignore)
+void override_shoplineup_param(APState& state)
 {
     // set all items base prices to 1 so that we can
     // set the values properly in the shop params
@@ -151,9 +151,9 @@ void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::
         ParamRow* row = &table->rows[i];
         SHOP_LINEUP_PARAM* param = (SHOP_LINEUP_PARAM*)(table_ptr + row->reward_offset);
 
-        int32_t location_id = row->param_id + get_location_offset(ShopLineupParam_Location);
-        if (ignore.contains(location_id)) continue;
-        if (location_map.contains(location_id)) continue; // we deal with predefined items in the next for loop
+        int32_t location_id = row->param_id + 300'000'000;
+        if (state.slot_data.locations_to_ignore.contains(location_id)) continue;
+        if (state.location_map.contains(location_id)) continue; // we deal with predefined items in the next for loop
         
         if (param->quantity == 1) {
             unique_items.push_back(param->item_id);
@@ -168,7 +168,7 @@ void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::
     }
 
     std::hash<std::string> hasher;
-    size_t seed = hasher(seed_str);
+    size_t seed = hasher(state.player_seed);
 
     std::default_random_engine rng(static_cast<unsigned int>(seed));
     std::ranges::shuffle(unique_items, rng);
@@ -186,11 +186,11 @@ void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::
             param->price_rate = shop_prices.at(param_id); 
         }
 
-        int32_t location_id = param_id + get_location_offset(ShopLineupParam_Location);
-        if (ignore.contains(location_id)) continue;
+        int32_t location_id = param_id + 300'000'000;
+        if (state.slot_data.locations_to_ignore.contains(location_id)) continue;
 
-        if (location_map.contains(location_id)) {
-            APLocation& location = location_map[location_id];
+        if (state.location_map.contains(location_id)) {
+            APLocation& location = state.location_map[location_id];
             assert(location.reward_amount == 1 && "shop location must contain exactly 1 reward");
 
             param->item_id = location.rewards[0].real_item_id;
@@ -220,7 +220,7 @@ void override_shoplineup_param(std::map<int32_t, APLocation> location_map, std::
     }
 }
 
-void override_item_params(std::map<int32_t, APLocation> location_map, std::string seed, std::set<int32_t> ignore)
+void override_item_params(APState& state)
 {
     using namespace std::chrono;
 
@@ -235,9 +235,9 @@ void override_item_params(std::map<int32_t, APLocation> location_map, std::strin
     patch_memory(get_base_address() + 0x316A9F, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 #endif
 
-    override_itemlot_param(location_map, seed, ignore, param_offsets::item_lot_param2_other);
-    override_itemlot_param(location_map, seed, ignore, param_offsets::item_lot_param2_chr);
-    override_shoplineup_param(location_map, seed, ignore);
+    override_itemlot_param(state, param_offsets::item_lot_param2_other);
+    override_itemlot_param(state, param_offsets::item_lot_param2_chr);
+    override_shoplineup_param(state);
 
     auto end_time = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end_time - start_time);

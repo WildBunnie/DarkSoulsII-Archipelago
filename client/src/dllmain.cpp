@@ -39,7 +39,7 @@ void setup_logging()
     spdlog::set_level(spdlog::level::debug);
 }
 
-void handle_input()
+void handle_input(APState& state)
 {
     static std::string line;
 
@@ -52,7 +52,11 @@ void handle_input()
                 spdlog::info("List of available commands : \n"
                     "/help : Prints this help message.\n"
                     "!help : Prints the help message related to Archipelago.\n"
-                    "/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}] : Connect to the specified server.");
+                    "/connect {SERVER_IP}:{SERVER_PORT} {SLOT_NAME} [password:{PASSWORD}] : Connect to the specified server.\n"
+                    "!{message} : Send a message to Archipelago.\n"
+                    "/reset : Reset your progress to receive all items you have been sent again.\n"
+                    "/check_index : See the index of the last received item.\n"
+                    "/decrement_index {number} : Receive the last {number} items you have been sent again. The number cannot go below -1.");
             }
             else if (line.find("/connect ") == 0) {
 
@@ -79,10 +83,35 @@ void handle_input()
                     password = param.substr(password_index + 9);
                 }
 
-                setup_apclient(address, slot_name, password);
+                setup_apclient(state, address, slot_name, password);
+            }
+            else if (line == "/reset") {
+                state.last_received_index = -1;
+                spdlog::info("The value of last_received_index has been reset. You will receive all items again.");
+                state.ap->Sync();
+            }
+            else if (line == "/check_index") {
+                spdlog::info("Current last_received_index: {}", state.last_received_index);
+            }
+            else if (line.find("/decrement_index ") == 0) {
+                std::string param = line.substr(17);
+                try {
+                    int decrement_value = std::stoi(param);
+                    state.last_received_index -= decrement_value;
+
+                    if (state.last_received_index < -1) {
+                        state.last_received_index = -1;
+                    }
+
+                    spdlog::info("Decremented last_received_index by {}. New value: {}", decrement_value, state.last_received_index);
+                    state.ap->Sync();
+                }
+                catch (const std::exception& e) {
+                    spdlog::warn("Invalid number provided. Usage: /decrement_index {number}");
+                }
             }
             else if (line.find("!") == 0) {
-                apclient_say(line);
+                apclient_say(state.ap, line);
             }
             else {
                 spdlog::info("Sorry did not understand that.");
@@ -103,23 +132,27 @@ void handle_input()
     }
 }
 
-void handle_check_locations()
+void handle_check_locations(APState& state)
 {
-    std::list<int32_t> locations_to_check = get_locations_to_check();
-    if (locations_to_check.empty()) return;
+    if (state.location_queue.empty()) return;
 
-    for (int32_t location : locations_to_check) {
-        // check if we get reward from nashandra
+    std::list<int32_t> locations_to_check;
+    while (!state.location_queue.empty()) {
+        int32_t location = state.location_queue.front();
+        state.location_queue.pop();
+
+        // TODO: make this less scuffed
         if (location == 200627000) {
-            announce_goal_reached();
+            announce_goal_reached(state.ap);
         }
+
+        locations_to_check.push_back(location);
     }
 
-    check_locations(locations_to_check);
-    clear_locations_to_check();
+    check_locations(state.ap, state.slot_data, locations_to_check);
 }
 
-void handle_give_items()
+void handle_give_items(APState& state)
 {
     if (!is_player_ingame()) return;
 
@@ -128,10 +161,11 @@ void handle_give_items()
 
     for (int i = 0; i < 8; i++) {
 
-        int64_t item_id = get_next_item();
-        if (item_id == -1) break;
+        if (state.item_queue.empty()) break;
+        int64_t item_id = state.item_queue.front();
+        state.item_queue.pop();
 
-        APItem ap_item = get_archipelago_item(item_id, unused_item_ids[i]);
+        APItem ap_item = get_archipelago_item(state.ap, state.slot_data, item_id, unused_item_ids[i]);
 
         Item item;
         item.item_id = ap_item.real_item_id;
@@ -144,7 +178,7 @@ void handle_give_items()
         // item_id < 1000000 means custom item
         if (ap_item.item_id < 1000000) {
             if (is_statue(ap_item.item_id)) unpetrify_statue(ap_item.item_id);
-            set_item_name(ap_item.real_item_id, ap_item.item_name);
+            state.item_names[ap_item.real_item_id] = ap_item.item_name;
         }
 
         item_struct.items[i] = item;
@@ -153,14 +187,20 @@ void handle_give_items()
 
     if (num_items > 0) {
         give_items(item_struct, num_items);
-        confirm_items_given(num_items);
+        state.last_received_index += num_items;
+        write_save_file(state);
     }
 }
 
-void handle_death_link()
+void handle_death_link(APState& state)
 {
-    if (is_death_link() && is_player_ingame() && player_just_died() && !died_by_deathlink()) {
-        send_death_link();
+    if (state.slot_data.death_link && is_player_ingame() && player_just_died()) {
+        if (!state.died_by_deathlink) {
+            send_death_link(state.ap);
+        }
+        else {
+            state.died_by_deathlink = false;
+        }
     }
 }
 
@@ -181,21 +221,24 @@ void run()
 
     setup_logging();
 
+    APState state;
+
     const int tps = 60; // ticks per second
     int loop_counter = 0;
     while (true) {
-        handle_input();
+        handle_input(state);
 
-        apclient_poll();
+        apclient_poll(state.ap);
 
-        if (!is_apclient_connected()) continue;
+        if (state.fatal_error) continue;
+        if (!is_apclient_connected(state.ap)) continue;
 
-        handle_check_locations();
-        handle_death_link();
+        handle_check_locations(state);
+        handle_death_link(state);
 
         // artificial delay between giving items
         if (loop_counter >= tps) {
-            handle_give_items();
+            handle_give_items(state);
             loop_counter = 0;
         }
 

@@ -18,10 +18,7 @@ HOOKS
 #undef HOOK
 
 bool hooks_enabled = false;
-bool _autoequip = false;
-std::map<int, std::wstring> item_names;
-std::map<int32_t, APLocation> _location_map;
-std::list<int32_t> locations_to_check;
+APState* _state = nullptr;
 
 std::wstring remove_special_characters(const std::wstring& input)
 {
@@ -41,21 +38,21 @@ std::wstring remove_special_characters(const std::wstring& input)
 
 void handle_location_checked(int32_t location_id)
 {
-    if (!_location_map.contains(location_id)) return;
+    if (!_state->location_map.contains(location_id)) return;
 
-    APLocation& location = _location_map[location_id];
+    APLocation& location = _state->location_map[location_id];
     for (int i = 0; i < location.reward_amount; i++) {
         APItem& reward = location.rewards[i];
 
         if (!reward.item_name.empty()) {
             std::wstring item_name = reward.item_name;
-            item_names[reward.real_item_id] = remove_special_characters(item_name);
+            _state->item_names[reward.real_item_id] = remove_special_characters(item_name);
         }
         if (is_statue(reward.item_id)) {
             unpetrify_statue(reward.item_id);
         }
     }
-    locations_to_check.push_back(location_id);
+    _state->location_queue.push(location_id);
 }
 
 #ifdef _M_IX86
@@ -65,7 +62,7 @@ void __cdecl detour_add_item_to_inventory(uintptr_t param_1, Item* param_2)
 #endif
 {
     original_add_item_to_inventory(param_1, param_2);
-    if (_autoequip && std::find(unused_item_ids.begin(), unused_item_ids.end(), param_2->item_id) == unused_item_ids.end())
+    if (_state->slot_data.auto_equip && std::find(unused_item_ids.begin(), unused_item_ids.end(), param_2->item_id) == unused_item_ids.end())
         equip_last_received_item();
     return;
 }
@@ -78,7 +75,7 @@ void __cdecl detour_give_items_on_reward(uintptr_t param_1, uintptr_t param_2, i
 {
     int32_t param_id = read_value<int32_t>(param_2);
     spdlog::debug("was rewarded: {}", param_id);
-    handle_location_checked(param_id + get_location_offset(ItemLotParam2_Other_Location));
+    handle_location_checked(param_id + 200'000'000);
     return original_give_items_on_reward(param_1, param_2, param_3, param_4, param_5);
 }
 
@@ -105,15 +102,15 @@ char __cdecl detour_give_shop_item(uintptr_t param_1, uintptr_t param_2, int32_t
     uint32_t offset = sizeof(uintptr_t) == 4 ? 0x8 : 0x10; // 0x8 in x32 and 0x10 in x64
     int32_t shop_lineup_id = read_value<int32_t>(param_2 + offset);
     spdlog::debug("just bought: {}", shop_lineup_id);
-    handle_location_checked(shop_lineup_id  + get_location_offset(ShopLineupParam_Location));
+    handle_location_checked(shop_lineup_id  + 300'000'000);
     return original_give_shop_item(param_1, param_2, param_3);
 }
 
 const wchar_t* __cdecl detour_get_item_info(int32_t flag, int32_t item_id)
 {
-    if (item_names.contains(item_id)) {
+    if (_state->item_names.contains(item_id)) {
         if (flag == 8) {
-            return item_names[item_id].c_str();
+            return _state->item_names[item_id].c_str();
         }
         else if (flag == 9) {
             return L"Archipelago Item";
@@ -143,10 +140,10 @@ uintptr_t __cdecl detour_get_hovering_item_info(uintptr_t param_1, uintptr_t par
     uintptr_t ptr = read_value<uintptr_t>(param_1 + offset);
     if (ptr != 0) {
         uint32_t param_id = read_value<uint32_t>(ptr + offset);
-        uint32_t location_id = param_id + get_location_offset(ShopLineupParam_Location);
-        if (_location_map.contains(location_id)) {
-            std::wstring item_name = _location_map[location_id].rewards[0].item_name;
-            item_names[custom_shop_item_id] = remove_special_characters(item_name); // this hook is only for shop rn
+        uint32_t location_id = param_id + 300'000'000;
+        if (_state->location_map.contains(location_id)) {
+            std::wstring item_name = _state->location_map[location_id].rewards[0].item_name;
+            _state->item_names[custom_shop_item_id] = remove_special_characters(item_name); // this hook is only for shop rn
         }
     }
     return original_get_hovering_item_info(param_1, param_2);
@@ -172,14 +169,13 @@ int32_t __cdecl detour_remove_item_from_inventory(uintptr_t param_1, uintptr_t p
     return original_remove_item_from_inventory(param_1, param_2, inventory_item_ptr, amount_to_remove);
 }
 
-void init_hooks(std::map<int32_t, APLocation> location_map, bool autoequip)
+void init_hooks(APState& state)
 {
-    uintptr_t base_address = get_base_address();
-
-    _location_map = location_map;
-    _autoequip = autoequip;
+    _state = &state;
 
     if (hooks_enabled) return;
+
+    uintptr_t base_address = get_base_address();
 
     MH_Initialize();
 
@@ -194,19 +190,4 @@ void init_hooks(std::map<int32_t, APLocation> location_map, bool autoequip)
     #undef HOOK
 
     hooks_enabled = true;
-}
-
-std::list<int32_t> get_locations_to_check()
-{
-    return locations_to_check;
-}
-
-void clear_locations_to_check()
-{
-    locations_to_check.clear();
-}
-
-void set_item_name(int32_t item_id, std::wstring item_name)
-{
-    item_names[item_id] = item_name;
 }

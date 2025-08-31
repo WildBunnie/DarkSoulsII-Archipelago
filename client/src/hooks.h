@@ -21,10 +21,7 @@ typedef struct {
     UINT64 capacity;
 } DLString;
 
-void init_hooks(std::map<int32_t, APLocation> location_map, bool autoequip);
-std::list<int32_t> get_locations_to_check();
-void clear_locations_to_check();
-void set_item_name(int32_t item_id, std::wstring item_name);
+void init_hooks(APState& state);
 
 extern "C" int __cdecl get_pickup_id(uintptr_t param_1, uintptr_t baseAddress);
 
