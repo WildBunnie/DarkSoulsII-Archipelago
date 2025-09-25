@@ -12,136 +12,87 @@
 #include <random>
 #include <chrono>
 
-struct PlayerStatus {
-    int8_t idc1[36]; // body,hollow and build type
-    int32_t items[10];
-    uint16_t item_amounts[10];
-    int32_t spells[10];
-    int32_t right_weapons[3];
-    int32_t left_weapons[3];
-    int32_t head_armor;
-    int32_t chest_armor;
-    int32_t hands_armor;
-    int32_t legs_armor;
-    int32_t rings[4];
-    uint32_t reinforcements[6];
-    int32_t unk04;
-    int32_t player_status_items[3];
-    int32_t unk05;
-    int32_t arrows[2];
-    int32_t bolts[2];
-    int16_t arrow_amounts[2];
-    int16_t bolt_amounts[2];
-    int32_t gestures[8];
-    int8_t idc2[4];
-};
-
-// make it so locksones are not sellable
-// and make it so they dont drop from rats
-void patch_lockstone_stuff()
+void override_itemlot_param(APState& state, std::vector<uintptr_t> param_offsets)
 {
-    uintptr_t base_address = get_base_address();
-
-    uintptr_t item_param = resolve_pointer(base_address, pointer_offsets::base_a, param_offsets::item_param);
-    uint32_t offset = sizeof(uintptr_t) == 4 ? 0x1AB20 : 0x1E984; // 0x1AB20 in x32 and 0x1E984 in x64
-    write_value<int32_t>(item_param + offset, 2240); // set it so lockstones have the same usage param as branches
-
-    uintptr_t itemlot_chr_param = resolve_pointer(base_address, pointer_offsets::base_a, param_offsets::item_lot_param2_chr);
-    offset = sizeof(uintptr_t) == 4 ? 0xAAD8 : 0x10A7C; // 0xAAD8 in x32 and 0x10A7C in x64
-    write_value<float_t>(itemlot_chr_param + offset, 0.0f); // make rats have 0% chance to drop lockstone
-}
-
-void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed_str, std::set<int32_t> ignore, std::vector<uintptr_t> param_offsets)
-{
-    uintptr_t param_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets);
-    int first_row_offset = 0x44 - sizeof(uintptr_t); // 0x3C for x64 and 0x40 for x86
-    ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + first_row_offset);
-
     std::vector<int32_t> guaranteed_items_offsets;
     std::vector<int32_t> random_items_offsets;
     std::set<int32_t> guaranteed_items_params;
     std::set<int32_t> random_items_params;
 
-    for (int i = 0; i < 10000; ++i) {
-        int param_id = row_ptr[i].param_id;
-
-        if (i > 0 && param_id == 0) break; // return if we reach the end
-        if (ignore.contains(param_id)) continue;
-        if (rewards.contains(param_id) && !shop_prices.contains(param_id)) continue;
-
-        uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
-        
-        uintptr_t item_ptr = reward_ptr + 0x2C;
-        int32_t item_id = read_value<int32_t>(item_ptr);
-
-        if (item_id == 60510000 || item_id == 0) {
-            ignore.insert(param_id);
-            continue;
-        }
-
-        // chance for the first item to drop
-        uintptr_t chance_ptr = reward_ptr + 0x54; 
-        float_t chance = read_value<float_t>(chance_ptr);
-
-        if (chance == 100.0) {
-            guaranteed_items_offsets.push_back(row_ptr[i].reward_offset);
-            guaranteed_items_params.insert(param_id);
-        }
-        // ignore stupid itemlots that have the first item with 
-        // 0% chance and the second item with 100% chance
-        else if (chance == 0.0) {
-            ignore.insert(param_id);
-        }
-        else {
-            random_items_offsets.push_back(row_ptr[i].reward_offset);
-            random_items_params.insert(param_id);
-        }
+    uintptr_t table_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets);
+    ParamTable* table = (ParamTable*)table_ptr;
+    
+    int offset;
+    if (param_offsets == param_offsets::item_lot_param2_other) {
+        offset = 200'000'000;
+    }
+    else if (param_offsets == param_offsets::item_lot_param2_chr) {
+        offset = 100'000'000;
+    }
+    else {
+        assert(false && "could not find proper location type");
     }
 
-    std::hash<std::string> hasher;
-    size_t seed = hasher(seed_str);
+    for (int i = 0; i < table->row_amount; ++i) {
+        ParamRow* row = &table->rows[i];
+        ITEM_LOT_PARAM2* param = (ITEM_LOT_PARAM2*)(table_ptr + row->reward_offset);
+    
+        int32_t location_id = row->param_id + offset;
+        if (state.slot_data.locations_to_ignore.contains(location_id)) continue;
+        if (state.location_map.contains(location_id)) continue; // we deal with predefined items in the next for loop
 
+        if (param->chance_lot_0 == 100.0) {
+            guaranteed_items_offsets.push_back(row->reward_offset);
+            guaranteed_items_params.insert(row->param_id);
+        }
+        else if (param->chance_lot_0 > 0.0){
+            random_items_offsets.push_back(row->reward_offset);
+            random_items_params.insert(row->param_id);
+        }
+    }
+    
+    std::hash<std::string> hasher;
+    size_t seed = hasher(state.player_seed);
+    
     std::default_random_engine rng(static_cast<unsigned int>(seed));
     std::ranges::shuffle(guaranteed_items_offsets, rng);
     std::ranges::shuffle(random_items_offsets, rng);
 
-    for (int i = 0; i < 10000; ++i) {
-        int param_id = row_ptr[i].param_id;
+    for (int i = 0; i < table->row_amount; ++i) {
+        ParamRow* row = &table->rows[i];
 
-        if (i > 0 && param_id == 0) break; // return if we reach the end
-        if (ignore.contains(param_id)) continue;
+        int32_t param_id = row->param_id;
+        ITEM_LOT_PARAM2* param = (ITEM_LOT_PARAM2*)(table_ptr + row->reward_offset);
 
-        uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
-        if (rewards.contains(param_id) && !shop_prices.contains(param_id)) {
-            int32_t item_id = rewards[param_id];
+        int32_t location_id = param_id + offset;
+        if (state.slot_data.locations_to_ignore.contains(location_id)) continue;
 
-            int8_t amount = 1;
-            if (item_bundles.contains(item_id)) {
-                int bundle_amount = item_id % 1000;
-                item_id = item_id - bundle_amount;
-                amount = bundle_amount;
+        if (state.location_map.contains(location_id)) {
+            APLocation& location = state.location_map[location_id];
+
+            int32_t* items = &param->item_lot_0;
+            uint8_t* reinforcements = &param->reinforcement_lot_0;
+            uint8_t* infusions = &param->infusion_lot_0;
+            uint8_t* amounts = &param->amount_lot_0;
+            float_t* chances = &param->chance_lot_0;
+
+            // zero out to guarantee nothing weird happens
+            std::memset(items, 0, sizeof(int32_t) * 10);
+            std::memset(reinforcements, 0, sizeof(int8_t) * 10);
+            std::memset(infusions, 0, sizeof(int8_t) * 10);
+            std::memset(amounts, 0, sizeof(int8_t) * 10);
+            std::memset(chances, 0, sizeof(float_t) * 10);
+
+            for (int j = 0; j < location.reward_amount && j < 10; j++) {
+                APItem& reward = location.rewards[j];
+                items[j] = reward.real_item_id;
+                amounts[j] = reward.amount;
+                chances[j] = 100.0f;
+                reinforcements[j] = reward.reinforcement;
             }
-
-            uintptr_t item_ptr = reward_ptr + 0x2C;
-            write_value<int32_t>(item_ptr, item_id);
-
-            uintptr_t amount_ptr = reward_ptr + 0x4;
-            write_value<int8_t>(amount_ptr, amount);
-
-            // zero out the amounts of the other items
-            void* ptr = reinterpret_cast<void*>(amount_ptr + 1);
-            std::memset(ptr, 0, 9 * sizeof(int8_t));
-
-            // zero out the reinforcement level
-            ptr = reinterpret_cast<void*>(amount_ptr + 0xA);
-            std::memset(ptr, 0, 10 * sizeof(int8_t));
-
-            // zero out the infusions
-            ptr = reinterpret_cast<void*>(amount_ptr + 0x14);
-            std::memset(ptr, 0, 10 * sizeof(int8_t));
         }
         else {
-            uintptr_t offset = row_ptr[i].reward_offset;
+            uintptr_t offset = row->reward_offset;
             if (guaranteed_items_params.contains(param_id)) {
                 offset = guaranteed_items_offsets.back();
                 guaranteed_items_offsets.pop_back();
@@ -150,7 +101,7 @@ void override_itemlot_param(std::map<int32_t, int32_t> rewards, std::string seed
                 offset = random_items_offsets.back();
                 random_items_offsets.pop_back();
             }
-            row_ptr[i].reward_offset = offset;
+            row->reward_offset = offset;
         }
     }
 }
@@ -178,125 +129,98 @@ void override_item_prices()
     }
 }
 
-void override_shoplineup_param(std::map<int32_t, int32_t> rewards, std::string seed_str, std::set<int32_t> ignore)
+void override_shoplineup_param(APState& state)
 {
     // set all items base prices to 1 so that we can
     // set the values properly in the shop params
     override_item_prices();
 
-    uintptr_t param_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::shop_lineup_param);
-    ParamRow* row_ptr = reinterpret_cast<ParamRow*>(param_ptr + 0x44 - sizeof(uintptr_t)); // 0x3C for x64 and 0x40 for x86
-
-    typedef struct {
+    struct ItemWithAmount {
         int32_t id;
         uint8_t amount;
-    } ItemWithAmount;
+    };
 
     std::vector<int32_t> unique_items;
     std::vector<ItemWithAmount> non_unique_items;
     std::vector<int32_t> infinite_items;
 
-    // get all the items for the static randomizer
-    for (int i = 0; i < 10000; ++i) {
-        int param_id = row_ptr[i].param_id;
+    uintptr_t table_ptr = resolve_pointer(get_base_address(), pointer_offsets::base_a, param_offsets::shop_lineup_param);
+    ParamTable* table = (ParamTable*)table_ptr;
 
-        if (i > 0 && param_id == 0) break; // return if we reach the end
-        if (ignore.contains(param_id)) continue;
-        if (rewards.contains(param_id)) continue; // we deal with predefined items in the next for loop
-        if (param_id >= 76801000 && param_id <= 76801306) continue; // skip straid trades
-        if (param_id >= 77601000 && param_id <= 77602121) continue; // skip ornifex trades
+    for (int i = 1; i < table->row_amount; ++i) {
+        ParamRow* row = &table->rows[i];
+        SHOP_LINEUP_PARAM* param = (SHOP_LINEUP_PARAM*)(table_ptr + row->reward_offset);
 
-        uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
-        uintptr_t amount_ptr = reward_ptr + 0x20;
-        int32_t item_id = read_value<int32_t>(reward_ptr);
-        uint8_t amount = read_value<uint8_t>(amount_ptr);
-
-        if (item_id == 0 || amount == 0) continue;
-
-        if (amount == 1) {
-            //spdlog::debug("unique item {}", param_id);
-            unique_items.push_back(item_id);
+        int32_t location_id = row->param_id + 300'000'000;
+        if (state.slot_data.locations_to_ignore.contains(location_id)) continue;
+        if (state.location_map.contains(location_id)) continue; // we deal with predefined items in the next for loop
+        
+        if (param->quantity == 1) {
+            unique_items.push_back(param->item_id);
         }
-        else if (amount == 255) {
-            infinite_items.push_back(item_id);
+        else if (param->quantity == 255) {
+            infinite_items.push_back(param->item_id);
         }
         else {
-            ItemWithAmount item = { item_id, amount };
+            ItemWithAmount item = { param->item_id, param->quantity };
             non_unique_items.push_back(item);
         }
     }
 
     std::hash<std::string> hasher;
-    size_t seed = hasher(seed_str);
+    size_t seed = hasher(state.player_seed);
 
     std::default_random_engine rng(static_cast<unsigned int>(seed));
     std::ranges::shuffle(unique_items, rng);
     std::ranges::shuffle(non_unique_items, rng);
     std::ranges::shuffle(infinite_items, rng);
 
-    for (int i = 0; i < 10000; ++i) {
-        int param_id = row_ptr[i].param_id;
+    for (int i = 1; i < table->row_amount; ++i) {
+        ParamRow* row = &table->rows[i];
 
-        if (i > 0 && param_id == 0) break; // return if we reach the end
+        int32_t param_id = row->param_id;
+        SHOP_LINEUP_PARAM* param = (SHOP_LINEUP_PARAM*)(table_ptr + row->reward_offset);
 
-        uintptr_t reward_ptr = param_ptr + row_ptr[i].reward_offset;
-        uintptr_t amount_ptr = reward_ptr + 0x20;
-
-        // we need to set the price rate no matter what
-        // because we set the default price of all the items to 1
+        // since we set all items to price = 1 above we need to set price rate on all rows
         if (shop_prices.contains(param_id)) {
-            uintptr_t price_rate_ptr = reward_ptr + 0x1C;
-            write_value<float_t>(price_rate_ptr, shop_prices.at(param_id));
+            param->price_rate = shop_prices.at(param_id); 
         }
 
-        // make it so the items never dissapear from the shop
-        // to prevent the player from losing checks
-        uintptr_t disable_flag_ptr = reward_ptr + 0xC;
-        write_value<float_t>(disable_flag_ptr, -1.0f);
+        int32_t location_id = param_id + 300'000'000;
+        if (state.slot_data.locations_to_ignore.contains(location_id)) continue;
 
-        if (ignore.contains(param_id)) continue;
-        if (param_id >= 76801000 && param_id <= 76801306) continue; // skip straid trades
-        if (param_id >= 77601000 && param_id <= 77602121) continue; // skip ornifex trades
+        if (state.location_map.contains(location_id)) {
+            APLocation& location = state.location_map[location_id];
+            assert(location.reward_amount == 1 && "shop location must contain exactly 1 reward");
 
-        if (rewards.contains(param_id)) {
-            int32_t item_id = rewards[param_id];
-
-            int8_t amount = 1;
-            if (item_bundles.contains(item_id)) {
-                int bundle_amount = item_id % 1000;
-                item_id = item_id - bundle_amount;
-                amount = bundle_amount;
-            }
-
-            write_value<int32_t>(reward_ptr, item_id);
-            write_value<uint8_t>(amount_ptr, amount);
+            param->item_id = location.rewards[0].real_item_id;
+            param->disable_flag = -1;
+            param->quantity = 1;
+            param->price_rate = shop_prices.at(param_id);
         }
         else {
-            int32_t item_id = read_value<int32_t>(reward_ptr);
-            uint8_t amount = read_value<uint8_t>(amount_ptr);
-            if (item_id == 0 || amount == 0) continue;
+            if (param->item_id == 0) continue;
 
-            if (amount == 1) {
-                item_id = unique_items.back();
+            if (param->quantity == 1) {
+                param->item_id = unique_items.back();
                 unique_items.pop_back();
             }   
-            else if (amount == 255) {
-                item_id = infinite_items.back();
+            else if (param->quantity == 255) {
+                param->item_id = infinite_items.back();
                 infinite_items.pop_back();
             }
             else {
                 ItemWithAmount item = non_unique_items.back();
                 non_unique_items.pop_back();
 
-                item_id = item.id;
-                write_value<uint8_t>(amount_ptr, item.amount);
+                param->item_id = item.id;
+                param->quantity = item.amount;
             }
-            write_value<int32_t>(reward_ptr, item_id);
         }
     }
 }
 
-void override_item_params(std::map<int32_t, int32_t> rewards, std::string seed, std::set<int32_t> ignore)
+void override_item_params(APState& state)
 {
     using namespace std::chrono;
 
@@ -311,11 +235,9 @@ void override_item_params(std::map<int32_t, int32_t> rewards, std::string seed, 
     patch_memory(get_base_address() + 0x316A9F, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 #endif
 
-    patch_lockstone_stuff();
-
-    override_itemlot_param(rewards, seed, ignore, param_offsets::item_lot_param2_other);
-    override_itemlot_param(rewards, seed, ignore, param_offsets::item_lot_param2_chr);
-    override_shoplineup_param(rewards, seed, ignore);
+    override_itemlot_param(state, param_offsets::item_lot_param2_other);
+    override_itemlot_param(state, param_offsets::item_lot_param2_chr);
+    override_shoplineup_param(state);
 
     auto end_time = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end_time - start_time);

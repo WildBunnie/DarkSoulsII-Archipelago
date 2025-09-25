@@ -44,18 +44,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\dinput8\dinput8.def">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="src\ds2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\offsets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\dinput8\dinput8.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\memory.h">
@@ -78,12 +70,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\dinput8\dinput8_64.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
-    <MASM Include="src\dinput8\dinput8_32.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
     <MASM Include="src\assembly\functions_64.asm">
       <Filter>Source Files</Filter>
     </MASM>

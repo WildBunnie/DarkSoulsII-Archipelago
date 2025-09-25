@@ -13,18 +13,12 @@
 #include <fstream>
 #include <sys/stat.h>
 
-getaddrinfo_t original_getaddrinfo;
-
 #define HOOK(name) name##_t original_##name;
 HOOKS
 #undef HOOK
 
 bool hooks_enabled = false;
-bool _autoequip = false;
-std::map<int, std::wstring> item_names;
-std::map<int32_t, std::string> _reward_names;
-std::map<int32_t, int32_t> _custom_items;
-std::list<int32_t> locations_to_check;
+APState* _state = nullptr;
 
 std::wstring remove_special_characters(const std::wstring& input)
 {
@@ -42,59 +36,23 @@ std::wstring remove_special_characters(const std::wstring& input)
     return output;
 }
 
-void write_binary_file_if_not_exists(const unsigned char* data, size_t size, const std::wstring& path)
-{
-    try {
-        // check if the file already exists
-        struct _stat buffer;
-        if (_wstat(path.c_str(), &buffer) == 0) {
-            return;
-        }
-
-        std::ofstream file(path, std::ios::binary);
-        file.write(reinterpret_cast<const char*>(data), size);
-        file.close();
-
-        std::wstring log_msg = L"Successfully wrote binary data to " + path;
-        spdlog::debug(std::string(log_msg.begin(), log_msg.end()));
-    }
-    catch (const std::exception& e) {
-        spdlog::debug("Error writing binary file: {}", e.what());
-    }
-}
-
 void handle_location_checked(int32_t location_id)
 {
-    // if the location has an item from other player
-    // set the item to have the correct name
-    if (_reward_names.contains(location_id)) {
-        std::string item_name = _reward_names[location_id];
-        std::wstring item_name_wide(item_name.begin(), item_name.end());
-        item_names[the_item_id] = remove_special_characters(item_name_wide);
-    }
-    // if its a custom item, do whatever we need to do
-    if (_custom_items.contains(location_id)) {
-        int32_t item_id = _custom_items[location_id];
-        if (is_statue(item_id)) {
-            unpetrify_statue(item_id);
+    if (!_state->location_map.contains(location_id)) return;
+
+    APLocation& location = _state->location_map[location_id];
+    for (int i = 0; i < location.reward_amount; i++) {
+        APItem& reward = location.rewards[i];
+
+        if (!reward.item_name.empty()) {
+            std::wstring item_name = reward.item_name;
+            _state->item_names[reward.real_item_id] = remove_special_characters(item_name);
+        }
+        if (is_statue(reward.item_id)) {
+            unpetrify_statue(reward.item_id);
         }
     }
-    locations_to_check.push_back(location_id);
-}
-
-INT __stdcall detour_getaddrinfo(PCSTR address, PCSTR port, const ADDRINFOA* pHints, PADDRINFOA* ppResult)
-{
-#ifdef _M_IX86
-    const char* address_to_block = "frpg2-steam-ope.fromsoftware.jp";
-#elif defined(_M_X64)
-    const char* address_to_block = "frpg2-steam64-ope-login.fromsoftware-game.net";
-#endif
-
-    if (address && strcmp(address, address_to_block) == 0) {
-        return EAI_FAIL;
-    }
-
-    return original_getaddrinfo(address, port, pHints, ppResult);
+    _state->location_queue.push(location_id);
 }
 
 #ifdef _M_IX86
@@ -104,7 +62,7 @@ void __cdecl detour_add_item_to_inventory(uintptr_t param_1, Item* param_2)
 #endif
 {
     original_add_item_to_inventory(param_1, param_2);
-    if (_autoequip && std::find(unused_item_ids.begin(), unused_item_ids.end(), param_2->item_id) == unused_item_ids.end())
+    if (_state->slot_data.auto_equip && std::find(unused_item_ids.begin(), unused_item_ids.end(), param_2->item_id) == unused_item_ids.end())
         equip_last_received_item();
     return;
 }
@@ -115,9 +73,9 @@ void __fastcall detour_give_items_on_reward(uintptr_t param_1, void* _edx, uintp
 void __cdecl detour_give_items_on_reward(uintptr_t param_1, uintptr_t param_2, int32_t param_3, int32_t param_4, int32_t param_5)
 #endif
 {
-    int32_t itemlot_id = read_value<int32_t>(param_2);
-    spdlog::debug("was rewarded: {}", itemlot_id);
-    handle_location_checked(itemlot_id);
+    int32_t param_id = read_value<int32_t>(param_2);
+    spdlog::debug("was rewarded: {}", param_id);
+    handle_location_checked(param_id + 200'000'000);
     return original_give_items_on_reward(param_1, param_2, param_3, param_4, param_5);
 }
 
@@ -127,15 +85,11 @@ char __fastcall detour_give_items_on_pickup(uintptr_t param_1, void* _edx, uintp
 char __cdecl detour_give_items_on_pickup(uintptr_t param_1, uintptr_t param_2)
 #endif
 {
-    int32_t itemlot_id = get_pickup_id(param_2, get_base_address());
-    spdlog::debug("picked up: {}", itemlot_id);
-
-    // janky way to fix the problem that some pickups
-    // have the same id as some of the shop items
-    if (!shop_prices.contains(itemlot_id)) {
-        handle_location_checked(itemlot_id);
-    }
-
+    // we get the location id directly instead of the param id because
+    // i dont know how to do it without hardcoding it in the assembly code
+    int32_t location_id = get_pickup_id(param_2, get_base_address());
+    spdlog::debug("picked up: {}", location_id % 100000000);
+    handle_location_checked(location_id);
     return original_give_items_on_pickup(param_1, param_2);
 }
 
@@ -148,15 +102,15 @@ char __cdecl detour_give_shop_item(uintptr_t param_1, uintptr_t param_2, int32_t
     uint32_t offset = sizeof(uintptr_t) == 4 ? 0x8 : 0x10; // 0x8 in x32 and 0x10 in x64
     int32_t shop_lineup_id = read_value<int32_t>(param_2 + offset);
     spdlog::debug("just bought: {}", shop_lineup_id);
-    handle_location_checked(shop_lineup_id);
+    handle_location_checked(shop_lineup_id  + 300'000'000);
     return original_give_shop_item(param_1, param_2, param_3);
 }
 
 const wchar_t* __cdecl detour_get_item_info(int32_t flag, int32_t item_id)
 {
-    if (item_names.contains(item_id)) {
+    if (_state->item_names.contains(item_id)) {
         if (flag == 8) {
-            return item_names[item_id].c_str();
+            return _state->item_names[item_id].c_str();
         }
         else if (flag == 9) {
             return L"Archipelago Item";
@@ -185,11 +139,11 @@ uintptr_t __cdecl detour_get_hovering_item_info(uintptr_t param_1, uintptr_t par
     int offset = sizeof(uintptr_t) * 2; // 0x8 in x86 and 0x10 in x64
     uintptr_t ptr = read_value<uintptr_t>(param_1 + offset);
     if (ptr != 0) {
-        uint32_t itemlot_id = read_value<uint32_t>(ptr + offset);
-        if (_reward_names.contains(itemlot_id)) {
-            std::string item_name = _reward_names[itemlot_id];
-            std::wstring item_name_wide(item_name.begin(), item_name.end());
-            item_names[the_item_id] = remove_special_characters(item_name_wide);
+        uint32_t param_id = read_value<uint32_t>(ptr + offset);
+        uint32_t location_id = param_id + 300'000'000;
+        if (_state->location_map.contains(location_id)) {
+            std::wstring item_name = _state->location_map[location_id].rewards[0].item_name;
+            _state->item_names[custom_shop_item_id] = remove_special_characters(item_name); // this hook is only for shop rn
         }
     }
     return original_get_hovering_item_info(param_1, param_2);
@@ -215,37 +169,13 @@ int32_t __cdecl detour_remove_item_from_inventory(uintptr_t param_1, uintptr_t p
     return original_remove_item_from_inventory(param_1, param_2, inventory_item_ptr, amount_to_remove);
 }
 
-#ifdef _M_IX86
-size_t __fastcall detour_virtual_to_archive_path(uintptr_t param_1, void* _edx, DLString* path)
-#elif defined(_M_X64)
-size_t __cdecl detour_virtual_to_archive_path(uintptr_t param_1, DLString* path)
-#endif
+void init_hooks(APState& state)
 {
-    if (path != nullptr && is_player_ingame())
-    {
-        const wchar_t* target = L"gamedata:/menu/tex/Icon/IC_0060375000.tpf";
-        const wchar_t* new_path = L"./archipelago/textures/IC_0060375000.tpf";
-        if (wcsncmp(path->string, target, wcslen(target)) == 0)
-        {
-            wcscpy_s(path->string, path->capacity, new_path);
-            path->length = wcslen(new_path);
-        }
-    }
-    return original_virtual_to_archive_path(param_1, path);
-}
-
-void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, int32_t> custom_items, bool autoequip)
-{
-    uintptr_t base_address = get_base_address();
-
-    _reward_names = reward_names;
-    _custom_items = custom_items;
-    _autoequip = autoequip;
+    _state = &state;
 
     if (hooks_enabled) return;
 
-    // create the file with the archipelago texture
-    write_binary_file_if_not_exists(ap_texture_tpf, sizeof(ap_texture_tpf), L"archipelago/textures/IC_0060375000.tpf");
+    uintptr_t base_address = get_base_address();
 
     MH_Initialize();
 
@@ -260,29 +190,4 @@ void init_hooks(std::map<int32_t, std::string> reward_names, std::map<int32_t, i
     #undef HOOK
 
     hooks_enabled = true;
-}
-
-void force_offline()
-{
-    uintptr_t base_address = get_base_address();
-
-    MH_Initialize();
-    LPVOID target = nullptr;
-    MH_CreateHookApiEx(L"ws2_32", "getaddrinfo", &detour_getaddrinfo, (LPVOID*)&original_getaddrinfo, &target);
-    MH_EnableHook(target);
-}
-
-std::list<int32_t> get_locations_to_check()
-{
-    return locations_to_check;
-}
-
-void clear_locations_to_check()
-{
-    locations_to_check.clear();
-}
-
-void set_item_name(int32_t item_id, std::wstring item_name)
-{
-    item_names[item_id] = item_name;
 }
