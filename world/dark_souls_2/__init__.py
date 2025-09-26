@@ -407,7 +407,7 @@ class DS2World(World):
         self.add_combat_rules()
 
         set_rule(self.multiworld.get_location("Defeat Nashandra", self.player), lambda state: state.has("Giant's Kinship", self.player))
-
+        self.set_location_rule("[Drangleic] Nashandra drop", lambda state: state.has("Defeat Nashandra", self.player))
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Defeat Nashandra", self.player)
 
         # from Utils import visualize_regions
