@@ -29,9 +29,10 @@ class ItemData:
 
     bundle: Optional[bool] = False
     """
-    Whether the amount of this item is greater than 1.
-    The item amount is added to the item code so, for example,
-    an item with code 1000 will become 1005 if it is a bundle of 5 items
+    Whether this item comes in a quantity greater than one.
+    
+    The item's quantity is added to its code. For example, an item with 
+    code 1000 and a quantity of 5 would be represented as 1005.
     """
 
     max_reinforcement: int = 0

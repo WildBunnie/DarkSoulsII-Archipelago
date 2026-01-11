@@ -353,7 +353,6 @@ bool read_save_file(APState& state)
 		return true;
 	}
 	catch (const std::exception& e) {
-		spdlog::warn("Error reading save file");
 		return false;
 	}
 }

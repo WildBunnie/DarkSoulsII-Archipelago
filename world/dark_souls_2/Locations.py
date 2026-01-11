@@ -4,7 +4,7 @@ import re
 
 from BaseClasses import ItemClassification
 from .Enums import ItemCategory
-from .Items import item_list
+from .Items import item_list, item_dictionary, category_names
 
 @dataclass
 class LocationData:
@@ -65,7 +65,7 @@ class LocationData:
     """Whether this location will have it's original item."""
 
     remaining_statues = [item for item in item_list if item.category == ItemCategory.STATUE]
-    def normalize_item_name(item_name, vanilla_only):
+    def validate_item_name(self, item_name):
         replacements = {
             "Pharros' Lockstone": "Master Lockstone",
             "Smelter Wedge": "Smelter Wedge x11",
@@ -77,7 +77,7 @@ class LocationData:
         
         if item_name == "Fragrant Branch of Yore":
             for i, statue in enumerate(LocationData.remaining_statues):
-                if not statue.sotfs or not vanilla_only:
+                if not statue.sotfs or not self.vanilla:
                     return LocationData.remaining_statues.pop(i).name
 
         return item_name
@@ -102,7 +102,7 @@ class LocationData:
         assert match, f"Invalid location name format: {self.name}"
 
         _, item_name = match.groups()
-        self.original_item_name = LocationData.normalize_item_name(item_name, self.vanilla)
+        self.original_item_name = self.validate_item_name(item_name)
 
         self.address = LocationData.__next_address
         LocationData.__next_address += 1
@@ -823,10 +823,24 @@ locations_by_region: Dict[str, List[LocationData]] = {
 
 location_name_groups: Dict[str, Set[str]] = {}
 
-for region in locations_by_region:
-    for location in locations_by_region[region]:
+for region_name in locations_by_region:
+    actual_region_name = region_name
+    if " - " in region_name:
+        actual_region_name = region_name.split(" - ")[0]
+
+    for location in locations_by_region[region_name]:
         if location.event: continue
-        if region not in location_name_groups:
-            location_name_groups[region] = {location.name}
+
+        # make a location group for each region
+        if actual_region_name not in location_name_groups:
+            location_name_groups[actual_region_name] = {location.name}
         else:
-            location_name_groups[region].add(location.name)
+            location_name_groups[actual_region_name].add(location.name)
+
+        # make a location group for each item category
+        item_data = item_dictionary[location.original_item_name]
+        category_name = category_names[item_data.category]
+        if category_name not in location_name_groups:
+            location_name_groups[category_name] = {location.name}
+        else:
+            location_name_groups[category_name].add(location.name)

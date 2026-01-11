@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import PerGameCommonOptions, DeathLink, Toggle, Choice, ExcludeLocations, StartInventory, DefaultOnToggle, Range
+from Options import LocationSet, PerGameCommonOptions, DeathLink, Toggle, Choice, ExcludeLocations, StartInventory, DefaultOnToggle, Range
 
 class NoWeaponRequirements(Toggle):
     """Remove the requirements to wield weapons"""
@@ -92,28 +92,12 @@ class DS2ExcludeLocations(ExcludeLocations):
     """Prevent these locations from having an important item."""
     default = frozenset({})
 
-class ExcludedLocationBehaviorOption(Choice):
-    """How to choose items for excluded locations in DS2.
-
-    - **Allow Useful:** Excluded locations can't have progression items, but they
-    can have useful items.
-
-    - **Forbid Useful:** Neither progression items nor useful items can be placed
-    in excluded locations.
-
-    - **Do Not Create:** Excluded locations that don't originally contain progression
-    items will not be added to the multiworld and will instead be shuffled between 
-    each other by the game's static randomizer.
-
-    A "progression item" is anything that's required to unlock another location in some game. A
-    "useful item" is something each game defines individually, usually items that are quite
-    desirable but not strictly necessary.
+class DS2RemoveLocations(LocationSet):
     """
-    display_name = "Excluded Locations Behavior"
-    option_allow_useful = 1
-    option_forbid_useful = 2
-    option_do_not_create = 3
-    default = 2
+    Prevent these locations from being added to the multiworld.
+    This will not work for locations that originally contain an item that is considered progression.
+    """
+    default = frozenset({})
 
 class DS2StartInventory(StartInventory):
     """Start with these items."""
@@ -170,7 +154,7 @@ class DS2Options(PerGameCommonOptions):
     early_blacksmith: EarlyBlacksmith
     infinite_lifegems: KeepInfiniteLifegems
     exclude_locations: DS2ExcludeLocations
-    excluded_location_behavior: ExcludedLocationBehaviorOption
+    remove_locations: DS2RemoveLocations
     start_inventory: DS2StartInventory
     old_iron_king_dlc: OldIronKingDLC
     ivory_king_dlc: IvoryKingDLC
