@@ -107,10 +107,9 @@ const uint32_t UNUSED_ITEM_IDS[] = {60155010, 60155020, 60155030, 65240000, 6525
 #define UNUSED_SHOP_ITEM_ID 60375000
 
 #define MAX_LOCATIONS 4096
-#define MAX_LOCATION_IDS 16
 #define MAX_ITEMS 2048
 #define MAX_ITEM_NAME 128
-#define MAX_LOCATION_REWARDS 10
+#define MAX_LOCATION_REWARDS 16
 
 // There are overlapping ids in different parameter tables
 // so we add this value to the parameter id to make it unique
@@ -134,7 +133,7 @@ typedef struct {
     float shop_price;
     int keep_unrandomized;
 
-    LocationReward location_rewards[MAX_LOCATION_IDS];
+    LocationReward location_rewards[MAX_LOCATION_REWARDS];
     int reward_count;
 } APLocationMapping;
 
@@ -225,7 +224,7 @@ APLocationMapping* get_location_mapping_by_id(int64_t location_id)
 {
     for (int i = 0; i < state.location_mapping_count; ++i) {
         APLocationMapping* mapping = &state.location_mappings[i];
-        for (int j = 0; j < mapping->reward_count; ++j) {
+        for (int j = 0; j < MAX_LOCATION_REWARDS; ++j) {
             if (mapping->location_rewards[j].archipelago_id == location_id) {
                 return mapping;
             }
@@ -721,6 +720,8 @@ void shop_patch_fn(ParamRowData* row_data, void* context) {
     ShopPatchContext* ctx = (ShopPatchContext*)context;
 
     uint32_t location_key = row_data->row->param_id + (uint32_t)LOC_SHOP_LINEUP;
+    param->price_rate = calculate_price_rate(param->price_rate, param->item_id, ctx);
+
     APLocationMapping* location_mapping = get_location_mapping(location_key);
     if (location_mapping && location_mapping->keep_unrandomized) return;
 
@@ -745,7 +746,6 @@ void shop_patch_fn(ParamRowData* row_data, void* context) {
         }
 
         // calculate price based on the original item at this place
-        param->price_rate = calculate_price_rate(param->price_rate, param->item_id, ctx);
         param->item_id = data.item_id;
         param->quantity = data.quantity;
     }
@@ -913,7 +913,7 @@ void ap_on_slot_connected(const nlohmann::json& data)
 
         const nlohmann::json& ids = entry.at("archipelago_ids");
         for (size_t j = 0; j < ids.size(); ++j) {
-            mapping->location_rewards[mapping->reward_count++].archipelago_id = ids[j].get<int64_t>();
+            mapping->location_rewards[j].archipelago_id = ids[j].get<int64_t>();
         }
     }
 
@@ -1001,26 +1001,14 @@ void ap_on_location_info(const std::list<APClient::NetworkItem>& network_items)
     for (const auto& network_item : network_items) {
         APLocationMapping* location_mapping = get_location_mapping_by_id(network_item.location);
 
-        int reward_idx = 0;
-        LocationReward* reward = 0;
-        for (reward_idx = 0; reward_idx < location_mapping->reward_count; ++reward_idx) {
-            if (location_mapping->location_rewards[reward_idx].item_id == 0) {
-                reward = &location_mapping->location_rewards[reward_idx];
-                break;
-            }
-        }
-
-        if (reward_idx == location_mapping->reward_count) {
-            DEBUG_PRINT("WE SHOULD NOT BE HERE");
-            continue;
-        }
+        LocationReward* reward = &location_mapping->location_rewards[location_mapping->reward_count++];
 
         uint32_t unused_item_id = 0;
         if (location_mapping->location_type == LOC_SHOP_LINEUP) { // aka is shop
             unused_item_id = UNUSED_SHOP_ITEM_ID;
         }
         else {
-            unused_item_id = state.unused_items[reward_idx].item_id;
+            unused_item_id = state.unused_items[location_mapping->reward_count - 1].item_id;
         }
 
         reward->archipelago_id = network_item.location;
@@ -1425,19 +1413,21 @@ void render_overlay()
     if (clamp_to_viewport) {
         ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-        ImVec2 pos  = ImGui::GetWindowPos();
-        ImVec2 size = ImGui::GetWindowSize();
+        if (viewport->Size.x > 0.0f && viewport->Size.y > 0.0f) {
+            ImVec2 pos  = ImGui::GetWindowPos();
+            ImVec2 size = ImGui::GetWindowSize();
 
-        float min_x = viewport->Pos.x + OVERLAY_PADDING;
-        float min_y = viewport->Pos.y + OVERLAY_PADDING;
+            float min_x = viewport->Pos.x + OVERLAY_PADDING;
+            float min_y = viewport->Pos.y + OVERLAY_PADDING;
 
-        float max_x = viewport->Pos.x + viewport->Size.x - size.x - OVERLAY_PADDING;
-        float max_y = viewport->Pos.y + viewport->Size.y - size.y - OVERLAY_PADDING;
+            float max_x = viewport->Pos.x + viewport->Size.x - size.x - OVERLAY_PADDING;
+            float max_y = viewport->Pos.y + viewport->Size.y - size.y - OVERLAY_PADDING;
 
-        pos.x = (pos.x < min_x) ? min_x : (pos.x > max_x ? max_x : pos.x);
-        pos.y = (pos.y < min_y) ? min_y : (pos.y > max_y ? max_y : pos.y);
+            pos.x = (pos.x < min_x) ? min_x : (pos.x > max_x ? max_x : pos.x);
+            pos.y = (pos.y < min_y) ? min_y : (pos.y > max_y ? max_y : pos.y);
 
-        ImGui::SetWindowPos(pos);
+            ImGui::SetWindowPos(pos);
+        }
     }
 
     ImGui::End();
