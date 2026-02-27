@@ -590,7 +590,7 @@ void itemlot_prepass_fn(ParamRowData* row_data, void* context) {
     if (chance_sum >= 100.0f) {
         ctx->guaranteed[ctx->guaranteed_count++] = row_data->row->reward_offset;
     }
-    else {
+    else if (chance_sum > 0) {
         ctx->random[ctx->random_count++] = row_data->row->reward_offset;
     }
 }
@@ -640,7 +640,7 @@ void itemlot_patch_fn(ParamRowData* row_data, void* context) {
         if (chance_sum >= 100.0f) {
             row_data->row->reward_offset = ctx->guaranteed[ctx->guaranteed_count--];
         }
-        else {
+        else if (chance_sum > 0) {
             row_data->row->reward_offset = ctx->random[ctx->random_count--];
         }
     }

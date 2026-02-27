@@ -1,4 +1,5 @@
 .smithbox
 *.bak
 *.prev
+*.temp
 project.json
