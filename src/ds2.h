@@ -707,7 +707,7 @@ int libds2_init()
     uintptr_t base_address = (uintptr_t)GetModuleHandle("DarkSoulsII.exe");
     uintptr_t game_manager_imp_addr = base_address + DS2_SINGLETON_GameManagerImp;
 
-    for (int attempts = 0; attempts < 300; ++attempts) {
+    for (int attempts = 0; attempts < 10000; ++attempts) {
         ds2_game_manager_imp = *(DS2GameManagerImp**)game_manager_imp_addr;
         if (ds2_game_manager_imp) break;
         Sleep(1000 / 60);
