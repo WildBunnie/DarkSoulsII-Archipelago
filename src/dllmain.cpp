@@ -24,16 +24,21 @@
     #include "imgui_impl_dx9.h"
 #endif
 
-#ifdef PRINT_DEBUG_STUFF
-    #define DEBUG_PRINT(fmt, ...) \
-        printf("[DEBUG] %s: " fmt "\n", __func__, ##__VA_ARGS__)
+#define LOG_PRINT(level, fmt, ...)                                         \
+    do {                                                                   \
+        SYSTEMTIME _st;                                                    \
+        GetLocalTime(&_st);                                                \
+        printf("[%02d-%02d-%04d %02d:%02d:%02d.%03d] [%s] (%s) " fmt "\n", \
+            _st.wDay, _st.wMonth, _st.wYear,                               \
+            _st.wHour, _st.wMinute, _st.wSecond,                           \
+            _st.wMilliseconds,                                             \
+            level,                                                         \
+            __func__,                                                      \
+            ##__VA_ARGS__);                                                \
+    } while (0)
 
-    #define ERROR_PRINT(fmt, ...) \
-        printf("[ERROR] %s: " fmt "\n", __func__, ##__VA_ARGS__)
-#else
-    #define DEBUG_PRINT(fmt, ...) do {} while (0)
-    #define ERROR_PRINT(fmt, ...) do {} while (0)
-#endif
+#define DEBUG_PRINT(fmt, ...) LOG_PRINT("DEBUG", fmt, ##__VA_ARGS__)
+#define ERROR_PRINT(fmt, ...) LOG_PRINT("ERROR", fmt, ##__VA_ARGS__)
 
 #define PANIC(fmt, ...) do { \
     char buf[1024]; \
@@ -1079,12 +1084,12 @@ void ap_on_print(const std::string& msg) {
 
     char buffer[512];
     snprintf(buffer, sizeof(buffer),
-        "[%02d-%02d-%04d %02d:%02d:%02d.%03d] %s",
-        st.wDay, st.wMonth, st.wYear,
+        "[%02d:%02d:%02d] %s",
         st.wHour, st.wMinute, st.wSecond,
-        st.wMilliseconds,
         msg.c_str()
     );
+
+    DEBUG_PRINT("%s", msg.c_str());
 
     state.console_log.push_back(buffer);
 }
@@ -1436,21 +1441,50 @@ void render_overlay()
 
 int init()
 {
-#ifdef PRINT_DEBUG_STUFF
+#ifdef MOD_DEBUG
     AllocConsole();
     freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+#else
+    FILE* log_file = freopen("archipelago.log", "a", stdout);
+    if (!log_file) {
+        DWORD err = GetLastError();
+        printf("Error opening log file. Error code: %lu\n", err);
+        return 0;
+    }
 #endif
 
-    if (!CreateDirectoryA("archipelago", 0) &&
-        (GetLastError() != ERROR_ALREADY_EXISTS)) return 0;
+    if (!CreateDirectoryA("archipelago", 0)) {
+        DWORD err = GetLastError();
+        if (err != ERROR_ALREADY_EXISTS) {
+            printf("Error creating archipelago folder. Error code: %lu\n", err);
+            return 0;
+        }
+    }
 
-    if (!CreateDirectoryA("archipelago\\save_data", 0) &&
-        (GetLastError() != ERROR_ALREADY_EXISTS)) return 0;
+    if (!CreateDirectoryA("archipelago\\save_data", 0)) {
+        DWORD err = GetLastError();
+        if (err != ERROR_ALREADY_EXISTS) {
+            printf("Error creating archipelago\\save_data folder. Error code: %lu\n", err);
+            return 0;
+        }
+    }
 
-    if(!libds2_init()) return 0;
-    if(!init_hooks()) return 0;
-    if(!init_patches()) return 0;
-    if(!init_overlay(render_overlay)) return 0;
+    if(!libds2_init()) {
+        ERROR_PRINT("Error initializing DS2 stuff");
+        return 0;
+    }
+    if(!init_hooks()) {
+        ERROR_PRINT("Error initializing hooks");
+        return 0;
+    }
+    if(!init_patches()) {
+        ERROR_PRINT("Error initializing patches");
+        return 0;
+    }
+    if(!init_overlay(render_overlay)) {
+        ERROR_PRINT("Error initializing overlay");
+        return 0;
+    }
 
     // init state
     InitializeCriticalSection(&state.queue_lock);
@@ -1460,8 +1494,7 @@ int init()
         state.unused_items[i].item_id = UNUSED_ITEM_IDS[i];
     }
 
-    // TODO: replace with other define
-#ifdef PRINT_DEBUG_STUFF
+#ifdef MOD_DEBUG
     strncpy(state.slot_name, "Player1", sizeof(state.slot_name));
     strncpy(state.server_uri, "localhost:38281", sizeof(state.server_uri));
 #endif
@@ -1474,7 +1507,8 @@ DWORD WINAPI run(LPVOID)
     if (!init()) {
         MessageBoxA(NULL,
                     "An error occurred during initialization.\n"
-                    "The mod will disable itself.",
+                    "The mod will disable itself.\n"
+                    "Check the archipelago.log file for more information.",
                     "Dark Souls II Archipelago Error",
                     MB_OK | MB_ICONERROR);
     }
