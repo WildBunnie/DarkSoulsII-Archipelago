@@ -138,6 +138,8 @@ typedef struct {
     float shop_price;
     int keep_unrandomized;
 
+    int64_t archipelago_ids[MAX_LOCATION_REWARDS];
+
     LocationReward location_rewards[MAX_LOCATION_REWARDS];
     int reward_count;
 } APLocationMapping;
@@ -230,7 +232,7 @@ APLocationMapping* get_location_mapping_by_id(int64_t location_id)
     for (int i = 0; i < state.location_mapping_count; ++i) {
         APLocationMapping* mapping = &state.location_mappings[i];
         for (int j = 0; j < MAX_LOCATION_REWARDS; ++j) {
-            if (mapping->location_rewards[j].archipelago_id == location_id) {
+            if (mapping->archipelago_ids[j] == location_id) {
                 return mapping;
             }
         }
@@ -904,6 +906,10 @@ void ap_on_slot_connected(const nlohmann::json& data)
             ERROR_PRINT("Invalid location key: %d", mapping->location_key);
         }
 
+        if (entry.contains("shop_price")) {
+            mapping->shop_price = entry.at("shop_price").get<float>();
+        }
+
         if (entry.contains("keep_unrandomized") &&
             entry.at("keep_unrandomized").is_boolean() &&
             entry.at("keep_unrandomized").get<bool>())
@@ -912,13 +918,9 @@ void ap_on_slot_connected(const nlohmann::json& data)
             continue;
         }
 
-        if (entry.contains("shop_price")) {
-            mapping->shop_price = entry.at("shop_price").get<float>();
-        }
-
         const nlohmann::json& ids = entry.at("archipelago_ids");
         for (size_t j = 0; j < ids.size(); ++j) {
-            mapping->location_rewards[j].archipelago_id = ids[j].get<int64_t>();
+            mapping->archipelago_ids[j] = ids[j].get<int64_t>();
         }
     }
 
