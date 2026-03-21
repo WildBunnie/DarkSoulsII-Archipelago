@@ -473,12 +473,44 @@ uint32_t __fastcall detour_remove_item_from_inventory(uintptr_t param_1, void*, 
     return original_remove_item_from_inventory(param_1, param_2, item, quantity);
 }
 
+void remove_special_characters(const wchar_t* input, wchar_t* output, int max_len)
+{
+    int j = 0;
+
+    for (int i = 0; input[i] != L'\0' && j < max_len - 1; i++) {
+        wchar_t ch = input[i];
+
+        int is_alphanumeric =
+            (ch >= L'0' && ch <= L'9') ||
+            (ch >= L'A' && ch <= L'Z') ||
+            (ch >= L'a' && ch <= L'z');
+
+        if (is_alphanumeric ||
+            ch == L'-' || ch == L'\'' || ch == L',' ||
+            ch == L' ' || ch == L':' || ch == L'+' || ch == L'&')
+        {
+            output[j++] = ch;
+        }
+    }
+
+    output[j] = L'\0';
+}
+
 const wchar_t* __cdecl detour_get_fmg_entry(DS2FMGFileID file_id, int32_t entry_id)
 {
+    static wchar_t cleaned_name[MAX_ITEM_NAME];
+
     if (file_id == DS2_FMG_ITEM_NAMES) {
         UnusedItem* unused_item = get_unused_item(entry_id);
         if (unused_item && unused_item->item_name[0] != L'\0') {
-            return unused_item->item_name;
+
+            remove_special_characters(
+                unused_item->item_name,
+                cleaned_name,
+                MAX_ITEM_NAME
+            );
+
+            return cleaned_name;
         }
     }
 
