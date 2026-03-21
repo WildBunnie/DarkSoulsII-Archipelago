@@ -172,7 +172,9 @@ typedef struct {
     uint32_t event_flags[MAX_EVENT_FLAGS];
 } ModSaveData;
 
-#define MAX_SLOT_NAME 16
+// The max slot name for ap is 16
+// we make it 17 cause of the null terminator
+#define MAX_SLOT_NAME 17
 #define MAX_PASSWORD 256
 #define MAX_SEED_SIZE 256
 #define MAX_SERVER_URI 256
