@@ -1,3 +1,6 @@
 build
+release
+filelist.txt
 *.bat
 !build.bat
+!make_release.bat
