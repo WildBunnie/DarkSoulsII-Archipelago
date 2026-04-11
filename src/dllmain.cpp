@@ -42,7 +42,7 @@
 
 #define PANIC(fmt, ...) do { \
     char buf[1024]; \
-    snprintf(buf, sizeof(buf), fmt, __VA_ARGS__); \
+    snprintf(buf, sizeof(buf), fmt, ##__VA_ARGS__); \
     MessageBoxA(NULL, buf, "Dark Souls II Archipelago Error", MB_OK | MB_ICONERROR); \
     ExitProcess(1); \
 } while(0)
@@ -179,6 +179,12 @@ typedef struct {
 #define MAX_SEED_SIZE 256
 #define MAX_SERVER_URI 256
 #define MAX_REFUSE_REASON 512
+
+struct ImguiTextNode {
+    std::string text;
+    std::string color;
+};
+
 typedef struct {
     int stop;
 
@@ -215,9 +221,77 @@ typedef struct {
 
     // TODO maybe cap the size
     std::vector<std::string> console_log;
+    std::vector<std::list<ImguiTextNode>> imgui_log;
 } ModState;
 
 static ModState state = {0};
+
+ImVec4 HexToVec4(std::string hex);
+
+ImVec4 HexToVec4(std::string hex) {
+    // Basic logic: convert hex string to floats
+    // This is a simplified example; usually involves sscanf or bit shifting
+    unsigned int r, g, b;
+    sscanf(hex.c_str(), "#%02x%02x%02x", &r, &g, &b);
+    return ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
+}
+
+void DrawTextLine(const std::list<ImguiTextNode>& lineNodes) {
+    for (auto it = lineNodes.begin(); it != lineNodes.end(); ++it) {
+        // Convert your string color to ImVec4
+        ImVec4 cmdColor = HexToVec4(it->color);
+        
+        // Draw the colored text
+        ImGui::TextColored(cmdColor, "%s", it->text.c_str());
+
+        // If this isn't the last element, stay on the same line
+        if (std::next(it) != lineNodes.end()) {
+            ImGui::SameLine(0.0f, 0.0f); // 0.0f spacing for tight concatenation
+        }
+    }
+}
+
+std::list<ImguiTextNode>apclient_textnode_to_imgui_textnode(const std::list<APClient::TextNode>& msg) {
+    std::list<ImguiTextNode> imgui_line {0};
+
+    for (const auto& node: msg) {
+        std::string color;
+        std::string text;
+        color = node.color;
+        if (node.type == "player_id") {
+            int id = std::stoi(node.text);
+            if (color.empty() && state.ap->slot_concerns_self(id)) color = "#FF00FF"; //magenta
+            else if (color.empty()) color = "#FFFF00"; // yellow
+            text = state.ap->get_player_alias(id);
+        } else if (node.type == "item_id") {
+            int64_t id = std::stoll(node.text);
+            if (color.empty()) {
+                if (node.flags & APClient::ItemFlags::FLAG_ADVANCEMENT) color = "#DDA0DD"; // plum
+                else if (node.flags & APClient::ItemFlags::FLAG_NEVER_EXCLUDE) color = "#6A5ACD"; // slateblue
+                else if (node.flags & APClient::ItemFlags::FLAG_TRAP) color = "#FA8072"; // salmon
+                else color = "#00FFFF"; // cyan
+            }
+            text = state.ap->get_item_name(id, state.ap->get_player_game(node.player));
+        } else if (node.type == "location_id") {
+            int64_t id = std::stoll(node.text);
+            if (color.empty()) color = "#0000FF"; // blue
+            text = state.ap->get_location_name(id, state.ap->get_player_game(node.player));
+        } else if (node.type == "hint_status") {
+            text = node.text;
+            if (node.hintStatus == APClient::HINT_FOUND) color = "#008000"; // green
+            else if (node.hintStatus == APClient::HINT_UNSPECIFIED) color = "#808080"; // grey
+            else if (node.hintStatus == APClient::HINT_NO_PRIORITY) color = "#6A5ACD"; // slateblue
+            else if (node.hintStatus == APClient::HINT_AVOID) color = "#FA8072"; // salmon
+            else if (node.hintStatus == APClient::HINT_PRIORITY) color = "#DDA0DD"; // plum
+            else color = "#FF0000";  // unknown status -> red
+        } else {
+            text = node.text;
+        }
+
+        imgui_line.push_back(ImguiTextNode{ text, color });
+    }
+    state.imgui_log.push_back(imgui_line);
+}
 
 APLocationMapping* get_location_mapping(uint32_t location_key)
 {
@@ -800,14 +874,14 @@ void randomize()
     }
     srand(hash_seed);
 
-    ItemlotPatchContext icontext = {0};
+    ItemlotPatchContext icontext = {(APLocationType)0};
     icontext.location_type = LOC_ITEMLOT_OTHER;
     libds2_patch_param_table(DS2_PARAM_ITEM_LOT_PARAM2_OTHER, itemlot_prepass_fn, &icontext);
     shuffle(icontext.guaranteed, icontext.guaranteed_count, sizeof(int32_t));
     shuffle(icontext.random, icontext.random_count, sizeof(int32_t));
     libds2_patch_param_table(DS2_PARAM_ITEM_LOT_PARAM2_OTHER, itemlot_patch_fn, &icontext);
 
-    icontext = {0};
+    icontext = {(APLocationType)0};
     icontext.location_type = LOC_ITEMLOT_CHR;
     libds2_patch_param_table(DS2_PARAM_ITEM_LOT_PARAM2_CHR, itemlot_prepass_fn, &icontext);
     shuffle(icontext.guaranteed, icontext.guaranteed_count, sizeof(int32_t));
@@ -1132,6 +1206,7 @@ void ap_on_print(const std::string& msg) {
 
 void ap_on_print_json(const std::list<APClient::TextNode>& msg) {
     std::string message = state.ap->render_json(msg, APClient::RenderFormat::TEXT);
+    apclient_textnode_to_imgui_textnode(msg);
     ap_on_print(message);
 }
 
@@ -1418,16 +1493,27 @@ void render_overlay()
         if (ImGui::BeginTabItem("Console")) {
             ImGui::BeginChild("ConsoleChild", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 
-            for (size_t i = 0; i < state.console_log.size(); ++i) {
-                const auto& line = state.console_log[i];
+            // -- OLD--
+            // for (size_t i = 0; i < state.console_log.size(); ++i) {
+            //     const auto& line = state.console_log[i];
+            //
+            //     ImGui::PushTextWrapPos(ImGui::GetContentRegionAvail().x);
+            //     ImGui::TextUnformatted(line.c_str());
+            //     ImGui::PopTextWrapPos();
+            //
+            //
+            //     if (i + 1 < state.console_log.size()) {
+            //         ImGui::Spacing();
+            //     }
+            // }
+            // -- OLD --
 
-                ImGui::PushTextWrapPos(ImGui::GetContentRegionAvail().x);
-                ImGui::TextUnformatted(line.c_str());
-                ImGui::PopTextWrapPos();
 
-                if (i + 1 < state.console_log.size()) {
-                    ImGui::Spacing();
-                }
+            for (size_t i = 0; i < state.imgui_log.size(); ++i) {
+                const auto& imgui_line = state.imgui_log[i];
+                // -- NEW --
+                DrawTextLine(imgui_line);
+                // -- NEW --
             }
 
             if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
