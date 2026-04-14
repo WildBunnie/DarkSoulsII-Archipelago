@@ -42,7 +42,7 @@
 
 #define PANIC(fmt, ...) do { \
     char buf[1024]; \
-    snprintf(buf, sizeof(buf), fmt, ##__VA_ARGS__); \
+    snprintf(buf, sizeof(buf), fmt, __VA_ARGS__); \
     MessageBoxA(NULL, buf, "Dark Souls II Archipelago Error", MB_OK | MB_ICONERROR); \
     ExitProcess(1); \
 } while(0)
@@ -876,14 +876,14 @@ void randomize()
     }
     srand(hash_seed);
 
-    ItemlotPatchContext icontext = {(APLocationType)0};
+    ItemlotPatchContext icontext = {0};
     icontext.location_type = LOC_ITEMLOT_OTHER;
     libds2_patch_param_table(DS2_PARAM_ITEM_LOT_PARAM2_OTHER, itemlot_prepass_fn, &icontext);
     shuffle(icontext.guaranteed, icontext.guaranteed_count, sizeof(int32_t));
     shuffle(icontext.random, icontext.random_count, sizeof(int32_t));
     libds2_patch_param_table(DS2_PARAM_ITEM_LOT_PARAM2_OTHER, itemlot_patch_fn, &icontext);
 
-    icontext = {(APLocationType)0};
+    icontext = {0};
     icontext.location_type = LOC_ITEMLOT_CHR;
     libds2_patch_param_table(DS2_PARAM_ITEM_LOT_PARAM2_CHR, itemlot_prepass_fn, &icontext);
     shuffle(icontext.guaranteed, icontext.guaranteed_count, sizeof(int32_t));
@@ -1495,27 +1495,9 @@ void render_overlay()
         if (ImGui::BeginTabItem("Console")) {
             ImGui::BeginChild("ConsoleChild", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 
-            // -- OLD--
-            // for (size_t i = 0; i < state.console_log.size(); ++i) {
-            //     const auto& line = state.console_log[i];
-            //
-            //     ImGui::PushTextWrapPos(ImGui::GetContentRegionAvail().x);
-            //     ImGui::TextUnformatted(line.c_str());
-            //     ImGui::PopTextWrapPos();
-            //
-            //
-            //     if (i + 1 < state.console_log.size()) {
-            //         ImGui::Spacing();
-            //     }
-            // }
-            // -- OLD --
-
-
             for (size_t i = 0; i < state.imgui_log.size(); ++i) {
                 const auto& imgui_line = state.imgui_log[i];
-                // -- NEW --
                 DrawTextLine(imgui_line);
-                // -- NEW --
             }
 
             if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
