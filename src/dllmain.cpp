@@ -180,7 +180,7 @@ typedef struct {
 #define MAX_SERVER_URI 256
 #define MAX_REFUSE_REASON 512
 
-struct ImguiTextNode {
+struct ImGuiTextNode {
     std::string text;
     ImVec4* color;
 };
@@ -221,7 +221,7 @@ typedef struct {
 
     // TODO maybe cap the size
     std::vector<std::string> console_log;
-    std::vector<std::list<ImguiTextNode>> imgui_log;
+    std::vector<std::list<ImGuiTextNode>> imgui_log;
 } ModState;
 
 static ModState state = {0};
@@ -241,7 +241,7 @@ struct ConsoleColors {
 };
 static const ConsoleColors console_colors;
 
-void DrawTextLine(const std::list<ImguiTextNode>& lineNodes) {
+void DrawTextLine(const std::list<ImGuiTextNode>& lineNodes) {
     for (auto it = lineNodes.begin(); it != lineNodes.end(); ++it) {
 
         // Draw the colored text
@@ -254,8 +254,9 @@ void DrawTextLine(const std::list<ImguiTextNode>& lineNodes) {
     }
 }
 
+// stolen from apclientpp/apclient.hpp:777 render_json function, adjusted for ImGui
 void apclient_textnode_to_imgui_textnode(const std::list<APClient::TextNode>& msg) {
-    std::list<ImguiTextNode> imgui_line {0};
+    std::list<ImGuiTextNode> imgui_line {0};
 
     for (const auto& node: msg) {
         ImVec4 color = console_colors.White;
@@ -290,7 +291,7 @@ void apclient_textnode_to_imgui_textnode(const std::list<APClient::TextNode>& ms
             text = node.text;
         }
 
-        imgui_line.push_back(ImguiTextNode{ text, color: &color });
+        imgui_line.push_back(ImGuiTextNode{ text, color: &color });
     }
     state.imgui_log.push_back(imgui_line);
 }
