@@ -244,12 +244,11 @@ static const ConsoleColors console_colors;
 void DrawTextLine(const std::list<ImGuiTextNode>& lineNodes) {
     for (auto it = lineNodes.begin(); it != lineNodes.end(); ++it) {
 
-        // Draw the colored text
         ImGui::TextColored(*it->color, "%s", it->text.c_str());
 
         // If this isn't the last element, stay on the same line
         if (std::next(it) != lineNodes.end()) {
-            ImGui::SameLine(0.0f, 0.0f); // 0.0f spacing for tight concatenation
+            ImGui::SameLine(0.0f, 0.0f);
         }
     }
 }
