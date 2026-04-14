@@ -237,7 +237,7 @@ struct ConsoleColors {
     ImVec4 SlateBlue = ImVec4(0.42f, 0.35f, 0.80f, 1.00f);
     ImVec4 Salmon    = ImVec4(1.00f, 0.50f, 0.45f, 1.00f);
     ImVec4 Grey      = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-    ImVec4 White      = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    ImVec4 White     = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 };
 static const ConsoleColors console_colors;
 
