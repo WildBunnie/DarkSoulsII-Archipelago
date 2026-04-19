@@ -42,7 +42,7 @@
 
 #define PANIC(fmt, ...) do { \
     char buf[1024]; \
-    snprintf(buf, sizeof(buf), fmt, __VA_ARGS__); \
+    snprintf(buf, sizeof(buf), fmt, ##__VA_ARGS__); \
     MessageBoxA(NULL, buf, "Dark Souls II Archipelago Error", MB_OK | MB_ICONERROR); \
     ExitProcess(1); \
 } while(0)
@@ -182,7 +182,7 @@ typedef struct {
 
 struct ImGuiTextNode {
     std::string text;
-    ImVec4* color;
+    ImVec4 color;
 };
 
 typedef struct {
@@ -244,7 +244,7 @@ static const ConsoleColors console_colors;
 void DrawTextLine(const std::list<ImGuiTextNode>& lineNodes) {
     for (auto it = lineNodes.begin(); it != lineNodes.end(); ++it) {
 
-        ImGui::TextColored(*it->color, "%s", it->text.c_str());
+        ImGui::TextColored(it->color, "%s", it->text.c_str());
 
         // If this isn't the last element, stay on the same line
         if (std::next(it) != lineNodes.end()) {
@@ -290,7 +290,10 @@ void apclient_textnode_to_imgui_textnode(const std::list<APClient::TextNode>& ms
             text = node.text;
         }
 
-        imgui_line.push_back(ImGuiTextNode{ text, color: &color });
+        ImGuiTextNode imgui_text_node;
+        imgui_text_node.text = text;
+        imgui_text_node.color = color;
+        imgui_line.push_back(imgui_text_node);
     }
     state.imgui_log.push_back(imgui_line);
 }
@@ -883,7 +886,7 @@ void randomize()
     shuffle(icontext.random, icontext.random_count, sizeof(int32_t));
     libds2_patch_param_table(DS2_PARAM_ITEM_LOT_PARAM2_OTHER, itemlot_patch_fn, &icontext);
 
-    icontext = {0};
+    icontext = ItemlotPatchContext{0};
     icontext.location_type = LOC_ITEMLOT_CHR;
     libds2_patch_param_table(DS2_PARAM_ITEM_LOT_PARAM2_CHR, itemlot_prepass_fn, &icontext);
     shuffle(icontext.guaranteed, icontext.guaranteed_count, sizeof(int32_t));
