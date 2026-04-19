@@ -42,7 +42,7 @@
 
 #define PANIC(fmt, ...) do { \
     char buf[1024]; \
-    snprintf(buf, sizeof(buf), fmt, __VA_ARGS__); \
+    snprintf(buf, sizeof(buf), fmt, ##__VA_ARGS__); \
     MessageBoxA(NULL, buf, "Dark Souls II Archipelago Error", MB_OK | MB_ICONERROR); \
     ExitProcess(1); \
 } while(0)
@@ -179,6 +179,12 @@ typedef struct {
 #define MAX_SEED_SIZE 256
 #define MAX_SERVER_URI 256
 #define MAX_REFUSE_REASON 512
+
+struct ImGuiTextNode {
+    std::string text;
+    ImVec4 color;
+};
+
 typedef struct {
     int stop;
 
@@ -215,9 +221,82 @@ typedef struct {
 
     // TODO maybe cap the size
     std::vector<std::string> console_log;
+    std::vector<std::list<ImGuiTextNode>> imgui_log;
 } ModState;
 
 static ModState state = {0};
+
+struct ConsoleColors {
+    ImVec4 Red       = ImVec4(1.00f, 0.25f, 0.25f, 1.00f);
+    ImVec4 Green     = ImVec4(0.20f, 0.80f, 0.20f, 1.00f);
+    ImVec4 Yellow    = ImVec4(1.00f, 0.80f, 0.00f, 1.00f);
+    ImVec4 Blue      = ImVec4(0.20f, 0.50f, 1.00f, 1.00f);
+    ImVec4 Magenta   = ImVec4(0.80f, 0.30f, 0.80f, 1.00f);
+    ImVec4 Cyan      = ImVec4(0.00f, 0.80f, 0.80f, 1.00f);
+    ImVec4 Plum      = ImVec4(0.87f, 0.63f, 0.87f, 1.00f);
+    ImVec4 SlateBlue = ImVec4(0.42f, 0.35f, 0.80f, 1.00f);
+    ImVec4 Salmon    = ImVec4(1.00f, 0.50f, 0.45f, 1.00f);
+    ImVec4 Grey      = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+    ImVec4 White     = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+};
+static const ConsoleColors console_colors;
+
+void DrawTextLine(const std::list<ImGuiTextNode>& lineNodes) {
+    for (auto it = lineNodes.begin(); it != lineNodes.end(); ++it) {
+
+        ImGui::TextColored(it->color, "%s", it->text.c_str());
+
+        // If this isn't the last element, stay on the same line
+        if (std::next(it) != lineNodes.end()) {
+            ImGui::SameLine(0.0f, 0.0f);
+        }
+    }
+}
+
+// stolen from apclientpp/apclient.hpp:777 render_json function, adjusted for ImGui
+void apclient_textnode_to_imgui_textnode(const std::list<APClient::TextNode>& msg) {
+    std::list<ImGuiTextNode> imgui_line {0};
+
+    for (const auto& node: msg) {
+        ImVec4 color = console_colors.White;
+        std::string text;
+        if (node.type == "player_id") {
+            int id = std::stoi(node.text);
+            if (node.color.empty() && state.ap->slot_concerns_self(id)) color = console_colors.Magenta; //magenta
+            else if (node.color.empty()) color = console_colors.Yellow; // yellow
+            text = state.ap->get_player_alias(id);
+        } else if (node.type == "item_id") {
+            int64_t id = std::stoll(node.text);
+            if (node.color.empty()) {
+                if (node.flags & APClient::ItemFlags::FLAG_ADVANCEMENT) color = console_colors.Plum; // plum
+                else if (node.flags & APClient::ItemFlags::FLAG_NEVER_EXCLUDE) color = console_colors.SlateBlue; // slateblue
+                else if (node.flags & APClient::ItemFlags::FLAG_TRAP) color = console_colors.Salmon; // salmon
+                else color = console_colors.Cyan; // cyan
+            }
+            text = state.ap->get_item_name(id, state.ap->get_player_game(node.player));
+        } else if (node.type == "location_id") {
+            int64_t id = std::stoll(node.text);
+            if (node.color.empty()) color = console_colors.Blue; // blue
+            text = state.ap->get_location_name(id, state.ap->get_player_game(node.player));
+        } else if (node.type == "hint_status") {
+            text = node.text;
+            if (node.hintStatus == APClient::HINT_FOUND) color = console_colors.Green; // green
+            else if (node.hintStatus == APClient::HINT_UNSPECIFIED) color = console_colors.Grey; // grey
+            else if (node.hintStatus == APClient::HINT_NO_PRIORITY) color = console_colors.SlateBlue; // slateblue
+            else if (node.hintStatus == APClient::HINT_AVOID) color = console_colors.Salmon; // salmon
+            else if (node.hintStatus == APClient::HINT_PRIORITY) color = console_colors.Plum; // plum
+            else color = console_colors.Red;  // unknown status -> red
+        } else {
+            text = node.text;
+        }
+
+        ImGuiTextNode imgui_text_node;
+        imgui_text_node.text = text;
+        imgui_text_node.color = color;
+        imgui_line.push_back(imgui_text_node);
+    }
+    state.imgui_log.push_back(imgui_line);
+}
 
 APLocationMapping* get_location_mapping(uint32_t location_key)
 {
@@ -807,7 +886,7 @@ void randomize()
     shuffle(icontext.random, icontext.random_count, sizeof(int32_t));
     libds2_patch_param_table(DS2_PARAM_ITEM_LOT_PARAM2_OTHER, itemlot_patch_fn, &icontext);
 
-    icontext = {0};
+    icontext = ItemlotPatchContext{0};
     icontext.location_type = LOC_ITEMLOT_CHR;
     libds2_patch_param_table(DS2_PARAM_ITEM_LOT_PARAM2_CHR, itemlot_prepass_fn, &icontext);
     shuffle(icontext.guaranteed, icontext.guaranteed_count, sizeof(int32_t));
@@ -1132,6 +1211,7 @@ void ap_on_print(const std::string& msg) {
 
 void ap_on_print_json(const std::list<APClient::TextNode>& msg) {
     std::string message = state.ap->render_json(msg, APClient::RenderFormat::TEXT);
+    apclient_textnode_to_imgui_textnode(msg);
     ap_on_print(message);
 }
 
@@ -1418,16 +1498,9 @@ void render_overlay()
         if (ImGui::BeginTabItem("Console")) {
             ImGui::BeginChild("ConsoleChild", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 
-            for (size_t i = 0; i < state.console_log.size(); ++i) {
-                const auto& line = state.console_log[i];
-
-                ImGui::PushTextWrapPos(ImGui::GetContentRegionAvail().x);
-                ImGui::TextUnformatted(line.c_str());
-                ImGui::PopTextWrapPos();
-
-                if (i + 1 < state.console_log.size()) {
-                    ImGui::Spacing();
-                }
+            for (size_t i = 0; i < state.imgui_log.size(); ++i) {
+                const auto& imgui_line = state.imgui_log[i];
+                DrawTextLine(imgui_line);
             }
 
             if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
