@@ -172,6 +172,12 @@ typedef struct {
     uint32_t event_flags[MAX_EVENT_FLAGS];
 } ModSaveData;
 
+typedef struct {
+    float x_coord;
+    float y_coord;
+    float z_coord;
+} DS2PlayerPosition;
+
 // The max slot name for ap is 16
 // we make it 17 cause of the null terminator
 #define MAX_SLOT_NAME 17
@@ -179,6 +185,7 @@ typedef struct {
 #define MAX_SEED_SIZE 256
 #define MAX_SERVER_URI 256
 #define MAX_REFUSE_REASON 512
+#define MAX_MAP_ID_SIZE 13
 typedef struct {
     int stop;
 
@@ -212,6 +219,9 @@ typedef struct {
     UnusedItem unused_shop_item;
     UnusedItem unused_items[UNUSED_ITEM_COUNT];
     int unused_item_count;
+
+    char map_id[MAX_MAP_ID_SIZE];
+    DS2PlayerPosition* player_position_address;
 
     // TODO maybe cap the size
     std::vector<std::string> console_log;
@@ -1245,6 +1255,206 @@ void handle_give_items()
     }
 }
 
+constexpr std::string_view MAP_ID_THINGS_BETWIXT = "m10_02_00_00";
+constexpr std::string_view MAP_ID_MAJULA = "m10_04_00_00";
+constexpr std::string_view MAP_ID_FOREST_OF_FALLEN_GIANTS = "m10_10_00_00";
+constexpr std::string_view MAP_ID_BRIGHTSTONE_COVE_TSELDORA = "m10_14_00_00";
+constexpr std::string_view MAP_ID_ALDIAS_KEEP = "m10_15_00_00";
+constexpr std::string_view MAP_ID_LOST_BASTILLE = "m10_16_00_00";
+constexpr std::string_view MAP_ID_SINNERS_RISE = "m10_16_00_01"; // Artificial Map ID created by setting last digit to '1'.
+constexpr std::string_view MAP_ID_EARTHEN_PEAK = "m10_17_00_00";
+constexpr std::string_view MAP_ID_HARVEST_VALLEY = "m10_17_00_01"; // Artificial Map ID created by setting last digit to '1'.
+constexpr std::string_view MAP_ID_NOMANS_WHARF = "m10_18_00_00";
+constexpr std::string_view MAP_ID_IRON_KEEP = "m10_19_00_00";
+constexpr std::string_view MAP_ID_HUNTSMANS_COPSE = "m10_23_00_00";
+constexpr std::string_view MAP_ID_THE_GUTTER = "m10_25_00_00";
+constexpr std::string_view MAP_ID_DRAGON_AERIE = "m10_27_00_00";
+constexpr std::string_view MAP_ID_PATH_TO_THE_SHADED_WOODS = "m10_29_00_00"; // Treated as Majula by tracker.
+constexpr std::string_view MAP_ID_UNSEEN_PATH_TO_HEIDES = "m10_30_00_00";
+constexpr std::string_view MAP_ID_HEIDES_TOWER_OF_FLAME = "m10_31_00_00";
+constexpr std::string_view MAP_ID_SHADED_WOODS = "m10_32_00_00";
+constexpr std::string_view MAP_ID_DOORS_OF_PHARROS = "m10_33_00_00";
+constexpr std::string_view MAP_ID_GRAVE_OF_SAINTS = "m10_34_00_00";
+constexpr std::string_view MAP_ID_MEMORIES_OF_THE_GIANTS = "m20_10_00_00";
+constexpr std::string_view MAP_ID_SHRINE_OF_AMANA = "m20_11_00_00";
+constexpr std::string_view MAP_ID_DRANGLEIC_CASTLE = "m20_21_00_00";
+constexpr std::string_view MAP_ID_UNDEAD_CRYPT = "m20_24_00_00";
+constexpr std::string_view MAP_ID_DRAGON_MEMORIES = "m20_26_00_00";
+constexpr std::string_view MAP_ID_CHAOS_OF_THE_ABYSS = "m40_03_00_00";
+constexpr std::string_view MAP_ID_SHULVA = "m50_35_00_00";
+constexpr std::string_view MAP_ID_BRUME_TOWER = "m50_36_00_00";
+constexpr std::string_view MAP_ID_ELEUM_LOYCE = "m50_37_00_00";
+constexpr std::string_view MAP_ID_MEMORY_OF_THE_KING = "m50_38_00_00";
+
+void send_map_id_changed()
+{
+    if (!state.ap || state.ap->get_state() != APClient::State::SLOT_CONNECTED) return;
+
+    DEBUG_PRINT("sending MapUpdate bounce packet for map_id: %s", state.map_id);
+
+    nlohmann::json data{
+        {"type", "MapUpdate"},
+        {"mapId", state.map_id},
+    };
+    bool success = state.ap->Bounce(data, {state.ap->get_game()}, {state.ap->get_player_number()}, {});
+    if (!success) {
+        DEBUG_PRINT("FAILED sending MapUpdate bounce packet for map_id: %s", state.map_id);
+    }
+}
+
+void load_player_position()
+{
+    if (state.player_position_address) return;
+    uintptr_t base_address = (uintptr_t)GetModuleHandle(0);
+    state.player_position_address = (DS2PlayerPosition*)resolve_pointer_chain(base_address, player_position_chain, sizeof(player_position_chain) / sizeof(player_position_chain[0]));
+}
+
+void refine_map_id(std::string& new_map_id)
+{
+    load_player_position();
+    if (!state.player_position_address) return;
+    DS2PlayerPosition player = *state.player_position_address;
+
+    // Use player position coordinates to alter the found Map ID to improve accuracy.
+    if (new_map_id == MAP_ID_THINGS_BETWIXT) {
+        if (player.x_coord > -90) {
+            new_map_id = MAP_ID_MAJULA;
+        }
+    } else if (new_map_id == MAP_ID_MAJULA) {
+        if (player.z_coord < -135 && state.map_id == MAP_ID_THINGS_BETWIXT) {
+            // Prevent map tab stuttering at boundary with Things Betwixt.
+            new_map_id = MAP_ID_THINGS_BETWIXT;
+        } else if (player.x_coord < -150 && player.y_coord > 23.5) {
+            new_map_id = MAP_ID_HUNTSMANS_COPSE;
+        }
+    } else if (new_map_id == MAP_ID_FOREST_OF_FALLEN_GIANTS) {
+        if (player.x_coord > -55 && player.z_coord > -125) {
+            new_map_id = MAP_ID_MAJULA;
+        }
+    } else if (new_map_id == MAP_ID_BRIGHTSTONE_COVE_TSELDORA) {
+        if (player.y_coord < 132 && player.z_coord < -215) {
+            new_map_id = MAP_ID_DOORS_OF_PHARROS;
+        }
+    } else if (new_map_id == MAP_ID_LOST_BASTILLE) {
+        if (player.y_coord < -70 || player.z_coord > 645) {
+            new_map_id = MAP_ID_SINNERS_RISE;
+        }
+    } else if (new_map_id == MAP_ID_EARTHEN_PEAK) {
+        if (player.y_coord > 150) {
+            new_map_id = MAP_ID_IRON_KEEP;
+        } else if (player.x_coord > -483 && player.z_coord < 252) {
+            new_map_id = MAP_ID_HUNTSMANS_COPSE;
+        } else if (player.x_coord < -579 && player.y_coord < 55) {
+            // Broken statue area which extends past the boundary line for Earthen Peak.
+            new_map_id = MAP_ID_HARVEST_VALLEY;
+        } else if (player.y_coord > 58 || player.z_coord > 469) {
+            return; // Leave as Earthen Peak.
+        } else {
+            new_map_id = MAP_ID_HARVEST_VALLEY;
+        }
+    } else if (new_map_id == MAP_ID_NOMANS_WHARF) {
+        if (player.z_coord < 440) {
+            new_map_id = MAP_ID_HEIDES_TOWER_OF_FLAME;
+        }
+    } else if (new_map_id == MAP_ID_HUNTSMANS_COPSE) {
+        if (player.x_coord > -150 && player.y_coord < 23.5) {
+            new_map_id = MAP_ID_MAJULA;
+        } else if (player.x_coord < -483 && player.z_coord > 252) {
+            new_map_id = MAP_ID_HARVEST_VALLEY;
+        }
+    } else if (new_map_id == MAP_ID_THE_GUTTER) {
+        if (player.y_coord > -120.5) {
+            new_map_id = MAP_ID_MAJULA;
+        }
+    } else if (new_map_id == MAP_ID_PATH_TO_THE_SHADED_WOODS) {
+        if (player.x_coord < -175) {
+            new_map_id = MAP_ID_SHADED_WOODS;
+        }
+    } else if (new_map_id == MAP_ID_HEIDES_TOWER_OF_FLAME) {
+        if (player.z_coord < 140) {
+            new_map_id = MAP_ID_MAJULA;
+        }
+    } else if (new_map_id == MAP_ID_SHADED_WOODS) {
+        if (player.y_coord > 95) {
+            new_map_id = MAP_ID_DOORS_OF_PHARROS;
+        } else if (player.z_coord < -336 || (player.x_coord > -253 && player.z_coord < -193)) {
+            new_map_id = MAP_ID_DRANGLEIC_CASTLE;
+        }
+    } else if (new_map_id == MAP_ID_DOORS_OF_PHARROS) {
+        if (player.y_coord < 95) {
+            new_map_id = MAP_ID_SHADED_WOODS;
+        } else if (player.y_coord > 132) {
+            new_map_id = MAP_ID_BRIGHTSTONE_COVE_TSELDORA;
+        }
+    } else if (new_map_id == MAP_ID_GRAVE_OF_SAINTS) {
+        if (player.x_coord < -60 && player.y_coord < -29 && player.y_coord > -38) {
+            return; // Leave as Grave of Saints.
+        } else if (player.y_coord < -120.5) {
+            new_map_id = MAP_ID_THE_GUTTER;
+        } else {
+            new_map_id = MAP_ID_MAJULA;
+        }
+    } else if (new_map_id == MAP_ID_SHRINE_OF_AMANA) {
+        if (player.y_coord < -70) {
+            new_map_id = MAP_ID_UNDEAD_CRYPT;
+        }
+    } else if (new_map_id == MAP_ID_UNDEAD_CRYPT) {
+        if (player.y_coord > -70) {
+            new_map_id = MAP_ID_SHRINE_OF_AMANA;
+        }
+    }
+    // TODO: add player position based refinement for DLC sub-areas:
+    //   m50_35_00_00 Shulva
+    //   m50_36_00_00 Brume Tower
+    //   m50_37_00_00 Eleum Loyce
+
+    // Note: No refinement required for the following Map IDs:
+    //   m10_15_00_00 Aldia's Keep
+    //   m10_19_00_00 Iron Keep
+    //   m10_27_00_00 Dragon Aerie
+    //   m10_30_00_00 Unseen Path to Heide's
+    //   m20_10_00_00 Memories of the Giants
+    //   m20_21_00_00 Drangleic Castle
+    //   m20_26_00_00 Dragon Memories
+    //   m40_03_00_00 Chaos of the Abyss
+    //   m50_38_00_00 Memory of the King
+}
+
+void handle_current_map_id()
+{
+    if (libds2_get_player_state() != DS2_GAMESTATE_INGAME) return;
+
+    // Verify memory address points to a Map ID. This location can contain garbage data.
+    uintptr_t base_address = (uintptr_t)GetModuleHandle(0);
+    char* game_map_id = (char*)base_address + DS2_LOCATION_MAP_ID;
+    // Note: didn't use regex to avoid adding an import, Map ID pattern is "m\d0_\d\d_00_00".
+    if (game_map_id[0] != 'm' ||
+        game_map_id[2] != '0' ||
+        game_map_id[3] != '_' ||
+        game_map_id[6] != '_' ||
+        game_map_id[7] != '0' ||
+        game_map_id[8] != '0' ||
+        game_map_id[9] != '_' ||
+        game_map_id[10] != '0' ||
+        game_map_id[11] != '0') {
+            return;
+        }
+
+    // Refine the Map ID using player coordinates to improve accuracy and fix map tab stuttering at boundaries.
+    std::string new_map_id(game_map_id, MAX_MAP_ID_SIZE - 1);
+    refine_map_id(new_map_id);
+
+    bool is_map_id_changed = false;
+    for (int i = 0; i < MAX_MAP_ID_SIZE - 1; ++i) {
+        if (state.map_id[i] != new_map_id[i]) {
+            is_map_id_changed = true;
+            state.map_id[i] = new_map_id[i];
+        }
+    }
+
+    if (is_map_id_changed) send_map_id_changed();
+}
+
 int patch_memory(void* address, void* patch, size_t size)
 {
     DWORD old_protect = 0;
@@ -1555,6 +1765,7 @@ DWORD WINAPI run(LPVOID)
         if (state.ap->get_state() == APClient::State::SLOT_CONNECTED) {
             handle_check_locations();
             handle_give_items();
+            handle_current_map_id();
 
             if (state.goaled) {
                 state.ap->StatusUpdate(APClient::ClientStatus::GOAL);
