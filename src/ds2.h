@@ -469,6 +469,8 @@ DS2GameManagerImp* ds2_game_manager_imp = 0;
 
 #define DS2_FUNCTION_SAVE_GAME                    DS2_OFFSET(0x2E78C0, 0x31B3F0)
 
+#define DS2_LOCATION_MAP_ID                       DS2_OFFSET(0x16AAE50, 0x11B79E8)
+
 /* =========================================================
    Pointer Chains
    ========================================================= */
@@ -544,6 +546,14 @@ static uintptr_t ring_param_chain[] = {
     0x0
 };
 uintptr_t DS2_PARAM_RING_PARAM = 0;
+
+static uintptr_t player_position_chain[] = {
+    DS2_SINGLETON_GameManagerImp,
+    DS2_OFFSET(0xD0, 0x74),
+    DS2_OFFSET(0xF8, 0xB4),
+    DS2_OFFSET(0xF0, 0xA8),
+    0x20
+};
 
 /* =========================================================
    Function Typedefs
