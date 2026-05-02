@@ -1303,7 +1303,7 @@ void send_map_id_changed()
         {"type", "MapUpdate"},
         {"mapId", state.map_id},
     };
-    bool success = state.ap->Bounce(data, {state.ap->get_game()}, {state.ap->get_player_number()}, {});
+    bool success = state.ap->Bounce(data, {}, {state.ap->get_player_number()}, {});
     if (!success) {
         DEBUG_PRINT("FAILED sending MapUpdate bounce packet for map_id: %s", state.map_id);
     }
