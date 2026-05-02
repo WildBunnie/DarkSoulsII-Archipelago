@@ -1261,9 +1261,9 @@ constexpr std::string_view MAP_ID_FOREST_OF_FALLEN_GIANTS = "m10_10_00_00";
 constexpr std::string_view MAP_ID_BRIGHTSTONE_COVE_TSELDORA = "m10_14_00_00";
 constexpr std::string_view MAP_ID_ALDIAS_KEEP = "m10_15_00_00";
 constexpr std::string_view MAP_ID_LOST_BASTILLE = "m10_16_00_00";
-constexpr std::string_view MAP_ID_SINNERS_RISE = "m10_16_00_01"; // Artificial Map ID created by setting last digit to '1'.
+constexpr std::string_view MAP_ID_SINNERS_RISE = "m10_16_00_01"; // Artificial Map ID.
 constexpr std::string_view MAP_ID_EARTHEN_PEAK = "m10_17_00_00";
-constexpr std::string_view MAP_ID_HARVEST_VALLEY = "m10_17_00_01"; // Artificial Map ID created by setting last digit to '1'.
+constexpr std::string_view MAP_ID_HARVEST_VALLEY = "m10_17_00_01"; // Artificial Map ID.
 constexpr std::string_view MAP_ID_NOMANS_WHARF = "m10_18_00_00";
 constexpr std::string_view MAP_ID_IRON_KEEP = "m10_19_00_00";
 constexpr std::string_view MAP_ID_HUNTSMANS_COPSE = "m10_23_00_00";
@@ -1282,8 +1282,15 @@ constexpr std::string_view MAP_ID_UNDEAD_CRYPT = "m20_24_00_00";
 constexpr std::string_view MAP_ID_DRAGON_MEMORIES = "m20_26_00_00";
 constexpr std::string_view MAP_ID_CHAOS_OF_THE_ABYSS = "m40_03_00_00";
 constexpr std::string_view MAP_ID_SHULVA = "m50_35_00_00";
+constexpr std::string_view MAP_ID_DRAGONS_SANCTUM = "m50_35_00_01"; // Artificial Map ID.
+constexpr std::string_view MAP_ID_DRAGONS_REST = "m50_35_00_02"; // Artificial Map ID.
+constexpr std::string_view MAP_ID_CAVE_OF_THE_DEAD = "m50_35_00_03"; // Artificial Map ID.
 constexpr std::string_view MAP_ID_BRUME_TOWER = "m50_36_00_00";
+constexpr std::string_view MAP_ID_IRON_PASSAGE = "m50_36_00_01"; // Artificial Map ID.
+constexpr std::string_view MAP_ID_MEMORY_OF_OLD_IRON_KING = "m50_36_00_02"; // Artificial Map ID.
 constexpr std::string_view MAP_ID_ELEUM_LOYCE = "m50_37_00_00";
+constexpr std::string_view MAP_ID_GRAND_CATHEDRAL = "m50_37_00_01"; // Artificial Map ID.
+constexpr std::string_view MAP_ID_FRIGID_OUTSKIRTS = "m50_37_00_02"; // Artificial Map ID.
 constexpr std::string_view MAP_ID_MEMORY_OF_THE_KING = "m50_38_00_00";
 
 void send_map_id_changed()
@@ -1402,11 +1409,43 @@ void refine_map_id(std::string& new_map_id)
         if (player.y_coord > -70) {
             new_map_id = MAP_ID_SHRINE_OF_AMANA;
         }
+    } else if (new_map_id == MAP_ID_SHULVA) {
+        if (player.y_coord < -69.3) {
+            new_map_id = MAP_ID_DRAGONS_REST;
+        } else if (player.y_coord < -5 || (player.x_coord < -10 && player.z_coord < -6)) {
+            new_map_id = MAP_ID_DRAGONS_SANCTUM;
+        } else if (player.x_coord < 9 && player.z_coord > 36.1) {
+            if (player.x_coord > -1.1 && player.y_coord > 25.8) {
+                // Pagan tree area, leave as Shulva.
+                return;
+            } else {
+                new_map_id = MAP_ID_CAVE_OF_THE_DEAD;
+            }
+        } else if (player.x_coord < -18 && player.y_coord < 25 && player.y_coord > 16.4) {
+            // Middle of elevator by Priestess' Chamber bonfire.
+            new_map_id = MAP_ID_CAVE_OF_THE_DEAD;
+        }
+    } else if (new_map_id == MAP_ID_BRUME_TOWER) {
+        if (player.x_coord < -155 && player.y_coord < -0.5 && player.y_coord > -27 && player.z_coord > 420) {
+            new_map_id = MAP_ID_IRON_PASSAGE;
+        } else if (player.z_coord > 585) {
+            new_map_id = MAP_ID_MEMORY_OF_OLD_IRON_KING;
+        } else if (player.z_coord > 465) {
+            if (player.y_coord < 65 && player.y_coord > 25) {
+                // Cursed side tower with Maldron the Assassin, leave as Brume Tower.
+                return;
+            } else if (player.y_coord < 71.4) {
+                // Beginning of memory before first dropdown.
+                new_map_id = MAP_ID_MEMORY_OF_OLD_IRON_KING;
+            }
+        }
+    } else if (new_map_id == MAP_ID_ELEUM_LOYCE) {
+        if (player.z_coord > 5) {
+            new_map_id = MAP_ID_FRIGID_OUTSKIRTS;
+        } else if (player.x_coord > 76 && player.z_coord > -80) {
+            new_map_id = MAP_ID_GRAND_CATHEDRAL;
+        }
     }
-    // TODO: add player position based refinement for DLC sub-areas:
-    //   m50_35_00_00 Shulva
-    //   m50_36_00_00 Brume Tower
-    //   m50_37_00_00 Eleum Loyce
 
     // Note: No refinement required for the following Map IDs:
     //   m10_15_00_00 Aldia's Keep
