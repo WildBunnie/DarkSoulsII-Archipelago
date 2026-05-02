@@ -1446,17 +1446,6 @@ void refine_map_id(std::string& new_map_id)
             new_map_id = MAP_ID_GRAND_CATHEDRAL;
         }
     }
-
-    // Note: No refinement required for the following Map IDs:
-    //   m10_15_00_00 Aldia's Keep
-    //   m10_19_00_00 Iron Keep
-    //   m10_27_00_00 Dragon Aerie
-    //   m10_30_00_00 Unseen Path to Heide's
-    //   m20_10_00_00 Memories of the Giants
-    //   m20_21_00_00 Drangleic Castle
-    //   m20_26_00_00 Dragon Memories
-    //   m40_03_00_00 Chaos of the Abyss
-    //   m50_38_00_00 Memory of the King
 }
 
 void handle_current_map_id()
